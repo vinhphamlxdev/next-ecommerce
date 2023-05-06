@@ -1,0 +1,4 @@
+export const IMG_SRC = {
+  logo: require("../assets/logo.png"),
+  product: require("../assets/productimg.jpg"),
+};
