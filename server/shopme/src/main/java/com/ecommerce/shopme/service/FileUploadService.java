@@ -4,27 +4,45 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.UUID;
-
-import org.apache.commons.io.FilenameUtils;
+import java.nio.file.StandardCopyOption;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ecommerce.shopme.exception.FileStorageException;
+
+import org.springframework.util.StringUtils;
+
 @Service
 public class FileUploadService {
-    private final String uploadDir = "D:/uploads";
 
-    public  String saveImage(MultipartFile imageFile) throws IOException {
-        if (imageFile != null && !imageFile.isEmpty()) {
-            String imageName = generateFileName(imageFile.getOriginalFilename());
-            Path imagePath = Paths.get(uploadDir + imageName);
-            Files.copy(imageFile.getInputStream(), imagePath);
-            return imagePath.toString();
-        }
-        return null;
-    }
+  @Value("${file.upload-dir}")
+  private String uploadDir;
 
-    private String generateFileName(String fileName) {
-        return UUID.randomUUID().toString() + "_" + fileName;
+  public String saveFile(MultipartFile file) {
+    try {
+      // Lấy tên tệp
+      String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+      // Tạo đường dẫn đầy đủ đến thư mục lưu trữ
+      Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+
+      // Tạo thư mục lưu trữ nếu nó chưa tồn tại
+      if (!Files.exists(uploadPath)) {
+        Files.createDirectories(uploadPath);
+      }
+
+      // Tạo đường dẫn đầy đủ đến tệp ảnh
+      Path filePath = uploadPath.resolve(fileName).normalize();
+
+      // Lưu tệp ảnh vào thư mục lưu trữ
+      Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+      // Trả về đường dẫn đầy đủ đến tệp ảnh
+      return filePath.toString();
+
+    } catch (IOException ex) {
+      throw new FileStorageException("Could not store file " + file.getOriginalFilename() + ". Please try again!", ex);
     }
+  }
 }
