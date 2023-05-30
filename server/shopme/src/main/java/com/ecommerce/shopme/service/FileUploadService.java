@@ -16,33 +16,33 @@ import org.springframework.util.StringUtils;
 @Service
 public class FileUploadService {
 
-  @Value("${file.upload-dir}")
-  private String uploadDir;
+  // @Value("${file.upload-dir}")
+  // private String uploadDir;
 
-  public String saveFile(MultipartFile file) {
-    try {
-      // Lấy tên tệp
-      String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+  // public String saveFile(MultipartFile file) {
+  //   try {
+  //     // Lấy tên tệp
+  //     String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 
-      // Tạo đường dẫn đầy đủ đến thư mục lưu trữ
-      Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+  //     // Tạo đường dẫn đầy đủ đến thư mục lưu trữ
+  //     Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
 
-      // Tạo thư mục lưu trữ nếu nó chưa tồn tại
-      if (!Files.exists(uploadPath)) {
-        Files.createDirectories(uploadPath);
-      }
+  //     // Tạo thư mục lưu trữ nếu nó chưa tồn tại
+  //     if (!Files.exists(uploadPath)) {
+  //       Files.createDirectories(uploadPath);
+  //     }
 
-      // Tạo đường dẫn đầy đủ đến tệp ảnh
-      Path filePath = uploadPath.resolve(fileName).normalize();
+  //     // Tạo đường dẫn đầy đủ đến tệp ảnh
+  //     Path filePath = uploadPath.resolve(fileName).normalize();
 
-      // Lưu tệp ảnh vào thư mục lưu trữ
-      Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+  //     // Lưu tệp ảnh vào thư mục lưu trữ
+  //     Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-      // Trả về đường dẫn đầy đủ đến tệp ảnh
-      return filePath.toString();
+  //     // Trả về đường dẫn đầy đủ đến tệp ảnh
+  //     return filePath.toString();
 
-    } catch (IOException ex) {
-      throw new FileStorageException("Could not store file " + file.getOriginalFilename() + ". Please try again!", ex);
-    }
-  }
+  //   } catch (IOException ex) {
+  //     throw new FileStorageException("Could not store file " + file.getOriginalFilename() + ". Please try again!", ex);
+  //   }
+  // }
 }

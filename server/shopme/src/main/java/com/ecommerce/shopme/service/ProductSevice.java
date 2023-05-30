@@ -11,7 +11,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.ecommerce.shopme.DTO.ProductDTO;
+import com.ecommerce.shopme.DTO.ProductDetail;
 import com.ecommerce.shopme.Entity.Product;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
 import com.ecommerce.shopme.repository.ProductRepository;
@@ -24,6 +24,7 @@ public class ProductSevice {
     private ProductRepository productRepository;
     
     public Page<Product> listAll(Pageable pageable) {
+      
         if (pageable.isPaged()) {
             return productRepository.findAll(pageable);
         } else {
@@ -32,15 +33,21 @@ public class ProductSevice {
         }
     }
     //get product by id
-    public Product getProductById(int id) {
+    public Product getProductById(Integer id) {
         return productRepository.findById(id);
     }
+    //save product
     public Product saveProduct(Product product){
        return productRepository.save(product);
     }
-   public void deleteProduct(Integer id){
+    //delete product by id
+   public void deleteProductById(Integer id){
     productRepository.deleteById(id);
    }
+//kiem tra ton tai
+public boolean existsProductById(Integer id){
+    return productRepository.existsById(id);
+}
 
     
 }

@@ -21,8 +21,8 @@ public Page<Category> listAllCategory(Pageable pageable) {
     if (pageable.isPaged()) {
         return categoryRepository.findAll(pageable);
     } else {
-        List<Category> allCategorys = categoryRepository.findAll(Pageable.unpaged()).getContent();
-        return new PageImpl<>(allCategorys);
+        List<Category> allCategory = categoryRepository.findAll(Pageable.unpaged()).getContent();
+        return new PageImpl<>(allCategory);
     }
 }
 //get Category by id
@@ -35,5 +35,10 @@ public Category saveCategory(Category category){
 public void deleteCategory(Integer id){
 categoryRepository.deleteById(id);
 }
+//kiem tra ton tai
+public boolean existsCategoryById(Integer id){
+    return categoryRepository.existsById(id);
+}
+
 
 }

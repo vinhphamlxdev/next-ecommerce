@@ -21,8 +21,8 @@ public class OrderService {
     if (pageable.isPaged()) {
         return orderRepository.findAll(pageable);
     } else {
-        List<Order> allProducts = orderRepository.findAll(Pageable.unpaged()).getContent();
-        return new PageImpl<>(allProducts);
+        List<Order> allOrders = orderRepository.findAll(Pageable.unpaged()).getContent();
+        return new PageImpl<>(allOrders);
     }
    }
 //create order

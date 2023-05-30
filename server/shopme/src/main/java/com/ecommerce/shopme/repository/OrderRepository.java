@@ -10,5 +10,5 @@ import com.ecommerce.shopme.Entity.Order;
 public interface OrderRepository extends PagingAndSortingRepository<Order,Integer> {
     Order save(Order order);
     Order  findById(Integer id);
-    Order deleteById(Integer id);
+    void deleteById(Integer id);
 }

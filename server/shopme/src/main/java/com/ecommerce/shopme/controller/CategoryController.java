@@ -14,9 +14,17 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.ecommerce.shopme.DTO.CategoryDetail;
+import com.ecommerce.shopme.DTO.PageResponse;
 import com.ecommerce.shopme.Entity.Category;
 import com.ecommerce.shopme.service.CategoryService;
+import com.ecommerce.shopme.utils.CustomResponse;
+
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
 
 @RestController
 public class CategoryController {
@@ -24,47 +32,88 @@ public class CategoryController {
     private CategoryService categoryService;
         //GET
         @GetMapping("/categorys")
-        public ResponseEntity<Page<Category>> getAllCategory(@RequestParam(defaultValue = "0") int pageNum,
-        @RequestParam(defaultValue = "3") int pageSize){
-            Pageable pageable = PageRequest.of(pageNum, pageSize);
-            Page<Category> Categorys = categoryService.listAllCategory(pageable);
-            return ResponseEntity.ok(Categorys);
+        public ResponseEntity<?> getAllCategory(@RequestParam(defaultValue = "0") int pageNum,
+        @RequestParam(defaultValue = "2") int itemPerPage){
+            Pageable pageable = PageRequest.of(pageNum, itemPerPage);
+            Page<Category> categorys = categoryService.listAllCategory(pageable);
+        
+            // Tạo danh sách ProductResponse từ danh sách Product
+            List<CategoryDetail> categoryRes = categorys.stream()
+                .map(category -> {
+                    CategoryDetail categoryDetail = new CategoryDetail();
+                    categoryDetail.setId(category.getId());
+                    categoryDetail.setName(category.getName());
+                    categoryDetail.setDescription(category.getDescription());
+                    return categoryDetail;
+                })
+                .collect(Collectors.toList());
+                CustomResponse customResponse = new CustomResponse();
+                customResponse.setStatus("success");
+                customResponse.setCategorys(categoryRes);
+                customResponse.setPage(new PageResponse<>(categorys.getNumber(), categorys.getSize(), categorys.getTotalElements(),categorys.getTotalPages()));
+                return ResponseEntity.ok(customResponse);
+          
         }
         
         @GetMapping("/categorys/{id}")
-        public ResponseEntity<Category> getById(@PathVariable int id){
-            Category Category = categoryService.getCategoryById(id);
-            if (Category!=null) {
-                return ResponseEntity.ok(Category);
-            }else{
-                return ResponseEntity.notFound().build();
+        public ResponseEntity<?> getById(@PathVariable  Integer id){
+            try {
+                Category categoryExist = categoryService.getCategoryById(id);
+                if (categoryExist!=null) {
+                    CategoryDetail categoryDetail = new CategoryDetail(
+                        categoryExist.getId(), categoryExist.getName(),
+                         categoryExist.getSlug(), 
+                         categoryExist.getDescription());
+                        return ResponseEntity.ok(categoryDetail);
+                }
+                else {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong tim thay danh muc voi id" +id);
+                }
+              } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Da xay ra loi");
+              }
+        }
+        @PostMapping("/categorys")
+        public ResponseEntity<Category> addCategory(@RequestBody @Valid Category category) {
+            try {
+                Category createdCategory = categoryService.saveCategory(category);
+                return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
             }
         }
-        //POST
-        @PostMapping("/categorys")
-        public ResponseEntity<?> addCategory(@RequestBody Category category){
-            Category createCategory = categoryService.saveCategory(category);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createCategory);
-        }
+        
         //PUT
     @PutMapping("/categorys/{id}")
-    public ResponseEntity<Category> updateCategory(@PathVariable int id, @RequestBody Category updateCategory){
-        Category category = categoryService.getCategoryById(id);
-        if (category!=null) {
-            //update info Category
-            category.setName(updateCategory.getName());
-            category.setDescription(updateCategory.getDescription());
-            //save Category
-            categoryService.saveCategory(category);
-            return ResponseEntity.ok(category);
-        }else{
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<?> updateCategory(@PathVariable Integer id, @RequestBody Category updateCategory){
+        Category categoryExist = categoryService.getCategoryById(id);
+        if (categoryExist == null) {
+            String message = "Danh mục có ID " + id + " không tồn tại";
+            return ResponseEntity.ok(message);
         }
+        Category updatedCategory = categoryService.saveCategory(updateCategory);
+        return ResponseEntity.ok(updatedCategory);
     }
   //DELETE
   @DeleteMapping("/categorys/{id}")
-    public void deleteCategory(@PathVariable Integer id){
-        categoryService.deleteCategory(id);
+ public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id){
+    try {
+        // Kiểm tra xem sản phẩm có tồn tại không
+        if (!categoryService.existsCategoryById(id)) {
+             // Sản phẩm không tồn tại
+             String message = "Danh mục có ID " + id + " không tồn tại";
+             return ResponseEntity.ok(message);
+        }
+        
+            // Xóa sản phẩm
+            categoryService.deleteCategory(id);
+            return ResponseEntity.ok("Đã xóa danh mục thành công");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+ }
 
 }

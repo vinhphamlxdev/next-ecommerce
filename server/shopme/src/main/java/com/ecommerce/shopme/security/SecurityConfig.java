@@ -1,55 +1,50 @@
 package com.ecommerce.shopme.security;
-
-import org.springframework.context.annotation.*;
-import org.springframework.security.authentication.dao.*;
-import org.springframework.security.config.annotation.authentication.builders.*;
+import lombok.AllArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.*;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
-import com.ecommerce.shopme.User.UserDetailsServiceImpl;
-
-
+//bật thuộc tính jsr250Enabled để sử dụng chú thích @RolesAllowed trong mã API  để ủy quyền cấp phương thức
 @Configuration
-@EnableWebSecurity
-public class SecurityConfig {
+@AllArgsConstructor
+@EnableGlobalMethodSecurity(
+    prePostEnabled = false, securedEnabled = false, jsr250Enabled = true
+)
+public class SecurityConfig  {
+    private UserDetailsService userDetailsService;
     
-    // @Bean
-    // public UserDetailsService userDetailsService() {
-    //     return new UserDetailsServiceImpl();
-    // }
-     
+
+
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public static PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-     
-    // @Bean
-    // public DaoAuthenticationProvider authenticationProvider() {
-    //     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    //     authProvider.setUserDetailsService(userDetailsService());
-    //     authProvider.setPasswordEncoder(passwordEncoder());
-         
-    //     return authProvider;
-    // }
- 
-    // @Override
-    // protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    //     auth.authenticationProvider(authenticationProvider());
-    // }
- 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-            http.csrf().disable()
-            .authorizeHttpRequests()
-            .requestMatchers("/home")
-            .permitAll()
-            .and()
-            .formLogin();
-            return http.build();
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
+        http.csrf().disable()
+            .authorizeHttpRequests()
+            .requestMatchers("products", "products/*","categorys","categorys/*")
+            .permitAll()
+            .requestMatchers("/api/v1/management/**").hasAnyRole("ADMIN", "MANAGER")
+            .anyRequest()
+          .authenticated();
+              
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 }
+
+
