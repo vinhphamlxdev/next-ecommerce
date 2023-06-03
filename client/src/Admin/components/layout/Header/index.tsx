@@ -1,12 +1,12 @@
 import { IMG_SRC } from "@/common/constanst";
-import { RootState } from "@/store/store";
+import { useGlobalStore } from "@/store/globalStore";
 import Image from "next/image";
 import * as React from "react";
-import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 export interface HeaderProps {}
 
 export default function Header(props: HeaderProps) {
-  const { isSticky } = useSelector((state: RootState) => state.global);
+  const { isSticky } = useGlobalStore((state) => state);
   return (
     <header
       className={`admin-header fixed z-[200] top-0 right-0 w-[calc(100%-288px)] px-3  h-16  justify-between flex items-center ${

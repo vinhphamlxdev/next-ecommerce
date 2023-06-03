@@ -13,6 +13,7 @@ module.exports = {
       colors: {
         bgMenu: "#edede9",
         saveBg: "#8ac926",
+        activeBg: "#8ac926",
       },
     },
   },

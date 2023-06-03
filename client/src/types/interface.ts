@@ -1,7 +1,7 @@
-export interface Category {
-  id: string;
+export interface ICategory {
+  id: number;
   name: string;
   description: string;
-  enable: boolean;
-  slug: string;
+  enable?: boolean;
+  slug?: string;
 }

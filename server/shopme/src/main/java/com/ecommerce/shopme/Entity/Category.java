@@ -7,6 +7,8 @@ import java.util.Set;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.github.slugify.Slugify;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -43,5 +45,7 @@ public class Category {
     //orphanRemoval = true: để đảm bảo rằng khi một sản phẩm không còn được liên kết với bất kỳ danh mục nào, nó sẽ được xóa khỏi cơ sở dữ liệu
     @OneToMany(mappedBy = "category",cascade = CascadeType.ALL)
     private List<Product> products;
+   
+  
 
 }

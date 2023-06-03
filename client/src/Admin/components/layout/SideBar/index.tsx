@@ -8,7 +8,8 @@ import {
   AiOutlineUser,
   AiOutlineSetting,
 } from "react-icons/ai";
-
+import { BsDatabase, BsDatabaseAdd } from "react-icons/bs";
+import { BiCategoryAlt } from "react-icons/bi";
 interface SidebarProps {}
 const sidebarLink: {
   id: number;
@@ -24,82 +25,50 @@ const sidebarLink: {
     path: "/admin/home",
   },
   {
-    id: 100,
+    id: 2,
     title: "Category",
-    icon: <AiOutlineShoppingCart />,
+    icon: <BiCategoryAlt />,
     path: "/admin/category",
   },
 
   {
-    id: 2,
-    title: "Products",
-    icon: "",
-    path: "/admin/products",
-    children: [
-      {
-        id: 1,
-        title: "All Product",
-        path: "/admin/product",
-      },
-      {
-        id: 2,
-        title: "Add Product",
-        path: "/admin/add-product",
-      },
-      {
-        id: 3,
-        title: "Recently Product",
-        path: "/admin/recently-product",
-      },
-    ],
-  },
-  {
     id: 3,
-    title: "Orders",
-    icon: <AiOutlineShoppingCart />,
-    path: "/admin/order",
-    children: [
-      {
-        id: 1,
-        title: "All Order",
-        path: "/admin/all-order",
-      },
-      {
-        id: 2,
-        title: "Order Pending",
-        path: "/admin/pending-order",
-      },
-    ],
+    title: "Products",
+    icon: <BsDatabase />,
+    path: "/admin/products",
   },
   {
     id: 4,
-    title: "Users",
-    icon: <AiOutlineUser />,
-    path: "/admin/user",
-    children: [
-      {
-        id: 1,
-        title: "User Active",
-        path: "/admin/active-user",
-      },
-      {
-        id: 2,
-        title: "User Inactive",
-        path: "/admin/inactive-user",
-      },
-    ],
+    title: "Add product",
+    icon: <BsDatabaseAdd />,
+    path: "/admin/add-product",
   },
   {
     id: 5,
+    title: "Orders",
+    icon: <AiOutlineShoppingCart />,
+    path: "/admin/order",
+  },
+  {
+    id: 6,
+    title: "Users",
+    icon: <AiOutlineUser />,
+    path: "/admin/user",
+  },
+  {
+    id: 7,
     title: "Setting",
     icon: <AiOutlineSetting />,
-    path: "/admin/settings",
+    path: "/admin/setting",
   },
 ];
 
 export default function SideBar(props: SidebarProps) {
   const router = useRouter();
   const { pathname } = router;
+  const handleClickNavbarItem = (item: any, id: number) => {
+    console.log(item, id);
+  };
   return (
     <div className="w-72 p-3 admin-sidebar h-full bg-white">
       <div className="flex flex-col gap-y-4">
@@ -110,17 +79,19 @@ export default function SideBar(props: SidebarProps) {
         </div>
         <div className="sidebar-menu-list flex flex-col gap-y-3">
           {sidebarLink.map((link) => {
+            let Component = Link;
             return (
-              <Link
+              <Component
                 href={link.path}
                 key={link.id}
+                onClick={() => handleClickNavbarItem(link, link.id)}
                 className={`px-2 transition-all hover:bg-bgMenu  cursor-pointer rounded-md  py-4 flex items-center gap-x-3 ${
                   link.path === pathname ? "bg-bgMenu text-purple-500" : ""
                 } `}
               >
                 {link.icon}
                 <span className="font-normal">{link.title}</span>
-              </Link>
+              </Component>
             );
           })}
         </div>

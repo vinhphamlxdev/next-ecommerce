@@ -7,13 +7,13 @@ import * as Yup from "yup";
 import { useRouter } from "next/router";
 import { UseAddProduct } from "@/hooks/useAddProduct";
 import { formData } from "@/utils/formData";
-import { Category } from "@/types/interface";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import SelectImage from "@/Admin/components/SelectImage";
+import { ICategory } from "@/types/interface";
 export interface AddProductProps {}
 
 export default function AddProduct(props: AddProductProps) {
-  const [select, setSelect] = useState<Category[] | any>();
+  const [select, setSelect] = useState<ICategory[] | any>();
   const [imgs, setImgs] = useState<string[]>([]);
   const [file, setFile] = useState<File[]>([]);
   const router = useRouter();

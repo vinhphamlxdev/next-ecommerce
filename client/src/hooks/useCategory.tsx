@@ -1,9 +1,9 @@
-import { axioAuth } from "@/services/auth";
+import { axiosAuth } from "@/services/auth";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 export const GetCategory = async (page: any) => {
-  const data = axioAuth
+  const data = axiosAuth
     .get("categories", {
       params: {
         page: page || 1,
@@ -16,7 +16,7 @@ export const GetCategory = async (page: any) => {
 export const GetCategorySimple = (page: any) => {
   const [data, setData] = useState(null);
   useEffect(() => {
-    axioAuth
+    axiosAuth
       .get("categories", {
         params: {
           page: page || 1,
@@ -29,7 +29,7 @@ export const GetCategorySimple = (page: any) => {
 };
 
 export const UseAddCategory = async (values: any) => {
-  await axioAuth
+  await axiosAuth
     .post("categories", values)
     .then((res: any) => {
       toast("Thêm danh mục thành công!", {
@@ -52,18 +52,18 @@ export const UseAddCategory = async (values: any) => {
 };
 
 export const UseEditCategory = async (values: any, id: string) => {
-  await toast.promise(axioAuth.put(`categories/${id}`, values), {
+  await toast.promise(axiosAuth.put(`categories/${id}`, values), {
     pending: "Loading....",
-    success: "Edit category success! 👌",
-    error: "Edit category fail!  🤯",
+    success: "Edit danh mục thành công! 👌",
+    error: "Edit danh mục thất bại!  🤯",
   });
 };
 
 export const UseDeleteCategory = async (id: string) => {
-  await axioAuth
+  await axiosAuth
     .delete(`categories/${id}`)
     .then((res: any) => {
-      toast(" Delete category success!", {
+      toast("Xóa danh mục thành công!", {
         position: "top-right",
         autoClose: 5000,
         closeOnClick: true,

@@ -1,22 +1,19 @@
-import { setBgHeaderAdmin } from "@/store/features/globalSlice";
+import { useGlobalStore } from "@/store/globalStore";
 import * as React from "react";
-import { useDispatch } from "react-redux";
 
 export interface MainProps {
   children: React.ReactNode;
 }
 
 export default function Main(props: MainProps) {
+  const { setBgHeader } = useGlobalStore((state) => state);
   const layoutRef = React.useRef<HTMLDivElement>(null);
-  const dispatch = useDispatch();
   React.useEffect(() => {
     const layoutElm = layoutRef?.current;
     const handleScroll = (e: Event) => {
       const target = e.target as HTMLDivElement;
       const scrollValid = target.scrollTop;
-      scrollValid > 10
-        ? dispatch(setBgHeaderAdmin(true))
-        : dispatch(setBgHeaderAdmin(false));
+      setBgHeader(scrollValid > 10);
     };
     if (layoutElm) {
       layoutElm.addEventListener("scroll", handleScroll);

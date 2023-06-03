@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import com.ecommerce.shopme.utils.CustomResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
+@CrossOrigin(origins = "http://localhost:4000", maxAge = 3600)
 @RestController
 public class CategoryController {
     @Autowired
@@ -33,7 +35,7 @@ public class CategoryController {
         //GET
         @GetMapping("/categorys")
         public ResponseEntity<?> getAllCategory(@RequestParam(defaultValue = "0") int pageNum,
-        @RequestParam(defaultValue = "2") int itemPerPage){
+        @RequestParam(defaultValue = "4") int itemPerPage){
             Pageable pageable = PageRequest.of(pageNum, itemPerPage);
             Page<Category> categorys = categoryService.listAllCategory(pageable);
         
@@ -73,6 +75,7 @@ public class CategoryController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Da xay ra loi");
               }
         }
+       
         @PostMapping("/categorys")
         public ResponseEntity<Category> addCategory(@RequestBody @Valid Category category) {
             try {
@@ -92,8 +95,10 @@ public class CategoryController {
             String message = "Danh mục có ID " + id + " không tồn tại";
             return ResponseEntity.ok(message);
         }
-        Category updatedCategory = categoryService.saveCategory(updateCategory);
-        return ResponseEntity.ok(updatedCategory);
+            updateCategory.setId(id);
+            Category savedCategory = categoryService.saveCategory(updateCategory);
+            return ResponseEntity.ok(savedCategory);
+       
     }
   //DELETE
   @DeleteMapping("/categorys/{id}")

@@ -1,11 +1,14 @@
+import * as React from "react";
 import LayoutAdmin from "@/Admin/components/layout";
 import { IMG_SRC } from "@/common/constanst";
 import Image from "next/image";
-import * as React from "react";
-
+import userImg from "../../../../public/wall.jpg";
+import { useGlobalStore } from "@/store/globalStore";
 export interface OrdersProps {}
 
 export default function AllOrder(props: OrdersProps) {
+  const { isSticky, setBgHeader } = useGlobalStore((state) => state);
+  console.log(isSticky);
   return (
     <LayoutAdmin>
       <div className="p-3 flex flex-col gap-y-3 rounded-sm bg-white shadow-md">
@@ -74,21 +77,18 @@ export default function AllOrder(props: OrdersProps) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <div className="flex">
-                    <a
-                      href="/"
-                      className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer"
-                    >
+                    <button className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer">
                       👁️‍🗨️
-                    </a>
+                    </button>
                   </div>
                 </td>
               </tr>
               <tr className="bg-gray-700 mt-2">
                 <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                  <img
-                    src="https://orig00.deviantart.net/a16b/f/2015/098/0/f/goku_super_saiyan_by_jeffthesupersaiyan-d8oxtbw.jpg"
+                  <Image
+                    src={IMG_SRC.logo}
                     className="h-12 w-12 object-cover bg-white rounded-full border"
-                    alt="..."
+                    alt=""
                   />
                   <span className="ml-3 font-bold text-white ">Vinh pham</span>
                 </th>
@@ -110,12 +110,9 @@ export default function AllOrder(props: OrdersProps) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <div className="flex">
-                    <a
-                      href="/"
-                      className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer"
-                    >
+                    <button className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer">
                       👁️‍🗨️
-                    </a>
+                    </button>
                   </div>
                 </td>
               </tr>
