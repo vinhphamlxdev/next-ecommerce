@@ -19,22 +19,21 @@ public class ProductDetail {
     private boolean isDeleted;
     private Integer quantity;
     private String description;
-    private boolean inStock;
-    private Category category;
- 
-    
+    private Integer inStock;
+    private List<CategorySummaryDTO> categorys;
     public ProductDetail(Integer id, String name, float price, List<String> imageUrls, boolean isDeleted,
-             String description, boolean inStock, Category category) {
+            Integer quantity, String description, Integer inStock, List<CategorySummaryDTO> categorys) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.imageUrls = imageUrls;
         this.isDeleted = isDeleted;
+        this.quantity = quantity;
         this.description = description;
         this.inStock = inStock;
-        this.category = category;
+        this.categorys = categorys;
     }
-
+  
 
 
 }

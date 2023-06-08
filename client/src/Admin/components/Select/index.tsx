@@ -1,11 +1,11 @@
 import * as React from "react";
 import { GetCategorySimple as getCategory } from "../../../hooks/useCategory";
-import { Category } from "@/types/interface";
 import { GrFormClose } from "react-icons/gr";
+import { ICategory } from "@/types/interface";
 export interface SelectProps {
   label?: string;
-  select: Category[];
-  setSelect: React.Dispatch<React.SetStateAction<Category[]>>;
+  select: any;
+  setSelect: React.Dispatch<React.SetStateAction<any>>;
   id: string;
   error?: string;
 }
@@ -59,7 +59,6 @@ export default function Select({
   ];
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const values = JSON.parse(e.target.value);
-    console.log(values);
     const isExist = select.findIndex((value: any) => value.id === values.id);
     if (isExist !== -1) {
       return;
@@ -69,18 +68,18 @@ export default function Select({
     console.log(select);
   };
   const handleRemove = (id: string) => {
-    const newValues = select.filter((elm) => elm.id !== id);
+    const newValues = select.filter((elm: any) => elm.id !== id);
     console.log(newValues);
     setSelect(newValues);
   };
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-        {select?.map((item, index) => {
+        {select?.map((item: any, index: number) => {
           return (
             <div
               key={index}
-              className="text-white flex gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs"
+              className="text-white flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs"
             >
               <span>{item.name}</span>
               <i

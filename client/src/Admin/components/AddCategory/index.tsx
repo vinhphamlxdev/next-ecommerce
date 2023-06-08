@@ -9,7 +9,6 @@ import axios from "axios";
 import { ICategory } from "@/types/interface";
 import getMessage from "@/utils/getMessage";
 import { toast } from "react-toastify";
-import Loading from "../Loading";
 import Portal from "@/components/Portal";
 
 export interface AddCategoryProps {

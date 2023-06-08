@@ -69,7 +69,7 @@ export default function SelectImage(props: ISelectImageProps) {
           {images?.map((img, index) => {
             return (
               <div key={index} className="relative image-product">
-                <Image
+                <img
                   className="object-cover h-44 border border-gray-300"
                   src={img}
                   alt=""

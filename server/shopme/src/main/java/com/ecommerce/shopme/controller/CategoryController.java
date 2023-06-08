@@ -1,5 +1,6 @@
 package com.ecommerce.shopme.controller;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.ecommerce.shopme.DTO.CategoryDTO;
 import com.ecommerce.shopme.DTO.CategoryDetail;
 import com.ecommerce.shopme.DTO.PageResponse;
 import com.ecommerce.shopme.Entity.Category;
@@ -27,7 +29,7 @@ import com.ecommerce.shopme.utils.CustomResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
-@CrossOrigin(origins = "http://localhost:4000", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4000", maxAge = -1)
 @RestController
 public class CategoryController {
     @Autowired
@@ -46,10 +48,12 @@ public class CategoryController {
                     categoryDetail.setId(category.getId());
                     categoryDetail.setName(category.getName());
                     categoryDetail.setDescription(category.getDescription());
+                    categoryDetail.setSlug(category.getSlug());
                     return categoryDetail;
                 })
                 .collect(Collectors.toList());
                 CustomResponse customResponse = new CustomResponse();
+              
                 customResponse.setStatus("success");
                 customResponse.setCategorys(categoryRes);
                 customResponse.setPage(new PageResponse<>(categorys.getNumber(), categorys.getSize(), categorys.getTotalElements(),categorys.getTotalPages()));
@@ -58,28 +62,34 @@ public class CategoryController {
         }
         
         @GetMapping("/categorys/{id}")
-        public ResponseEntity<?> getById(@PathVariable  Integer id){
-            try {
-                Category categoryExist = categoryService.getCategoryById(id);
-                if (categoryExist!=null) {
-                    CategoryDetail categoryDetail = new CategoryDetail(
-                        categoryExist.getId(), categoryExist.getName(),
-                         categoryExist.getSlug(), 
-                         categoryExist.getDescription());
-                        return ResponseEntity.ok(categoryDetail);
-                }
-                else {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong tim thay danh muc voi id" +id);
-                }
-              } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Da xay ra loi");
-              }
+        public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id) {
+            Category categoryExist = categoryService.getCategoryById(id);
+            if (categoryExist != null) {
+                CategoryDTO categoryDTO = new CategoryDTO();
+                            categoryDTO.setId(categoryExist.getId());
+                            categoryDTO.setName(categoryExist.getName());
+                            categoryDTO.setDescription(categoryExist.getDescription());
+                            categoryDTO.setSlug(categoryExist.getSlug());
+                Map<String, Object> response = new HashMap<>();
+                response.put("status", "success");
+                response.put("category", categoryDTO);
+    
+                return ResponseEntity.ok(response);
+            } else {
+                Map<String, Object> response = new HashMap<>();
+                CategoryDTO categoryDTO = new CategoryDTO();
+                response.put("status", "error");
+                response.put("category", categoryDTO);
+                return ResponseEntity.ok(response);
+
+            }
         }
        
         @PostMapping("/categorys")
         public ResponseEntity<Category> addCategory(@RequestBody @Valid Category category) {
             try {
                 Category createdCategory = categoryService.saveCategory(category);
+     
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -91,12 +101,15 @@ public class CategoryController {
     @PutMapping("/categorys/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Integer id, @RequestBody Category updateCategory){
         Category categoryExist = categoryService.getCategoryById(id);
+
         if (categoryExist == null) {
             String message = "Danh mục có ID " + id + " không tồn tại";
+        
             return ResponseEntity.ok(message);
         }
             updateCategory.setId(id);
             Category savedCategory = categoryService.saveCategory(updateCategory);
+       
             return ResponseEntity.ok(savedCategory);
        
     }

@@ -39,6 +39,11 @@ categoryRepository.deleteById(id);
 public boolean existsCategoryById(Integer id){
     return categoryRepository.existsById(id);
 }
+//get danh muc dua tren danh sach id
+public List<Category> getCategoriesByIds(List<Integer> categoryIds) {
+    return categoryRepository.findByIdIn(categoryIds);
+}
+
 
 
 }

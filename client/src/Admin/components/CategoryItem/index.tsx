@@ -1,3 +1,4 @@
+import axiosClient from "@/service/axiosClient";
 import getMessage from "@/utils/getMessage";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -29,30 +30,21 @@ export default function CategoryItem({
       name: category.name,
       description: category.description,
     },
-    validationSchema: Yup.object({
-      name: Yup.string()
-        .min(3, "Tên danh mục cần nhiều hơn 3 kí tự")
-        .max(30, "Tên danh mục tối đa 30 kí tự")
-        .required("Tên danh mục là bắt buộc"),
-      description: Yup.string()
-        .min(30, "Mô tả danh mục cần nhiều hơn 30 kí tự")
-        .required("Mô tả là bắt buộc"),
-    }),
+
     onSubmit: async (values) => {
-      console.log(values);
-      if (!values.name || !values.description) {
-        toast.error("Tên danh mục hoặc mô tả không được để trống");
-        return;
-      }
       let data = {
         name: values.name,
         description: values.description,
         slug: slugify(values.name),
       };
-      await axios.put(`http://localhost:8080/categorys/${id}`, data);
+      console.log(data);
+      try {
+        await axiosClient.put(`http://localhost:8080/${id}`, data);
+        toast.success("Cap nhat danh muc thanh cong");
+      } catch (error) {
+        console.log("co loi", error);
+      }
     },
-    validateOnBlur: false,
-    validateOnChange: false,
   });
   const [edit, setEdit] = React.useState<boolean>(false);
   const deleteCatgory = (id: number, name: string) => {
@@ -79,6 +71,7 @@ export default function CategoryItem({
         console.log(error);
       });
   };
+
   const isDisabled = React.useMemo(() => {
     return categoryFormik.isSubmitting;
   }, [categoryFormik.isSubmitting]);
@@ -108,45 +101,42 @@ export default function CategoryItem({
             <i className="bi text-red-500 text-xl cursor-pointer bi-trash"></i>
           </button>
         </div>
-        <form className="flex flex-col gap-y-5">
+        <form
+          onSubmit={categoryFormik.handleSubmit}
+          className="flex flex-col gap-y-5"
+        >
           <div className="category-name">
             <input
-              disabled={!edit}
               className="px-3 w-full text-gray-500 py-3 bg-[#edede9]"
-              value={categoryFormik.values.name}
-              type="text"
-              name="name"
+              disabled={!edit}
               id="name"
+              name="name"
+              type="text"
+              value={categoryFormik.values.name}
               onChange={categoryFormik.handleChange}
             />
           </div>
           <div className="category-desc">
             <textarea
               disabled={!edit}
-              value={categoryFormik.values.description}
-              className="bg-[#edede9] outline-none py-4 px-3 text-sm text-gray-600 w-full resize-y"
+              defaultValue={categoryFormik.values.description}
+              className="bg-[#edede9] font-normal outline-none py-4 px-3 text-base text-gray-600 w-full resize-y"
               name="description"
               id="description"
               onChange={categoryFormik.handleChange}
             ></textarea>
           </div>
-          <div className="btn-add-category flex justify-center items-center">
-            {edit && (
-              <button
-                disabled={isDisabled}
-                style={disabledStyle}
-                type="submit"
-                onClick={(e) => {
-                  setEdit(false);
-                  categoryFormik.handleSubmit();
-                }}
-                className="add-category   shadow-md  hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-1 flex justify-center items-center"
-              >
-                <BiSave></BiSave>
-                <span>Save</span>
-              </button>
-            )}
-          </div>
+          {edit && (
+            <button
+              // disabled={isDisabled}
+              // style={disabledStyle}
+              type="submit"
+              className="add-category   shadow-md  hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-1 flex justify-center items-center"
+            >
+              <BiSave></BiSave>
+              <span>Save</span>
+            </button>
+          )}
         </form>
       </div>
     </div>
