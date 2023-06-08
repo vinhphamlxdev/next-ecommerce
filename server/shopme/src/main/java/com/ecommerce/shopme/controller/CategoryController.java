@@ -23,7 +23,9 @@ import com.ecommerce.shopme.DTO.CategoryDTO;
 import com.ecommerce.shopme.DTO.CategoryDetail;
 import com.ecommerce.shopme.DTO.PageResponse;
 import com.ecommerce.shopme.Entity.Category;
+import com.ecommerce.shopme.Entity.Product;
 import com.ecommerce.shopme.service.CategoryService;
+import com.ecommerce.shopme.service.ProductSevice;
 import com.ecommerce.shopme.utils.CustomResponse;
 
 import jakarta.validation.Valid;
@@ -34,6 +36,8 @@ import jakarta.validation.constraints.Positive;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+    @Autowired 
+    ProductSevice productSevice;
         //GET
         @GetMapping("/categorys")
         public ResponseEntity<?> getAllCategory(@RequestParam(defaultValue = "0") int pageNum,
@@ -117,14 +121,19 @@ public class CategoryController {
   @DeleteMapping("/categorys/{id}")
  public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id){
     try {
-        // Kiểm tra xem sản phẩm có tồn tại không
-        if (!categoryService.existsCategoryById(id)) {
-             // Sản phẩm không tồn tại
-             String message = "Danh mục có ID " + id + " không tồn tại";
-             return ResponseEntity.ok(message);
+        // Kiểm tra xem danh muc có tồn tại không
+        Category existingCategory = categoryService.getCategoryById(id);
+
+        if (existingCategory==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
         }
-        
-            // Xóa sản phẩm
+        //lấy danh sách sản phẩm liên quan đến danh mục
+        List<Product> products = productSevice.getProductByCategoryId(id);
+        for (Product product : products) {
+            productSevice.deleteProductById(product.getId());
+            
+        }
+            // Xóa danh muc
             categoryService.deleteCategory(id);
             return ResponseEntity.ok("Đã xóa danh mục thành công");
 

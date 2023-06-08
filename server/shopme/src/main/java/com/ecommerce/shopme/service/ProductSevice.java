@@ -46,8 +46,17 @@ public class ProductSevice {
     }
     //delete product by id
    public void deleteProductById(Integer id){
-    productRepository.deleteById(id);
-   }
+    //lay san pham can xoa
+
+    Optional<Product> productOptional    =    productRepository.findById(id);
+    Product product = productOptional.orElse(null);
+  if (product!=null) {
+     // Xóa các ảnh liên quan
+     List<Image> images = product.getImages();
+        imageRepository.deleteAll(images);
+        productRepository.delete(product);
+  }
+}
 //kiem tra ton tai
 public boolean existsProductById(Integer id){
     return productRepository.existsById(id);
@@ -80,5 +89,8 @@ public void deleteImageByProductId(Integer productId){
     for (Image image : images) {
         imageRepository.delete(image);
     }
+}
+public List<Product> getProductByCategoryId(Integer id){
+    return productRepository.findByCategoryId(id);
 }
 }

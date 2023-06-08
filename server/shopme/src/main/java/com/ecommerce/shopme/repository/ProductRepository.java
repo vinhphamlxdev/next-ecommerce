@@ -20,6 +20,10 @@ public interface ProductRepository extends PagingAndSortingRepository<Product,In
     @Query("DELETE  from Product p WHERE p.id = :productId")
     void deleteById(Integer productId);
     boolean existsById(Integer id);
+   // Trong ProductRepository
+@Query("SELECT p FROM Product p JOIN p.categories c WHERE c.id = :categoryId")
+List<Product> findByCategoryId(@Param("categoryId") Integer categoryId);
+void delete(Product product);
 
 }
    
