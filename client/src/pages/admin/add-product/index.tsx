@@ -10,78 +10,87 @@ import { formData } from "@/utils/formData";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import SelectImage from "@/Admin/components/SelectImage";
 import { ICategory } from "@/types/interface";
+import { toast } from "react-toastify";
+import axios from "axios";
+import UseDisabled from "@/hooks/UseDisabled";
+import LoadingButton from "@/Admin/components/Loading/LoadingButton";
 export interface AddProductProps {}
 
 export default function AddProduct(props: AddProductProps) {
   const [select, setSelect] = useState<ICategory[] | any>();
-  const [imgs, setImgs] = useState<string[]>([]);
-  const [file, setFile] = useState<File[]>([]);
+  const [imgs, setImgs] = useState<any>([]);
+  const [files, setFile] = useState<File[]>([]);
+
   const router = useRouter();
+
   const productFormik = useFormik({
     initialValues: {
       name: "",
       description: "",
       price: "",
-      inStock: "",
-      selectOption: "",
-      images: [],
+      quantity: "",
     },
-    // validationSchema: Yup.object({
-    //   name: Yup.string()
-    //     .min(3, "Tên sản phẩm cần nhiều hơn 3 kí tự")
-    //     .max(100, "Tên sản phẩm tối đa 20 kí tự")
-    //     .required("Tên sản phẩm là bắt buộc"),
-    //   description: Yup.string()
-    //     .min(30, "Mô tả nên nhiều hơn 30 kí tự")
-    //     .required("Mô tả sản phẩm là bắt buộc"),
-    //   price: Yup.number()
-    //     .min(0, "Giá phải lơn hơn 0")
-    //     .required("Giá sản phẩm là bắt buộc"),
-    //   inStock: Yup.number()
-    //     .min(0, "Số lượng phải lớn hơn 0")
-    //     .required("Số lượng là bắt buộc"),
-    //   selectOption: Yup.string().required("vui lòng chọn danh mục sản phẩm!"),
-    //   images: Yup.array()
-    //     .min(1, "chọn ít nhất một ảnh")
-    //     .max(5, "Chọn tối đa 5 ảnh")
-    //     .test(
-    //       "is-file-format",
-    //       "Only JPG, PNG and GIF formats allowed",
-    //       (value: any) =>
-    //         value.every(
-    //           (image: File) =>
-    //             image.type === "image/jpeg" ||
-    //             image.type === "image/png" ||
-    //             image.type === "image/gif"
-    //         )
-    //     ),
-    // }),
+    validationSchema: Yup.object({
+      name: Yup.string()
+        .min(3, "Tên sản phẩm cần nhiều hơn 3 kí tự")
+        .max(100, "Tên sản phẩm tối đa 20 kí tự")
+        .required("Tên sản phẩm là bắt buộc"),
+      description: Yup.string()
+        .min(30, "Mô tả nên nhiều hơn 30 kí tự")
+        .required("Mô tả sản phẩm là bắt buộc"),
+      price: Yup.number()
+        .min(0, "Giá phải lơn hơn 0")
+        .required("Giá sản phẩm là bắt buộc"),
+      quantity: Yup.number()
+        .min(0, "Số lượng phải lớn hơn 0")
+        .required("Số lượng là bắt buộc"),
+    }),
 
     onSubmit: async (values) => {
-      const { name, price, description, inStock } = values;
+      if (!select || !select.length) {
+        toast.error("Vui lòng chọn danh mục");
+        return;
+      }
+      if (!imgs || !imgs.length) {
+        toast.error("Vui lòng chọn ảnh sản phẩm");
+        return;
+      }
+      const { name, price, description, quantity } = values;
+      const categoryIds = select.map((c: ICategory, index: number) => c.id);
       const newFormData = new FormData();
       newFormData.append("name", name);
       newFormData.append("description", description);
       newFormData.append("price", price);
-      values.images.forEach((img, index) => {
-        newFormData.append(`images[${index}]`, img);
-      });
-      // In ra dữ liệu trong FormData
-      for (let pair of newFormData.entries()) {
-        const [key, value] = pair;
-        if (key.startsWith("images")) {
-          console.log(key, value);
-        }
+      newFormData.append("quantity", quantity);
+      newFormData.append("categories", categoryIds);
+      for (let index = 0; index < files.length; index++) {
+        newFormData.append(`images[${index}]`, files[index]);
       }
-      // router.push("/admin/products");
+
+      const response = await axios.post(
+        `http://localhost:8080/products`,
+        newFormData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      if (response.status === 201) {
+        toast.success("Thêm sản phẩm thành công");
+      } else {
+        toast.error("Thêm sản phẩm thất bại");
+      }
+      console.log(response);
     },
     validateOnBlur: false,
     validateOnChange: false,
   });
+  const { isDisabled, disabledStyle } = UseDisabled(productFormik.isSubmitting);
   return (
     <LayoutAdmin>
       <div className="add-product-page  p-3 bg-white shadow-md rounded-md">
-        <h3 className="font-medium text-xl ">Add Category</h3>
+        <h3 className="font-medium text-xl">Add Product</h3>
         <form
           onSubmit={productFormik.handleSubmit}
           encType="multipart/form-data"
@@ -112,12 +121,12 @@ export default function AddProduct(props: AddProductProps) {
             error={productFormik.errors.price}
           />
           <Input
-            id="inStock"
-            data={productFormik.values.inStock}
+            id="quantity"
+            data={productFormik.values.quantity}
             setData={productFormik.handleChange}
             label="Quantity"
             placeholder="Please provide quantity product"
-            error={productFormik.errors.inStock}
+            error={productFormik.errors.quantity}
           />
 
           <Select
@@ -127,16 +136,18 @@ export default function AddProduct(props: AddProductProps) {
             setSelect={setSelect}
           />
           <SelectImage
-            file={file}
+            file={files}
             setFile={setFile}
             images={imgs}
             setImage={setImgs}
           />
           <button
+            disabled={isDisabled}
+            style={disabledStyle}
             type="submit"
             className="add-category hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center"
           >
-            <span>Add category</span>
+            {isDisabled ? <LoadingButton /> : <span>Add category</span>}
           </button>
         </form>
       </div>

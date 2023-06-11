@@ -25,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -55,7 +56,7 @@ import com.ecommerce.shopme.utils.ProductListResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
-
+@CrossOrigin(origins = "http://localhost:4000", maxAge = -1)
 @RestController
 @Validated
 public class ProductController {
@@ -158,7 +159,8 @@ public class ProductController {
     }
 
     @PostMapping("/products")
-    public ResponseEntity<?> addProduct(@ModelAttribute ProductDTO productRequest, @RequestParam("categories") List<Integer> categoryIds){
+    public ResponseEntity<?> addProduct(@ModelAttribute ProductDTO productRequest,
+     @RequestParam("categories") List<Integer> categoryIds){
         try {
             //lay danh muc tu co so du lieu
             List<Category> categorys = categoryService.getCategoriesByIds(categoryIds);
@@ -174,13 +176,13 @@ public class ProductController {
              // Gán danh sách danh mục cho sản phẩm
               product.setCategorys(categorys);
             
+              Product createdProduct = productService.saveProduct(product);
             // Lưu sản phẩm mới vào cơ sở dữ liệu
-            Product createdProduct = productService.saveProduct(product);
-             // Lưu các file ảnh vào thư mục trên server và cập nhật đường dẫn vào cơ sở dữ liệu
-             for (MultipartFile imageFile :productRequest.getImages()) {
+            // Lưu các file ảnh vào thư mục trên server và cập nhật đường dẫn vào cơ sở dữ liệu
+            for (MultipartFile imageFile :productRequest.getImages()) {
                 String  imageUrl = saveImageToFile(imageFile);
                 productService.addImageToProduct(createdProduct.getId(), imageUrl);
-             }
+            }
              return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
         } catch (Exception e) {
            e.printStackTrace();

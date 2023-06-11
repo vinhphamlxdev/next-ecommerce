@@ -25,16 +25,21 @@ export default function SelectImage(props: ISelectImageProps) {
     }
 
     let arr: any[] = [];
-    let fsArr: any[] = [];
+    let filesArr: any[] = [];
+    //check is an array key:[0,1,2...]
     check.forEach((val) => {
       const fileValid = event.target?.files[val];
       const reader = new FileReader();
+      // Hàm xử lý sự kiện `onload` sau khi file được load
       reader.onload = function (event) {
+        // Truy cập vào thuộc tính `result` để lấy được dữ liệu File dưới dạng `data URL
         arr = [...arr, event.target?.result];
-        fsArr = [...fsArr, fileValid];
+        filesArr = [...filesArr, fileValid];
       };
+      //when file loaded, we need to get array file and array image url, with array file to send to server,
+      // with arr img url to display
       reader.onloadend = function () {
-        setFile([...file, ...fsArr]);
+        setFile([...file, ...filesArr]);
         setImage([...images, ...arr]);
       };
       reader.readAsDataURL(fileValid);

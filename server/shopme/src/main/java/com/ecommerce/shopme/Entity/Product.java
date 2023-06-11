@@ -76,7 +76,6 @@ public class Product {
     @JoinTable(name = "product_category",
                joinColumns = @JoinColumn(name = "product_id"),
                inverseJoinColumns = @JoinColumn(name = "category_id"))
-    @NotNull(message = "Danh muc không được để trống")
     private List<Category> categories;
 
     public Integer getId() {

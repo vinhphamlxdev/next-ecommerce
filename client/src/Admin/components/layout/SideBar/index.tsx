@@ -66,9 +66,7 @@ const sidebarLink: {
 export default function SideBar(props: SidebarProps) {
   const router = useRouter();
   const { pathname } = router;
-  const handleClickNavbarItem = (item: any, id: number) => {
-    console.log(item, id);
-  };
+  const handleClickNavbarItem = (item: any, id: number) => {};
   return (
     <div className="w-72 p-3 admin-sidebar h-full bg-white">
       <div className="flex flex-col gap-y-4">

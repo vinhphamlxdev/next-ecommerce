@@ -12,7 +12,9 @@ import CategoryItem from "@/Admin/components/CategoryItem";
 import { useGlobalStore } from "@/store/globalStore";
 import { LoadingSkeleton } from "@/Admin/components/Loading";
 import Pagination from "@/Admin/components/Pagination";
-export interface CategoryProps {}
+export interface CategoryProps {
+  data: any;
+}
 
 export default function Category(props: CategoryProps) {
   const { setLoading, isLoading } = useGlobalStore((state) => state);
@@ -74,13 +76,22 @@ export default function Category(props: CategoryProps) {
             {isLoading && (
               <LoadingSkeleton columns={1} count={7} columnRow={3} />
             )}
-            <Pagination
+            {/* <Pagination
               onPageChange={handlePageChange}
               pagination={pagination}
-            />
+            /> */}
           </div>
         </div>
       </LayoutAdmin>
     </>
   );
 }
+// export async function getServerSideProps() {
+//   const response = await axios.get(`http://localhost:8080/categorys`);
+//   const data = response.data;
+//   return {
+//     props: {
+//       data: data,
+//     },
+//   };
+// }

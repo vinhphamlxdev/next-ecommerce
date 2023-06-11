@@ -10,6 +10,8 @@ import { ICategory } from "@/types/interface";
 import getMessage from "@/utils/getMessage";
 import { toast } from "react-toastify";
 import Portal from "@/components/Portal";
+import UseDisabled from "@/hooks/UseDisabled";
+import LoadingButton from "../Loading/LoadingButton";
 
 export interface AddCategoryProps {
   setRender: React.Dispatch<React.SetStateAction<boolean>>;
@@ -58,7 +60,6 @@ export default function AddCategory({
           `http://localhost:8080/categorys`,
           data
         );
-        setLoading(true);
         categoryFormik.resetForm();
         toast.success("Thêm danh mục thành công");
       } catch (error) {
@@ -67,28 +68,14 @@ export default function AddCategory({
       } finally {
         setRender((prevR) => !prevR);
       }
-
-      // await toast.promise(
-      //   axios.post(`https://localhost:8080/categorys`, data),
-      //   {
-      //     pending: "Promise is pending",
-      //     success: "Promise resolved 👌",
-      //     error: "Promise rejected 🤯",
-      //   }
-      // );
     },
     validateOnBlur: false,
     validateOnChange: false,
   });
-  const isDisabled = React.useMemo(() => {
-    return categoryFormik.isSubmitting;
-  }, [categoryFormik.isSubmitting]);
-  const disabledStyle = React.useMemo(() => {
-    return {
-      opacity: isDisabled ? "0.5" : "1",
-      cursor: isDisabled ? "not-allowed" : "pointer",
-    };
-  }, [isDisabled]);
+  const { disabledStyle, isDisabled } = UseDisabled(
+    categoryFormik.isSubmitting
+  );
+
   return (
     <>
       <div className="p-3  flex shadow-lg flex-col gap-y-4 bg-white rounded-lg">
@@ -102,7 +89,7 @@ export default function AddCategory({
             data={categoryFormik.values.name}
             setData={categoryFormik.handleChange}
             label="Name"
-            placeholder="Please provide name product"
+            placeholder="Please provide name category"
             error={categoryFormik.errors.name}
           />
           <Input
@@ -110,7 +97,7 @@ export default function AddCategory({
             data={categoryFormik.values.description}
             setData={categoryFormik.handleChange}
             label="Description"
-            placeholder="Please provide description product"
+            placeholder="Please provide description category"
             error={categoryFormik.errors.description}
           />
           <div className="btn-add-category flex justify-center items-center">
@@ -118,10 +105,16 @@ export default function AddCategory({
               disabled={isDisabled}
               style={disabledStyle}
               type="submit"
-              className={`add-category select-none hover:opacity-80 transition-all bg-purple-600 px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center `}
+              className={`add-category w-36 flex-shrink-0 h-11 select-none hover:opacity-80 transition-all bg-purple-600 px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center `}
             >
-              <i className="bi text-lg bi-cart-plus"></i>
-              <span>Add category</span>
+              {isDisabled ? (
+                <LoadingButton />
+              ) : (
+                <>
+                  <i className="bi text-lg bi-cart-plus"></i>
+                  <span>Add category</span>
+                </>
+              )}
             </button>
           </div>
         </form>

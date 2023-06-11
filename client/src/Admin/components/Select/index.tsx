@@ -2,6 +2,7 @@ import * as React from "react";
 import { GetCategorySimple as getCategory } from "../../../hooks/useCategory";
 import { GrFormClose } from "react-icons/gr";
 import { ICategory } from "@/types/interface";
+import axios from "axios";
 export interface SelectProps {
   label?: string;
   select: any;
@@ -18,45 +19,18 @@ export default function Select({
   error,
 }: SelectProps) {
   const [key, setKey] = React.useState(1);
-  // const categorys = getCategory();
-  const categorys = [
-    {
-      id: "0",
-      name: "Áo thun",
-      description: "Ở đây, hàm useState trả về một mảng gồm hai phần tử:",
-      enable: false,
-      slug: "Ở đây, hàm useState trả về một",
-    },
+  const [data, setData] = React.useState<ICategory[]>([]);
+  React.useEffect(() => {
+    async function fetchCategorys() {
+      const res = await axios.get(`http://localhost:8080/categorys?pageNum=0`);
+      if (res && res.data) {
+        console.log(res.data);
+        setData(res.data.categorys);
+      }
+    }
+    fetchCategorys();
+  }, []);
 
-    {
-      id: "1",
-      name: "Áo sơ mi",
-      description: "Ở đây, hàm useState trả về một mảng gồm hai phần tử:",
-      enable: false,
-      slug: "Ở đây, hàm useState trả về một",
-    },
-    {
-      id: "2",
-      name: "Quần kaki",
-      description: "Ở đây, hàm useState trả về một mảng gồm hai phần tử:",
-      enable: false,
-      slug: "Ở đây, hàm useState trả về một",
-    },
-    {
-      id: "3",
-      name: "Áo Polo",
-      description: "Ở đây, hàm useState trả về một mảng gồm hai phần tử:",
-      enable: false,
-      slug: "Ở đây, hàm useState trả về một",
-    },
-    {
-      id: "4",
-      name: "Hoodie",
-      description: "Ở đây, hàm useState trả về một mảng gồm hai phần tử:",
-      enable: false,
-      slug: "Ở đây, hàm useState trả về một",
-    },
-  ];
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const values = JSON.parse(e.target.value);
     const isExist = select.findIndex((value: any) => value.id === values.id);
@@ -69,9 +43,9 @@ export default function Select({
   };
   const handleRemove = (id: string) => {
     const newValues = select.filter((elm: any) => elm.id !== id);
-    console.log(newValues);
     setSelect(newValues);
   };
+
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
@@ -102,9 +76,9 @@ export default function Select({
           className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none"
         >
           <option value={-1}>---Choose Category---</option>
-          {categorys.map((value, index) => {
+          {data.map((value, index) => {
             return (
-              <option key={index} value={JSON.stringify(value)}>
+              <option key={value.id} value={JSON.stringify(value)}>
                 {value.name}
               </option>
             );

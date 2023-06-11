@@ -4,24 +4,25 @@ import { toast } from "react-toastify";
 export default function validateImage(
   event: React.ChangeEvent<HTMLInputElement> | any
 ) {
+  //data is an array key of file
   const data = Object.keys(event.target.files);
   if (window.File && window.FileReader && window.FileList && window.Blob) {
     const check = data.every((val) =>
       /(\.|\/)(gif|jpe?g|png)$/i.test(event.target.files[val].type)
     );
     if (!check) {
-      toast.error("File invalid. Please choose correct file!", {
+      toast.error("Vui lòng chọn ảnh định dạng png, gif hoặc jpeg!", {
         position: toast.POSITION.TOP_RIGHT,
-        theme: "dark",
+        theme: "light",
       });
-      return 0;
+      return false;
     }
   } else {
     toast.error("File invalid. Please choose correct file!", {
       position: toast.POSITION.TOP_RIGHT,
-      theme: "dark",
+      theme: "light",
     });
-    return 0;
+    return false;
   }
   return data;
 }
