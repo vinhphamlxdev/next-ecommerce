@@ -1,7 +1,16 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  images: {},
+  images: {
+    remotePatterns: [
+      // {
+      //   protocol: "https",
+      //   hostname: "assets.vercel.com",
+      //   port: "",
+      //   pathname: "/image/upload/**",
+      // },
+    ],
+  },
   compiler: {
     styledComponents: true,
   },

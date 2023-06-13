@@ -12,8 +12,9 @@ import CategoryItem from "@/Admin/components/CategoryItem";
 import { useGlobalStore } from "@/store/globalStore";
 import { LoadingSkeleton } from "@/Admin/components/Loading";
 import Pagination from "@/Admin/components/Pagination";
+import { ICategorysResponse, getAllCategorys } from "@/service/CategoryApi";
 export interface CategoryProps {
-  data: any;
+  data: ICategorysResponse;
 }
 
 export default function Category(props: CategoryProps) {
@@ -22,7 +23,8 @@ export default function Category(props: CategoryProps) {
     page: 1,
     itemPerpage: 4,
   });
-  const [data, setData] = React.useState<any>([]);
+  const [categorys, setCategorys] = React.useState<ICategory[]>([]);
+  console.log(categorys);
   const [render, setRender] = React.useState<boolean>(true);
   const handlePageChange = (newPage: number) => {
     console.log("New page", newPage);
@@ -31,12 +33,11 @@ export default function Category(props: CategoryProps) {
     setLoading(true);
     const fetchCategorys = async () => {
       try {
-        const res = await axios.get(
-          `http://localhost:8080/categorys?pageNum=0`
-        );
-        if (res?.data && res?.data?.categorys) {
-          setData(res.data.categorys);
-          const { page } = res?.data;
+        const data = await getAllCategorys();
+
+        if (data && data?.categorys) {
+          setCategorys(data.categorys);
+          const { page } = data;
           setLoading(false);
           setPagination({
             page: page.current,
@@ -49,27 +50,29 @@ export default function Category(props: CategoryProps) {
       }
     };
     fetchCategorys();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [render]);
 
   return (
     <>
       <LayoutAdmin>
         <div className="admin-category mt-5 flex flex-col gap-y-4">
-          <AddCategory categorys={data} setRender={setRender} />
+          <AddCategory categorys={categorys} setRender={setRender} />
           <div className="p-3 flex shadow-lg flex-col gap-y-4 bg-white rounded-lg">
             <h3 className="font-medium text-xl ">All Category</h3>
             {!isLoading &&
-              data &&
-              data.map((c: any, index: number) => {
+              categorys &&
+              categorys.map((c: any, index: number) => {
                 return (
                   <CategoryItem
-                    setData={setData}
-                    data={data}
+                    setData={setCategorys}
+                    data={categorys}
                     index={index}
                     category={c}
                     key={c.id}
-                    categorys={data}
+                    categorys={categorys}
                     id={c.id}
+                    setRender={setRender}
                   />
                 );
               })}
@@ -86,12 +89,3 @@ export default function Category(props: CategoryProps) {
     </>
   );
 }
-// export async function getServerSideProps() {
-//   const response = await axios.get(`http://localhost:8080/categorys`);
-//   const data = response.data;
-//   return {
-//     props: {
-//       data: data,
-//     },
-//   };
-// }

@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import Portal from "@/components/Portal";
 import UseDisabled from "@/hooks/UseDisabled";
 import LoadingButton from "../Loading/LoadingButton";
+import { createCategory } from "@/service/CategoryApi";
 
 export interface AddCategoryProps {
   setRender: React.Dispatch<React.SetStateAction<boolean>>;
@@ -41,7 +42,6 @@ export default function AddCategory({
       if (!values) {
         return;
       }
-      console.log(values);
       let data = {
         name: values.name,
         description: values.description,
@@ -56,10 +56,7 @@ export default function AddCategory({
         return;
       }
       try {
-        const response = await axios.post(
-          `http://localhost:8080/categorys`,
-          data
-        );
+        const response = await createCategory(data);
         categoryFormik.resetForm();
         toast.success("Thêm danh mục thành công");
       } catch (error) {

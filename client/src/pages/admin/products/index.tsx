@@ -7,11 +7,35 @@ import { IMG_SRC } from "@/common/constanst";
 import axios from "axios";
 import { IProduct } from "@/types/interface";
 import { GetServerSideProps } from "next";
-export interface ProductProps {
-  products: IProduct[];
-}
+import ImageComponent from "@/Admin/components/ImageComponent";
+import { useGlobalStore } from "@/store/globalStore";
+import { getAllProducts } from "@/service/ProductApi";
+import { LoadingSkeleton } from "@/Admin/components/Loading";
+import dynamic from "next/dynamic";
+export interface ProductProps {}
 
-export default function Products({ products }: ProductProps) {
+function Products(props: ProductProps) {
+  const { setLoading, isLoading } = useGlobalStore((state) => state);
+  const [products, setProducts] = React.useState<IProduct[]>([]);
+  React.useEffect(() => {
+    setLoading(true);
+    const fetchProducts = async () => {
+      try {
+        const data = await getAllProducts();
+
+        if (data && data?.products) {
+          setProducts(data.products);
+          const { page } = data;
+          setLoading(false);
+        }
+      } catch (error) {
+        console.log(error);
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <LayoutAdmin>
       <div className="admin-product p-3 bg-white shadow-md rounded-md">
@@ -49,20 +73,10 @@ export default function Products({ products }: ProductProps) {
               {products &&
                 products.length &&
                 products.map((product: IProduct, index: number) => {
-                  console.log(product?.imageUrls[0]);
                   return (
                     <tr key={product.id} className="bg-gray-700 mt-2">
                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                        <Image
-                          width={200}
-                          height={200}
-                          src={product.imageUrls[0]}
-                          className="h-12 w-12 opacity-0 bg-white rounded-full border"
-                          alt=""
-                          onLoadingComplete={(image) =>
-                            image.classList.remove("opacity-0")
-                          }
-                        />
+                        <ImageComponent path={product?.imageUrls[0]} />
                         <span className="ml-3 font-bold text-white">
                           {product.name}
                         </span>
@@ -98,26 +112,10 @@ export default function Products({ products }: ProductProps) {
                 })}
             </tbody>
           </table>
+          {isLoading && <LoadingSkeleton columnRow={4} height={16} count={6} />}
         </div>
       </div>
     </LayoutAdmin>
   );
 }
-export const getServerSideProps: GetServerSideProps<any> = async () => {
-  try {
-    const response = await axios.get(`http://localhost:8080/products`);
-    const data = response.data;
-    return {
-      props: {
-        products: data.products,
-      },
-    };
-  } catch (error) {
-    console.log("error:", error);
-    return {
-      props: {
-        products: [],
-      },
-    };
-  }
-};
+export default dynamic(() => Promise.resolve(Products), { ssr: false });

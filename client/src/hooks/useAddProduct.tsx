@@ -1,4 +1,4 @@
-import { axioAuth } from "@/services/auth";
+import { axioAuth } from "@/service/auth";
 import { toast } from "react-toastify";
 
 export const getProduct = (page: any) => {

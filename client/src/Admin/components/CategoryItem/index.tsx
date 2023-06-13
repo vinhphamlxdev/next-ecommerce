@@ -1,4 +1,7 @@
+import UseDisabled from "@/hooks/UseDisabled";
+import { deleteCategoryById, updateCategory } from "@/service/CategoryApi";
 import axiosClient from "@/service/axiosClient";
+import { ICategory } from "@/types/interface";
 import getMessage from "@/utils/getMessage";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -8,14 +11,16 @@ import { toast } from "react-toastify";
 import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
+import LoadingButton from "../Loading/LoadingButton";
 
 export interface ICategoryItemProps {
-  category: any;
+  category: ICategory;
   index: number;
-  setData: React.Dispatch<React.SetStateAction<any>>;
-  data: any;
-  categorys: any;
+  setData: React.Dispatch<React.SetStateAction<ICategory[]>>;
+  data: ICategory[];
+  categorys: ICategory[];
   id: number;
+  setRender: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export default function CategoryItem({
@@ -24,7 +29,10 @@ export default function CategoryItem({
   setData,
   categorys,
   id,
+  setRender,
 }: ICategoryItemProps) {
+  const [edit, setEdit] = React.useState<boolean>(false);
+
   const categoryFormik = useFormik({
     initialValues: {
       name: category.name,
@@ -32,24 +40,24 @@ export default function CategoryItem({
     },
 
     onSubmit: async (values) => {
-      let data = {
-        name: values.name,
-        description: values.description,
-        slug: slugify(values.name),
-      };
-      console.log(data);
       try {
-        await axiosClient.put(`http://localhost:8080/${id}`, data);
-        toast.success("Cap nhat danh muc thanh cong");
+        let data = {
+          name: values.name,
+          description: values.description,
+          slug: slugify(values.name),
+        };
+        await updateCategory(id, data);
+        toast.success("Cập nhật danh mục thành công");
+        setEdit(false);
       } catch (error) {
-        console.log("co loi", error);
+        console.log("co loi:", error);
+        setEdit(false);
       }
     },
   });
-  const [edit, setEdit] = React.useState<boolean>(false);
-  const deleteCatgory = (id: number, name: string) => {
+  const deleteCatgory = (id: number | unknown, name: string) => {
     Swal.fire({
-      text: `Bạn muốn xóa danh mục ${name}`,
+      text: `Bạn muốn xóa danh mục: ${name}`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#3085d6",
@@ -58,29 +66,22 @@ export default function CategoryItem({
     })
       .then(async (result) => {
         if (result.isConfirmed) {
-          const res = await axios.delete(
-            `http://localhost:8080/categorys/${id}`
-          );
-          console.log(res);
-          const newCategorys = categorys.filter((c: any) => c.id !== id);
-          setData(newCategorys);
+          const res = await deleteCategoryById(id);
           getMessage("Đã xóa danh mục thành công!", "success");
         }
       })
       .catch((error) => {
         console.log(error);
+      })
+      .finally(() => {
+        setRender((r) => !r);
+        setEdit(false);
       });
   };
 
-  const isDisabled = React.useMemo(() => {
-    return categoryFormik.isSubmitting;
-  }, [categoryFormik.isSubmitting]);
-  const disabledStyle = React.useMemo(() => {
-    return {
-      opacity: isDisabled ? "0.5" : "1",
-      cursor: isDisabled ? "not-allowed" : "pointer",
-    };
-  }, [isDisabled]);
+  const { disabledStyle, isDisabled } = UseDisabled(
+    categoryFormik.isSubmitting
+  );
   return (
     <div className="flex flex-col gap-y-3">
       <div className="flex flex-col all-category gap-y-5 bg-white px-3 py-2 shadow-md">
@@ -128,13 +129,19 @@ export default function CategoryItem({
           </div>
           {edit && (
             <button
-              // disabled={isDisabled}
-              // style={disabledStyle}
+              disabled={isDisabled}
+              style={disabledStyle}
               type="submit"
               className="add-category   shadow-md  hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-1 flex justify-center items-center"
             >
-              <BiSave></BiSave>
-              <span>Save</span>
+              {isDisabled ? (
+                <LoadingButton />
+              ) : (
+                <>
+                  <BiSave></BiSave>
+                  <span>Save</span>
+                </>
+              )}
             </button>
           )}
         </form>
