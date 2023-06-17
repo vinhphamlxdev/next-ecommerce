@@ -13,6 +13,7 @@ export interface IProduct {
   quantity: number;
   instock?: boolean;
   imageUrls: string[];
+  categorys: ICategory[];
 }
 export interface IOrder {
   id: number;

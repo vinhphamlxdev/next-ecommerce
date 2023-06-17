@@ -11,10 +11,21 @@ export interface ISelectImageProps {
   setFile: React.Dispatch<React.SetStateAction<File[]>>;
   setDeleteImg?: React.Dispatch<React.SetStateAction<string[]>>;
   deleteImg?: string[];
+  colums?: number;
+  columGap?: number;
 }
 
 export default function SelectImage(props: ISelectImageProps) {
-  const { images, setFile, setImage, file, setDeleteImg, deleteImg } = props;
+  const {
+    images,
+    setFile,
+    setImage,
+    file,
+    setDeleteImg,
+    deleteImg,
+    colums = 5,
+    columGap = 4,
+  } = props;
   const [key, setKey] = React.useState(1);
   const handleFileSelect = (
     event: React.ChangeEvent<HTMLInputElement> | any
@@ -70,10 +81,10 @@ export default function SelectImage(props: ISelectImageProps) {
   return (
     <div className="flex flex-col gap-y-3">
       {images && (
-        <div className="grid grid-cols-5 gap-y-3 gap-x-4">
+        <div className={`grid grid-cols-5 gap-y-3 gap-x-${columGap}`}>
           {images?.map((img, index) => {
             return (
-              <div key={index} className="relative image-product">
+              <div key={index} className="relative  w-full image-product">
                 <img
                   className="object-cover h-44 border border-gray-300"
                   src={img}

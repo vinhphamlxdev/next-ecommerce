@@ -2,16 +2,18 @@ import { IMG_SRC } from "@/common/constanst";
 import * as React from "react";
 import Image from "next/image";
 import ReactDOM from "react-dom";
+import { useGlobalStore } from "@/store/globalStore";
+import style from "@/styles/admin/loading.module.scss";
 export interface ILoadingSpinnerProps {}
 
 export default function LoadingSpinner(props: ILoadingSpinnerProps) {
+  const { isLoading, setLoading } = useGlobalStore();
   if (typeof document === "undefined")
     return <div className="modal-loading"></div>;
   return ReactDOM.createPortal(
-    <div className="relative flex z-50  items-center justify-center w-full h-screen bg-black ">
-      <div className="flex absolute   items-center  justify-center w-[300px] h-[300px] top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4">
-        <Image className="object-cover w-full " src={IMG_SRC.loading} alt="" />
-      </div>
+    <div className="flex w-full h-full inset-0 fixed z-[500]">
+      <div className="absolute inset-0 z-20 bg-black opacity-60 overlay "></div>
+      <div className={` inset-0 m-auto  z-[600] ${style.spinner}`}></div>
     </div>,
     document.querySelector("body") as HTMLElement
   );

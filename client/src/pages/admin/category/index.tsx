@@ -24,7 +24,6 @@ export default function Category(props: CategoryProps) {
     itemPerpage: 4,
   });
   const [categorys, setCategorys] = React.useState<ICategory[]>([]);
-  console.log(categorys);
   const [render, setRender] = React.useState<boolean>(true);
   const handlePageChange = (newPage: number) => {
     console.log("New page", newPage);

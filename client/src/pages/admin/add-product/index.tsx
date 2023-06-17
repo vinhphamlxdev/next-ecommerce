@@ -14,6 +14,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import UseDisabled from "@/hooks/UseDisabled";
 import LoadingButton from "@/Admin/components/Loading/LoadingButton";
+import { createProduct } from "@/service/ProductApi";
 export interface AddProductProps {}
 
 export default function AddProduct(props: AddProductProps) {
@@ -39,10 +40,12 @@ export default function AddProduct(props: AddProductProps) {
         .min(30, "Mô tả nên nhiều hơn 30 kí tự")
         .required("Mô tả sản phẩm là bắt buộc"),
       price: Yup.number()
-        .min(0, "Giá phải lơn hơn 0")
+        .min(100000, "Giá tối thiểu phải là 100000")
+        .max(1000000, "Giá tối đa phải là 1000000")
         .required("Giá sản phẩm là bắt buộc"),
       quantity: Yup.number()
-        .min(0, "Số lượng phải lớn hơn 0")
+        .min(1, "Số lượng phải lớn hơn 0")
+        .max(500, "Số lượng tối đa là 500")
         .required("Số lượng là bắt buộc"),
     }),
 
@@ -77,6 +80,7 @@ export default function AddProduct(props: AddProductProps) {
         }
       );
       if (response.status === 201) {
+        router.push("/admin/products");
         toast.success("Thêm sản phẩm thành công");
       } else {
         toast.error("Thêm sản phẩm thất bại");

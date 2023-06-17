@@ -3,6 +3,7 @@ import { GetCategorySimple as getCategory } from "../../../hooks/useCategory";
 import { GrFormClose } from "react-icons/gr";
 import { ICategory } from "@/types/interface";
 import axios from "axios";
+import { getAllCategorys } from "@/service/CategoryApi";
 export interface SelectProps {
   label?: string;
   select: any;
@@ -19,13 +20,14 @@ export default function Select({
   error,
 }: SelectProps) {
   const [key, setKey] = React.useState(1);
-  const [data, setData] = React.useState<ICategory[]>([]);
+  const [categorys, setCategorys] = React.useState<ICategory[]>([]);
   React.useEffect(() => {
     async function fetchCategorys() {
-      const res = await axios.get(`http://localhost:8080/categorys?pageNum=0`);
-      if (res && res.data) {
-        console.log(res.data);
-        setData(res.data.categorys);
+      const res = await getAllCategorys();
+      console.log(res);
+      if (res && res.categorys) {
+        console.log(res.categorys);
+        setCategorys(res.categorys);
       }
     }
     fetchCategorys();
@@ -76,7 +78,7 @@ export default function Select({
           className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none"
         >
           <option value={-1}>---Choose Category---</option>
-          {data.map((value, index) => {
+          {categorys.map((value, index) => {
             return (
               <option key={value.id} value={JSON.stringify(value)}>
                 {value.name}

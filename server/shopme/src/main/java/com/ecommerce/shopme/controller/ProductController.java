@@ -72,7 +72,7 @@ public class ProductController {
     
     @GetMapping("/products")
     public ResponseEntity<ProductListResponse> getAll(@RequestParam(defaultValue = "0") int pageNum,
-    @RequestParam(defaultValue = "3") int itemPerPage){
+    @RequestParam(defaultValue = "8") int itemPerPage){
         Pageable pageable = PageRequest.of(pageNum, itemPerPage);
         Page<Product> products = productService.listAll(pageable);
     
