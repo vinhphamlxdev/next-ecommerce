@@ -13,6 +13,7 @@ import { useGlobalStore } from "@/store/globalStore";
 import { LoadingSkeleton } from "@/Admin/components/Loading";
 import Pagination from "@/Admin/components/Pagination";
 import { ICategorysResponse, getAllCategorys } from "@/service/CategoryApi";
+import PaginationComponent from "@/Admin/components/Pagination";
 export interface CategoryProps {
   data: ICategorysResponse;
 }
@@ -20,37 +21,44 @@ export interface CategoryProps {
 export default function Category(props: CategoryProps) {
   const { setLoading, isLoading } = useGlobalStore((state) => state);
   const [pagination, setPagination] = React.useState({
-    page: 1,
-    itemPerpage: 4,
+    current: 1,
+    tolalPages: 3,
+  });
+  const [filters, setFilters] = React.useState({
+    pageNum: 0,
+    itemsPerPage: 3,
   });
   const [categorys, setCategorys] = React.useState<ICategory[]>([]);
   const [render, setRender] = React.useState<boolean>(true);
-  const handlePageChange = (newPage: number) => {
-    console.log("New page", newPage);
+
+  const handlePageChange = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    setFilters((prevFilter) => ({
+      ...prevFilter,
+      pageNum: newPage - 1,
+    }));
   };
   React.useEffect(() => {
-    setLoading(true);
     const fetchCategorys = async () => {
       try {
-        const data = await getAllCategorys();
-
+        const data = await getAllCategorys(filters);
         if (data && data?.categorys) {
           setCategorys(data.categorys);
           const { page } = data;
-          setLoading(false);
           setPagination({
-            page: page.current,
-            itemPerpage: page.itemsPerPage,
+            current: page?.current,
+            tolalPages: page?.totalPages,
           });
         }
       } catch (error) {
         console.log(error);
-        setLoading(false);
       }
     };
     fetchCategorys();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [render]);
+  }, [render, filters]);
 
   return (
     <>
@@ -59,8 +67,7 @@ export default function Category(props: CategoryProps) {
           <AddCategory categorys={categorys} setRender={setRender} />
           <div className="p-3 flex shadow-lg flex-col gap-y-4 bg-white rounded-lg">
             <h3 className="font-medium text-xl ">All Category</h3>
-            {!isLoading &&
-              categorys &&
+            {categorys &&
               categorys.map((c: any, index: number) => {
                 return (
                   <CategoryItem
@@ -75,13 +82,19 @@ export default function Category(props: CategoryProps) {
                   />
                 );
               })}
-            {isLoading && (
-              <LoadingSkeleton columns={1} count={7} columnRow={3} />
+            {!categorys.length && (
+              <LoadingSkeleton
+                columns={1}
+                height={50}
+                count={8}
+                columnRow={4}
+              />
             )}
-            {/* <Pagination
+            <PaginationComponent
+              totalPages={pagination?.tolalPages}
+              pageCurrent={pagination?.current}
               onPageChange={handlePageChange}
-              pagination={pagination}
-            /> */}
+            />
           </div>
         </div>
       </LayoutAdmin>

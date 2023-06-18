@@ -22,15 +22,35 @@ import { useRouter } from "next/router";
 import { useModalStore } from "@/store/modalStore";
 import ModalTest from "@/Admin/components/Modal/ModalProductDetail";
 import ModalProductEdit from "@/Admin/components/Modal/ModalProductEdit";
+import HeaderTable from "@/Admin/components/HeaderTable";
+import Pagination from "@/Admin/components/Pagination";
+import PaginationComponent from "@/Admin/components/Pagination";
+
 export interface ProductProps {}
 
 function Products(props: ProductProps) {
+  const thHeader: string[] = [
+    "Name",
+    "Price",
+    "InStock",
+    "Edit",
+    "Delete",
+    "Detail",
+  ];
   const router = useRouter();
   const { setLoading, isLoading } = useGlobalStore();
   const { setOpenEditProduct, setOpenDetailProduct } = useModalStore();
   const [products, setProducts] = React.useState<IProduct[]>([]);
   const [product, setProduct] = React.useState<IProduct>();
   const [render, setRender] = React.useState<boolean>(false);
+  const [pagination, setPagination] = React.useState({
+    current: 1,
+    tolalPages: 3,
+  });
+  const [filters, setFilters] = React.useState({
+    pageNum: 0,
+    itemsPerPage: 5,
+  });
   const deleteProduct = (id: number, name: string) => {
     Swal.fire({
       text: `Bạn muốn xóa sản phẩm: ${name}`,
@@ -80,25 +100,35 @@ function Products(props: ProductProps) {
       setLoading(false);
     }
   };
+  const handlePageChange = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number
+  ) => {
+    console.log(newPage);
+    setFilters((prevFilter) => ({
+      ...prevFilter,
+      pageNum: newPage - 1,
+    }));
+  };
   React.useEffect(() => {
-    setLoading(true);
     const fetchProducts = async () => {
       try {
-        const data = await getAllProducts();
-
+        const data = await getAllProducts(filters);
         if (data && data?.products) {
           setProducts(data.products);
           const { page } = data;
-          setLoading(false);
+          setPagination({
+            current: page?.current,
+            tolalPages: page?.totalPages,
+          });
         }
       } catch (error) {
         console.log(error);
-        setLoading(false);
       }
     };
     fetchProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [render]);
+  }, [render, filters]);
 
   return (
     <>
@@ -116,92 +146,79 @@ function Products(props: ProductProps) {
                 Add Product
               </button>
             </div>
+            {!products.length && (
+              <LoadingSkeleton
+                columns={1}
+                height={50}
+                count={8}
+                columnRow={4}
+              />
+            )}
             <table className="items-center border-spacing-y-2 text-white w-full bg-transparent border-separate ">
-              <thead className="bg-gray-700">
-                <tr>
-                  <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                    Name
-                  </th>
-                  <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                    Price
-                  </th>
-                  <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                    InStock
-                  </th>
-                  <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                    Edit
-                  </th>
-                  <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                    Delete
-                  </th>
-                  <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                    Detail
-                  </th>
-                </tr>
-              </thead>
+              <HeaderTable data={thHeader} />
               <tbody className=" w-full ">
-                {products &&
-                  products.length &&
-                  products.map((product: IProduct, index: number) => {
-                    return (
-                      <tr key={product.id} className="bg-gray-700 mt-2">
-                        <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                          <ImageComponent path={product?.imageUrls[0]} />
-                          <span className="ml-3 font-bold text-white">
-                            {product.name}
-                          </span>
-                        </th>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          {product.price}đ
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <i className="fas fa-circle text-orange-500 mr-2"></i>
-                          <span className="bg-saveBg rounded-[10px] px-3 py-[2px] block text-center overflow-hidden w-[50px]">
-                            {product.quantity}
-                          </span>
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                {products?.map((product: IProduct, index: number) => {
+                  return (
+                    <tr key={product.id} className="bg-gray-700 mt-2">
+                      <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
+                        {/* <ImageComponent path={product?.imageUrls[0]} /> */}
+                        <span className="ml-3 font-bold text-white">
+                          {product.name}
+                        </span>
+                      </th>
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        {product.price}đ
+                      </td>
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        <i className="fas fa-circle text-orange-500 mr-2"></i>
+                        <span className="bg-saveBg rounded-[10px] px-3 py-[2px] block text-center overflow-hidden w-[50px]">
+                          {product.quantity}
+                        </span>
+                      </td>
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        <button
+                          onClick={() => handleEditProduct(product.id)}
+                          className="py-3 px-5 bg-orange-400 rounded-[5px]"
+                        >
+                          <EditIcon />
+                        </button>
+                      </td>
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        <button
+                          onClick={() =>
+                            deleteProduct(product.id, product.name)
+                          }
+                          className="py-3 px-5 bg-red-500 rounded-[5px]"
+                        >
+                          <DeleteIcon />
+                        </button>
+                      </td>
+                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                        <div className="flex">
                           <button
-                            onClick={() => handleEditProduct(product.id)}
-                            className="py-3 px-5 bg-orange-400 rounded-[5px]"
+                            onClick={() => handleViewDetail(product?.id)}
+                            className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer"
                           >
-                            <EditIcon />
+                            <BsEye className="leading-[0px]" />
                           </button>
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button
-                            onClick={() =>
-                              deleteProduct(product.id, product.name)
-                            }
-                            className="py-3 px-5 bg-red-500 rounded-[5px]"
-                          >
-                            <DeleteIcon />
-                          </button>
-                        </td>
-                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <div className="flex">
-                            <button
-                              onClick={() => handleViewDetail(product?.id)}
-                              className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer"
-                            >
-                              <BsEye className="leading-[0px]" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
-            {isLoading && (
-              <LoadingSkeleton columnRow={4} height={16} count={6} />
-            )}
           </div>
+          <PaginationComponent
+            totalPages={pagination?.tolalPages}
+            pageCurrent={pagination?.current}
+            onPageChange={handlePageChange}
+          />
         </div>
+        {product && <ModalProductEdit data={product} setRender={setRender} />}
+        {product && <ModalTest data={product} />}
+        {isLoading && <LoadingSpinner />}
       </LayoutAdmin>
-      {product && <ModalProductEdit data={product} setRender={setRender} />}
-      {product && <ModalTest data={product} />}
-      {isLoading && <LoadingSpinner />}
     </>
   );
 }

@@ -22,7 +22,11 @@ export default function LoadingSkeleton({
       className={`grid gap-y-${columnRow} grid-cols-${columns} gap-x-${columnGap}`}
     >
       {new Array(count).fill(0).map((e: any, index: number) => {
-        return <Skeleton key={index} className={`h-${height}`} />;
+        return (
+          <div key={index}>
+            <Skeleton style={{ height: height }} />
+          </div>
+        );
       })}
     </div>
   );

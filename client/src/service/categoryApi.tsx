@@ -6,8 +6,10 @@ export interface ICategorysResponse {
   status: string;
   categorys: ICategory[];
 }
-export const getAllCategorys = async (): Promise<any> => {
-  const response = await axiosClient.get<ICategorysResponse>(`/categorys`);
+export const getAllCategorys = async (params: any): Promise<any> => {
+  const response = await axiosClient.get<ICategorysResponse>(`/categorys`, {
+    params: params,
+  });
   return response;
 };
 export const getCategoryById = async (id: number): Promise<any> => {

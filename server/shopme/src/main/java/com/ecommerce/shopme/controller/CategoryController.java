@@ -41,8 +41,8 @@ public class CategoryController {
         //GET
         @GetMapping("/categorys")
         public ResponseEntity<?> getAllCategory(@RequestParam(defaultValue = "0") int pageNum,
-        @RequestParam(defaultValue = "4") int itemPerPage){
-            Pageable pageable = PageRequest.of(pageNum, itemPerPage);
+        @RequestParam(defaultValue = "4") int itemsPerPage){
+            Pageable pageable = PageRequest.of(pageNum, itemsPerPage);
             Page<Category> categorys = categoryService.listAllCategory(pageable);
         
             // Tạo danh sách ProductResponse từ danh sách Product

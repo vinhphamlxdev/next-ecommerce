@@ -72,8 +72,8 @@ public class ProductController {
     
     @GetMapping("/products")
     public ResponseEntity<ProductListResponse> getAll(@RequestParam(defaultValue = "0") int pageNum,
-    @RequestParam(defaultValue = "8") int itemPerPage){
-        Pageable pageable = PageRequest.of(pageNum, itemPerPage);
+    @RequestParam(defaultValue = "3") int itemsPerPage){
+        Pageable pageable = PageRequest.of(pageNum, itemsPerPage);
         Page<Product> products = productService.listAll(pageable);
     
         // Tạo danh sách ProductResponse từ danh sách Product
@@ -112,7 +112,7 @@ public class ProductController {
             ProductListResponse productListResponse = new ProductListResponse();
             productListResponse.setStatus("success");
             productListResponse.setProducts(productResponses);
-            productListResponse.setPage(new PageResponse<>(products.getNumber()+1,
+            productListResponse.setPage(new PageResponse<>(products.getNumber(),
              products.getSize(),
               products.getTotalElements(),
                products.getTotalPages()

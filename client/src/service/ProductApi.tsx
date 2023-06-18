@@ -1,8 +1,10 @@
 import { IProduct } from "@/types/interface";
 import axiosClient from "./axiosClient";
 
-export const getAllProducts = async (): Promise<any> => {
-  const response = await axiosClient.get<any>(`/products`);
+export const getAllProducts = async (params: any): Promise<any> => {
+  const response = await axiosClient.get<any>(`/products`, {
+    params: params,
+  });
   return response;
 };
 export const getProductById = async (id: number): Promise<any> => {

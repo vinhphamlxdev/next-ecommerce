@@ -56,3 +56,12 @@ body {
 .react-responsive-modal-modal {
   border-radius: 6px;
 }
+.react-loading-skeleton {
+  display: inline-block !important;
+  &::after {
+    background: #dad7cd !important;
+  }
+}
+.Mui-selected {
+  background-color: #ccccccc2 !important;
+}

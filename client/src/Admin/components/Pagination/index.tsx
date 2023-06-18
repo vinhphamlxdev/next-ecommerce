@@ -1,37 +1,21 @@
+import { IPage } from "@/types/interface";
+import { Pagination } from "@mui/material";
 import * as React from "react";
 
 export interface IPaginationProps {
-  pagination: any;
-  onPageChange: any;
+  totalPages: number;
+  pageCurrent: number;
+  onPageChange?: any;
 }
 
-export default function Pagination({
-  pagination,
+export default function PaginationComponent({
+  totalPages,
+  pageCurrent,
   onPageChange = null,
 }: IPaginationProps) {
-  const { page, totalPage, itemPerpage } = pagination;
-
-  const handlePageChange = (newPage: number) => {
-    if (onPageChange) {
-      onPageChange(newPage);
-    }
-  };
   return (
-    <div className="flex justify-center gap-x-3">
-      <button
-        disabled={page === 0}
-        onClick={() => handlePageChange(page - 1)}
-        className=""
-      >
-        Prev
-      </button>
-      <button
-        disabled={page >= totalPage}
-        onClick={() => handlePageChange(page + 1)}
-        className=""
-      >
-        Next
-      </button>
+    <div className="text-center flex justify-center items-center mt-7">
+      <Pagination count={totalPages} onChange={onPageChange} shape="rounded" />
     </div>
   );
 }
