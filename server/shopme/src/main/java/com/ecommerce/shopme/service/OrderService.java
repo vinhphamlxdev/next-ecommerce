@@ -8,7 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import com.ecommerce.shopme.Entity.Order;
+
+import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.exception.OrderNotFoundException;
 import com.ecommerce.shopme.repository.OrderRepository;
 

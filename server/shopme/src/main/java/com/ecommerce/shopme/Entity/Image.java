@@ -1,4 +1,7 @@
-package com.ecommerce.shopme.Entity;
+package com.ecommerce.shopme.entity;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,6 +23,7 @@ public class Image {
     private Integer id;
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Product product;
     @Column(name = "image_url")
     private String imageUrl;
@@ -35,6 +39,7 @@ public class Image {
     public void setProduct(Product product) {
         this.product = product;
     }
+   
     public String getImageUrl() {
         return imageUrl;
     }

@@ -1,4 +1,4 @@
-package com.ecommerce.shopme.DTO;
+package com.ecommerce.shopme.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

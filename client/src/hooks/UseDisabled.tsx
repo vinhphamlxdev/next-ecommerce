@@ -1,6 +1,6 @@
 import * as React from "react";
 
-export default function UseDisabled(condition: boolean) {
+export default function useDisabled(condition: boolean) {
   const isDisabled = React.useMemo(() => {
     return condition;
   }, [condition]);

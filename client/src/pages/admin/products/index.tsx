@@ -40,7 +40,7 @@ function Products(props: ProductProps) {
   const router = useRouter();
   const { setLoading, isLoading } = useGlobalStore();
   const { setOpenEditProduct, setOpenDetailProduct } = useModalStore();
-  const [products, setProducts] = React.useState<IProduct[]>([]);
+  const [products, setProducts] = React.useState<IProduct[]>();
   const [product, setProduct] = React.useState<IProduct>();
   const [render, setRender] = React.useState<boolean>(false);
   const [pagination, setPagination] = React.useState({
@@ -88,6 +88,7 @@ function Products(props: ProductProps) {
     }
   };
   const handleViewDetail = async (id: number) => {
+    setLoading(true);
     setOpenDetailProduct(true);
     try {
       const response = await getProductById(id);
@@ -146,14 +147,7 @@ function Products(props: ProductProps) {
                 Add Product
               </button>
             </div>
-            {!products.length && (
-              <LoadingSkeleton
-                columns={1}
-                height={50}
-                count={8}
-                columnRow={4}
-              />
-            )}
+
             <table className="items-center border-spacing-y-2 text-white w-full bg-transparent border-separate ">
               <HeaderTable data={thHeader} />
               <tbody className=" w-full ">
@@ -161,7 +155,15 @@ function Products(props: ProductProps) {
                   return (
                     <tr key={product.id} className="bg-gray-700 mt-2">
                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                        {/* <ImageComponent path={product?.imageUrls[0]} /> */}
+                        <div className="relative  rounded-full">
+                          <Image
+                            className="rounded-full  w-14 h-14 flex-shrink-0 object-cover"
+                            width={100}
+                            height={100}
+                            src={product?.imageUrls[0]}
+                            alt=""
+                          />
+                        </div>
                         <span className="ml-3 font-bold text-white">
                           {product.name}
                         </span>
@@ -208,6 +210,19 @@ function Products(props: ProductProps) {
                 })}
               </tbody>
             </table>
+            {products?.length === 0 && (
+              <div className="text-white text-xl text-center">
+                Chưa có sản phẩm
+              </div>
+            )}
+            {!products && (
+              <LoadingSkeleton
+                columns={1}
+                height={50}
+                count={8}
+                columnRow={4}
+              />
+            )}
           </div>
           <PaginationComponent
             totalPages={pagination?.tolalPages}

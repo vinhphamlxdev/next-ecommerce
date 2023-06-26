@@ -1,12 +1,16 @@
-package com.ecommerce.shopme.DTO;
+package com.ecommerce.shopme.dto;
 
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ecommerce.shopme.Entity.Category;
-import com.ecommerce.shopme.Entity.Image;
+import com.ecommerce.shopme.entity.Category;
+import com.ecommerce.shopme.entity.Image;
 
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,11 +19,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ProductDTO {
     private Integer id;
+    @Column(unique = true, length = 255, nullable = false)
+    @NotBlank(message = "Tên sản phẩm không được để trống")
     private String name;
+    @Column(name = "price",nullable = false)
+    @Min(value = 100000,message = "Giá tối thiểu phải là 100000")
+    @Max(value = 1000000, message = "Giá tối đa phải là 1000000")
     private float price;
     private List<MultipartFile> images;
     private boolean isDeleted;
+    @Column(name = "quantity",nullable = false)
+    @Min(value = 1,message = "số lượng tối thiểu phải là 1")
+    @Max(value = 500, message = "số lượng tối đa phải là 500")
     private Integer quantity;
+    @Column(length = 512, nullable = false, name = "short_description")
+    @NotBlank(message = "Mô tả sản phẩm không được để trống")
     private String description;
     private Integer inStock;
     private Integer categoryId;

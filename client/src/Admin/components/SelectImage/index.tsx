@@ -9,8 +9,8 @@ export interface ISelectImageProps {
   setImage: React.Dispatch<React.SetStateAction<string[]>>;
   file: File[];
   setFile: React.Dispatch<React.SetStateAction<File[]>>;
-  setDeleteImg?: React.Dispatch<React.SetStateAction<string[]>>;
-  deleteImg?: string[];
+  setDeleteImgs?: React.Dispatch<React.SetStateAction<string[]>>;
+  deleteImgs?: string[] | any;
   colums?: number;
   columGap?: number;
 }
@@ -21,8 +21,8 @@ export default function SelectImage(props: ISelectImageProps) {
     setFile,
     setImage,
     file,
-    setDeleteImg,
-    deleteImg,
+    setDeleteImgs,
+    deleteImgs,
     colums = 5,
     columGap = 4,
   } = props;
@@ -56,27 +56,29 @@ export default function SelectImage(props: ISelectImageProps) {
       reader.readAsDataURL(fileValid);
     });
   };
-  const handleDeleteImg = (id: string) => {
-    const idNeedDelete = images.filter((img) => img != id);
-    setImage(idNeedDelete);
-    // if (setDeleteImg && !id.startsWith("data")) {
-    //   setDeleteImg([...deleteImg, id]);
-    // }
 
-    // if (setDeleteImg && id.startsWith("data")) {
-    //     let notDelete = "";
-    //     file.forEach((val:any) => {
-    //         const reader = new FileReader();
-    //         reader.readAsDataURL(val);
-    //         reader.onload = function (event) {
-    //             if (event.target?.result === id) {
-    //                 notDelete = val;
-    //                 setFile(file.filter((value:any) => value !== notDelete));
-    //                 return;
-    //             }
-    //         };
-    //     });
-    // }
+  const handleDeleteImg = (imgUrl: string, e: any) => {
+    console.log("imgUrl", imgUrl);
+    const newImages = images.filter((img) => img != imgUrl);
+    setImage(newImages);
+    if (setDeleteImgs && imgUrl.startsWith("https")) {
+      setDeleteImgs([...deleteImgs, imgUrl]);
+    }
+    if (setDeleteImgs && !imgUrl.startsWith("https")) {
+      let filesNotDelete: any;
+      file.forEach((val) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(val);
+        reader.onload = function (event: any) {
+          if (event.target.result === imgUrl) {
+            filesNotDelete = val;
+            //set lại list file khác với file click xóa
+            setFile(file.filter((value) => value !== filesNotDelete));
+            return;
+          }
+        };
+      });
+    }
   };
   return (
     <div className="flex flex-col gap-y-3">
@@ -85,13 +87,15 @@ export default function SelectImage(props: ISelectImageProps) {
           {images?.map((img, index) => {
             return (
               <div key={index} className="relative  w-full image-product">
-                <img
+                <Image
+                  width={176}
+                  height={176}
                   className="object-cover h-44 border border-gray-300"
                   src={img}
                   alt=""
                 />
                 <GrFormClose
-                  onClick={() => handleDeleteImg(img)}
+                  onClick={(e) => handleDeleteImg(img, e)}
                   className="cursor-pointer text-white absolute top-2 right-2 hover:text-red-500 text-2xl"
                 />
               </div>

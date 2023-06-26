@@ -1,12 +1,13 @@
-package com.ecommerce.shopme.DTO;
+package com.ecommerce.shopme.dto;
 
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ecommerce.shopme.Entity.Category;
-import com.ecommerce.shopme.Entity.Product;
+import com.ecommerce.shopme.entity.Category;
+import com.ecommerce.shopme.entity.Product;
+
 import lombok.*;
 
 @NoArgsConstructor

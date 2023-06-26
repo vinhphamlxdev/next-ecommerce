@@ -1,4 +1,4 @@
-import UseDisabled from "@/hooks/UseDisabled";
+import UseDisabled from "@/hooks/useDisabled";
 import { deleteCategoryById, updateCategory } from "@/service/CategoryApi";
 import axiosClient from "@/service/axiosClient";
 import { ICategory } from "@/types/interface";

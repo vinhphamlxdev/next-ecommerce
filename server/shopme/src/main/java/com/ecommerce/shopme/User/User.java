@@ -1,4 +1,4 @@
-package com.ecommerce.shopme.User;
+package com.ecommerce.shopme.user;
 import jakarta.persistence.*;
 
 import java.util.*;
@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.ecommerce.shopme.Entity.Order;
+import com.ecommerce.shopme.entity.Order;
 
 import lombok.*;
 

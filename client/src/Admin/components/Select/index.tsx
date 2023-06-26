@@ -23,8 +23,7 @@ export default function Select({
   const [categorys, setCategorys] = React.useState<ICategory[]>([]);
   React.useEffect(() => {
     async function fetchCategorys() {
-      const res = await getAllCategorys();
-      console.log(res);
+      const res = await getAllCategorys({});
       if (res && res.categorys) {
         console.log(res.categorys);
         setCategorys(res.categorys);

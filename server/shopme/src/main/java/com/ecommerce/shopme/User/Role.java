@@ -1,4 +1,4 @@
-package com.ecommerce.shopme.User;
+package com.ecommerce.shopme.user;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;

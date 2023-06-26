@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ecommerce.shopme.DTO.OrderDetail;
-import com.ecommerce.shopme.DTO.PageResponse;
-import com.ecommerce.shopme.Entity.Order;
+import com.ecommerce.shopme.dto.OrderDetail;
+import com.ecommerce.shopme.dto.PageResponse;
+import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.exception.OrderNotFoundException;
 import com.ecommerce.shopme.service.OrderService;
 import com.ecommerce.shopme.utils.CustomResponse;

@@ -9,10 +9,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.ecommerce.shopme.User.Role;
-import com.ecommerce.shopme.User.User;
 import com.ecommerce.shopme.repository.RoleRepository;
 import com.ecommerce.shopme.repository.UserRepository;
+import com.ecommerce.shopme.user.Role;
+import com.ecommerce.shopme.user.User;
 
 
 @Service

@@ -1,4 +1,4 @@
-package com.ecommerce.shopme.DTO;
+package com.ecommerce.shopme.dto;
 
 public class UserDTO {
     private Integer id;

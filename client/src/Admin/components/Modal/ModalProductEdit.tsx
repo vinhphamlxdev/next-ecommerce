@@ -8,8 +8,10 @@ import { toast } from "react-toastify";
 import { ICategory, IProduct } from "@/types/interface";
 import * as Yup from "yup";
 import { useFormik } from "formik";
-import UseDisabled from "@/hooks/UseDisabled";
+import UseDisabled from "@/hooks/useDisabled";
 import SelectImage from "../SelectImage";
+import LoadingButton from "../Loading/LoadingButton";
+import { LoadingSpinner } from "../Loading";
 
 export interface IModalProductEditProps {
   data: IProduct | any;
@@ -23,35 +25,18 @@ export default function ModalProductEdit({
   const [optionCategorys, setOptionCategory] = React.useState<
     ICategory[] | any
   >([]);
-  const { isOpenEditP, setOpenEditProduct } = useModalStore((state) => state);
+  const { isOpenEditP, setOpenEditProduct, isLoading, setLoading } =
+    useModalStore((state) => state);
   const [imgs, setImgs] = React.useState<any>([]);
   const [files, setFile] = React.useState<File[]>([]);
-
+  const [imgsDelete, setImgsDelete] = React.useState<string[] | any>([]);
   const productEditFormik = useFormik({
     initialValues: {
       name: data?.name,
       description: data?.description,
       price: data?.price,
       quantity: data?.quantity,
-      // inStock: data?.inStock,
     },
-    validationSchema: Yup.object({
-      name: Yup.string()
-        .min(3, "Tên sản phẩm cần nhiều hơn 3 kí tự")
-        .max(100, "Tên sản phẩm tối đa 20 kí tự")
-        .required("Tên sản phẩm là bắt buộc"),
-      description: Yup.string()
-        .min(30, "Mô tả nên nhiều hơn 30 kí tự")
-        .required("Mô tả sản phẩm là bắt buộc"),
-      price: Yup.number()
-        .min(100000, "Giá tối thiểu phải là 100000")
-        .max(1000000, "Giá tối đa phải là 1000000")
-        .required("Giá sản phẩm là bắt buộc"),
-      quantity: Yup.number()
-        .min(1, "Số lượng phải lớn hơn 0")
-        .max(500, "Số lượng tối đa là 500")
-        .required("Số lượng là bắt buộc"),
-    }),
     onSubmit: async (values: any) => {
       // Handle form submission
     },
@@ -59,8 +44,7 @@ export default function ModalProductEdit({
   });
 
   const handleSubmitEditProduct = async (id: number) => {
-    const { name, price, inStock, description, quantity } =
-      productEditFormik.values;
+    const { name, price, description, quantity } = productEditFormik.values;
     if (!optionCategorys || optionCategorys.length === 0) {
       toast.error("Vui lòng chọn danh mục sản phẩm");
       return;
@@ -69,6 +53,7 @@ export default function ModalProductEdit({
       toast.error("Vui lòng chọn ảnh sản phẩm");
       return;
     }
+
     const categoryIds = optionCategorys.map((c: ICategory) => c.id);
     const newFormData = new FormData();
     newFormData.append("name", name);
@@ -79,7 +64,7 @@ export default function ModalProductEdit({
     for (let index = 0; index < files.length; index++) {
       newFormData.append(`images[${index}]`, files[index]);
     }
-
+    newFormData.append("imgsDelete", imgsDelete);
     const response = await axios.put(
       `http://localhost:8080/products/${id}`,
       newFormData,
@@ -89,12 +74,18 @@ export default function ModalProductEdit({
         },
       }
     );
+    console.log(response);
     if (response.status === 200) {
       toast.success("Cập nhật sản phẩm thành công");
       setOpenEditProduct(false);
       setRender((prevR) => !prevR);
+      setFile([]);
+      setImgsDelete([]);
     } else {
       toast.error("Cập nhật sản phẩm thất bại");
+      setFile([]);
+      setImgsDelete([]);
+      setOpenEditProduct(false);
     }
   };
   React.useEffect(() => {
@@ -102,10 +93,9 @@ export default function ModalProductEdit({
       return;
     }
     setOptionCategory(data?.categorys);
+    setImgs(data?.imageUrls);
   }, [data]);
-  const { isDisabled, disabledStyle } = UseDisabled(
-    productEditFormik.isSubmitting
-  );
+
   if (typeof document === "undefined")
     return <div className="modal_product-detail"></div>;
   return ReactDOM.createPortal(
@@ -118,6 +108,7 @@ export default function ModalProductEdit({
         onClick={() => setOpenEditProduct(false)}
         className="absolute inset-0 z-20 bg-black opacity-60 overlay "
       ></div>
+      {isLoading && <LoadingSpinner />}
       <div className="p-3 max-h-[550px] has-scrollbar rounded-md relative bg-white w-[550px]  inset-0 m-auto z-[600]">
         <div className="flex gap-y-3 flex-col">
           <div className="modal-choose-category">
@@ -162,15 +153,15 @@ export default function ModalProductEdit({
             setImage={setImgs}
             colums={4}
             columGap={3}
+            deleteImgs={imgsDelete}
+            setDeleteImgs={setImgsDelete}
           />
           <button
-            disabled={isDisabled}
-            style={disabledStyle}
             type="submit"
             onClick={() => handleSubmitEditProduct(data?.id)}
             className="add-category hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center"
           >
-            <span>Add category</span>
+            <span>Save</span>
           </button>
         </div>
         <button

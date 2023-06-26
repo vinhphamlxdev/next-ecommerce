@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.shopme.Token.JwtTokenProvider;
-import com.ecommerce.shopme.User.User;
+import com.ecommerce.shopme.user.User;
 
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;

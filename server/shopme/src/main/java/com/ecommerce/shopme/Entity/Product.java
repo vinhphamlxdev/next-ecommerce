@@ -1,4 +1,4 @@
-package com.ecommerce.shopme.Entity;
+package com.ecommerce.shopme.entity;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -147,6 +147,7 @@ public class Product {
     }
 
     public void setImages(List<Image> images) {
+       
         this.images = images;
     }
 

@@ -9,8 +9,7 @@ import axios from "axios";
 import { ICategory } from "@/types/interface";
 import getMessage from "@/utils/getMessage";
 import { toast } from "react-toastify";
-import Portal from "@/components/Portal";
-import UseDisabled from "@/hooks/UseDisabled";
+import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "../Loading/LoadingButton";
 import { createCategory } from "@/service/CategoryApi";
 
@@ -31,7 +30,7 @@ export default function AddCategory({
     },
     validationSchema: Yup.object({
       name: Yup.string()
-        .min(3, "Tên danh mục cần nhiều hơn 3 kí tự")
+        .min(10, "Tên danh mục cần nhiều hơn 10 kí tự")
         .max(30, "Tên danh mục tối đa 30 kí tự")
         .required("Tên danh mục là bắt buộc"),
       description: Yup.string()

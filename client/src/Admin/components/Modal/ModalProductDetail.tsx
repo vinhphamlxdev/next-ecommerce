@@ -3,6 +3,9 @@ import * as React from "react";
 import ReactDOM from "react-dom";
 import InputModal from "../InputModal/InputModal";
 import { IProduct } from "@/types/interface";
+import Image from "next/image";
+import UseDisabled from "@/hooks/useDisabled";
+
 export interface IModalProductDetailProps {
   data: IProduct;
 }
@@ -58,27 +61,19 @@ export default function ModalProductDetail({ data }: IModalProductDetailProps) {
           <div className="bg-[#f5f5f5] text-gray-500 h-14 p-3 flex gap-x-3">
             {data?.description}
           </div>
-          <div className="grid grid-cols-5 gap-y-3 gap-x-3">
-            <img
-              src="https://cdn.elly.vn/uploads/2016/07/15204514/so-mi-lua-satin-theu-ren-12.jpg"
-              alt=""
-            />
-            <img
-              src="https://cdn.elly.vn/uploads/2016/07/15204514/so-mi-lua-satin-theu-ren-12.jpg"
-              alt=""
-            />
-            <img
-              src="https://cdn.elly.vn/uploads/2016/07/15204514/so-mi-lua-satin-theu-ren-12.jpg"
-              alt=""
-            />
-            <img
-              src="https://cdn.elly.vn/uploads/2016/07/15204514/so-mi-lua-satin-theu-ren-12.jpg"
-              alt=""
-            />
-            <img
-              src="https://cdn.elly.vn/uploads/2016/07/15204514/so-mi-lua-satin-theu-ren-12.jpg"
-              alt=""
-            />
+          <div className="grid grid-cols-3 gap-y-3 gap-x-3">
+            {data?.imageUrls?.map((img, index) => {
+              return (
+                <Image
+                  key={index}
+                  className="object-cover"
+                  width={200}
+                  height={250}
+                  src={img}
+                  alt=""
+                />
+              );
+            })}
           </div>
         </div>
         <button

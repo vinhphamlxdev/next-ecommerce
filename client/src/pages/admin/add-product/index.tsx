@@ -12,7 +12,7 @@ import SelectImage from "@/Admin/components/SelectImage";
 import { ICategory } from "@/types/interface";
 import { toast } from "react-toastify";
 import axios from "axios";
-import UseDisabled from "@/hooks/UseDisabled";
+import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "@/Admin/components/Loading/LoadingButton";
 import { createProduct } from "@/service/ProductApi";
 export interface AddProductProps {}
@@ -21,7 +21,6 @@ export default function AddProduct(props: AddProductProps) {
   const [select, setSelect] = useState<ICategory[] | any>();
   const [imgs, setImgs] = useState<any>([]);
   const [files, setFile] = useState<File[]>([]);
-
   const router = useRouter();
 
   const productFormik = useFormik({
@@ -33,8 +32,8 @@ export default function AddProduct(props: AddProductProps) {
     },
     validationSchema: Yup.object({
       name: Yup.string()
-        .min(3, "Tên sản phẩm cần nhiều hơn 3 kí tự")
-        .max(100, "Tên sản phẩm tối đa 20 kí tự")
+        .min(10, "Tên sản phẩm cần nhiều hơn 3 kí tự")
+        .max(70, "Tên sản phẩm tối đa 20 kí tự")
         .required("Tên sản phẩm là bắt buộc"),
       description: Yup.string()
         .min(30, "Mô tả nên nhiều hơn 30 kí tự")

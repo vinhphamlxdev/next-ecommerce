@@ -2,14 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      // {
-      //   protocol: "https",
-      //   hostname: "assets.vercel.com",
-      //   port: "",
-      //   pathname: "/image/upload/**",
-      // },
-    ],
+    domains: ["res.cloudinary.com"],
+    // formats: ["image/webp"],
+    minimumCacheTTL: 60,
+    // disableStaticImages: true,
   },
   compiler: {
     styledComponents: true,

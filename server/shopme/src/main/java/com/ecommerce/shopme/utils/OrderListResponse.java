@@ -2,8 +2,8 @@ package com.ecommerce.shopme.utils;
 
 import java.util.List;
 
-import com.ecommerce.shopme.DTO.OrderDetail;
-import com.ecommerce.shopme.DTO.PageResponse;
+import com.ecommerce.shopme.dto.OrderDetail;
+import com.ecommerce.shopme.dto.PageResponse;
 
 import lombok.*;
 

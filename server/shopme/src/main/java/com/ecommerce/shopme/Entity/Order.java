@@ -1,9 +1,10 @@
-package com.ecommerce.shopme.Entity;
+package com.ecommerce.shopme.entity;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ecommerce.shopme.User.User;
+import com.ecommerce.shopme.user.User;
+
 import jakarta.persistence.*;
 import lombok.*;
 

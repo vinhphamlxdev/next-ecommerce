@@ -1,6 +1,6 @@
-package com.ecommerce.shopme.DTO;
+package com.ecommerce.shopme.dto;
 
-import com.ecommerce.shopme.Entity.Category;
+import com.ecommerce.shopme.entity.Category;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

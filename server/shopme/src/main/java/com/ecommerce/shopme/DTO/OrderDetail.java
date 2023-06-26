@@ -1,8 +1,8 @@
-package com.ecommerce.shopme.DTO;
+package com.ecommerce.shopme.dto;
 
 import java.util.Date;
 
-import com.ecommerce.shopme.User.User;
+import com.ecommerce.shopme.user.User;
 
 import lombok.*;
 
