@@ -43,11 +43,16 @@ export default function CategoryItem({
       try {
         let data = {
           name: values.name,
-          description: values.description,
           slug: slugify(values.name),
+          description: values.description,
         };
-        await updateCategory(id, data);
-        toast.success("Cập nhật danh mục thành công");
+        const response = await updateCategory(id, data);
+        if (response.status === 500) {
+          toast.error("Cập nhật danh mục that bai");
+        } else {
+          toast.success("Cập nhật danh mục thành công");
+        }
+        console.log(response);
         setEdit(false);
       } catch (error) {
         console.log("co loi:", error);
@@ -55,7 +60,7 @@ export default function CategoryItem({
       }
     },
   });
-  const deleteCatgory = (id: number | unknown, name: string) => {
+  const deleteCatgory = (id: number | any, name: string) => {
     Swal.fire({
       text: `Bạn muốn xóa danh mục: ${name}`,
       icon: "warning",
@@ -87,7 +92,7 @@ export default function CategoryItem({
       <div className="flex flex-col all-category gap-y-5 bg-white px-3 py-2 shadow-md">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-x-2">
-            <span className="text-gray-500 text-base">{index + 1})</span>
+            {/* <span className="text-gray-500 text-base">{index + 1})</span> */}
             {!edit && (
               <i
                 onClick={() => setEdit(true)}
@@ -108,7 +113,7 @@ export default function CategoryItem({
         >
           <div className="category-name">
             <input
-              className="px-3 w-full text-gray-500 py-3 bg-[#edede9]"
+              className="px-3 w-full capitalize text-gray-500 py-3 bg-[#edede9]"
               disabled={!edit}
               id="name"
               name="name"
@@ -121,7 +126,7 @@ export default function CategoryItem({
             <textarea
               disabled={!edit}
               defaultValue={categoryFormik.values.description}
-              className="bg-[#edede9] font-normal outline-none py-4 px-3 text-base text-gray-600 w-full resize-y"
+              className="bg-[#edede9] capitalize font-normal outline-none py-4 px-3 text-base text-gray-600 w-full resize-y"
               name="description"
               id="description"
               onChange={categoryFormik.handleChange}

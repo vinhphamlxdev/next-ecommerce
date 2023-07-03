@@ -21,12 +21,19 @@ public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Product product;
+    
     @Column(name = "image_url")
     private String imageUrl;
+
+
+    
     public Integer getId() {
         return id;
     }

@@ -15,14 +15,13 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends PagingAndSortingRepository<Product,Integer> {
     Product save(Product product);
-    // @Query("SELECT p FROM Product p WHERE p.id = :productId")
     Optional<Product> findById(Integer id);
     @Modifying
     @Query("DELETE  from Product p WHERE p.id = :productId")
     void deleteById(Integer productId);
     boolean existsById(Integer id);
    // Trong ProductRepository
-@Query("SELECT p FROM Product p JOIN p.categories c WHERE c.id = :categoryId")
+@Query("SELECT p FROM Product p  WHERE p.category.id = :categoryId")
 List<Product> findByCategoryId(@Param("categoryId") Integer categoryId);
 void delete(Product product);
 

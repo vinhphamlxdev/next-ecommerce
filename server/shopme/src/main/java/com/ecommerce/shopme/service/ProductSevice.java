@@ -21,11 +21,15 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Image;
 import com.ecommerce.shopme.entity.Product;
+import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
+import com.ecommerce.shopme.repository.ColorRepository;
 import com.ecommerce.shopme.repository.ImageRepository;
 import com.ecommerce.shopme.repository.ProductRepository;
+import com.ecommerce.shopme.repository.SizeRepository;
 
 import io.jsonwebtoken.io.IOException;
 import jakarta.transaction.Transactional;
@@ -39,6 +43,10 @@ public class ProductSevice {
     @Autowired 
     private Cloudinary cloudinary;
 
+    @Autowired 
+    SizeRepository sizeRepository;
+    @Autowired
+    ColorRepository colorRepository;
     public Page<Product> listAll(Pageable pageable) {
       
         if (pageable.isPaged()) {
@@ -48,12 +56,12 @@ public class ProductSevice {
             return new PageImpl<>(allProducts);
         }
     }
-    //get product by id
+//     //get product by id
     public Product getProductById(Integer id) {
         
         return productRepository.findById(id).get();
     }
-    //save product
+//     //save product
     public Product saveProduct(Product product){
        return productRepository.save(product);
     }
@@ -68,7 +76,7 @@ public class ProductSevice {
     return null;
 
 }
-    //delete product by id
+//     //delete product by id
    public void deleteProductById(Integer id) throws java.io.IOException{
     //lay san pham can xoa
     Optional<Product> productOptional    =    productRepository.findById(id);
@@ -86,7 +94,7 @@ public class ProductSevice {
       
   }
 }
-//kiem tra ton tai
+// //kiem tra ton tai
 public boolean existsProductById(Integer id){
     return productRepository.existsById(id);
 }
@@ -95,9 +103,7 @@ public void addImageToProduct(Integer productId, String imageUrl) {
     //isPresent() kiem tra mot duoi tuong optional co rỗng hay không
     if (optionalProduct.isPresent()) {
         Product product = optionalProduct.get();
-        if (product.getImages()==null) {
-            product.setImages(new ArrayList<>());
-        }
+      
         // Tạo đối tượng Image mới
         Image image = new Image();
         image.setImageUrl(imageUrl);
@@ -110,9 +116,35 @@ public void addImageToProduct(Integer productId, String imageUrl) {
         // Xử lý khi không tìm thấy sản phẩm với id tương ứng
     }
 }
-//Khi đã tìm thấy hình ảnh có URL trùng khớp với URL cần xóa,
-// chúng ta không cần duyệt qua các hình ảnh còn lại trong danh sách images. 
-//Việc tiếp tục duyệt qua các hình ảnh không cần thiết sẽ tăng độ phức tạp của thuật toán và làm mất thời gian thực hiện.
+public void addSizeToProduct(Integer productId,String sizeName){
+     Optional<Product> optionalProduct = productRepository.findById(productId);
+     if (optionalProduct.isPresent()) {
+        Product product = optionalProduct.get();
+        Size size = new Size();
+        size.setName(sizeName);
+        size.setProduct(product);
+         // Thêm size vào danh sách size của product
+        //  sizeRepository.save(size);
+         product.getSizes().add(size);
+         productRepository.save(product);
+     }
+}
+public void addColorToProduct(Integer productId,String colorName){
+     Optional<Product> optionalProduct = productRepository.findById(productId);
+     if (optionalProduct.isPresent()) {
+        Product product = optionalProduct.get();
+        Color color = new Color();
+        color.setColorName(colorName);
+        color.setProduct(product);
+         // Thêm size vào danh sách size của product
+        //  colorRepository.save(color);
+         product.getColors().add(color);
+         productRepository.save(product);
+     }
+}
+// //Khi đã tìm thấy hình ảnh có URL trùng khớp với URL cần xóa,
+// // chúng ta không cần duyệt qua các hình ảnh còn lại trong danh sách images. 
+// //Việc tiếp tục duyệt qua các hình ảnh không cần thiết sẽ tăng độ phức tạp của thuật toán và làm mất thời gian thực hiện.
 public void deleteImage(Integer productId,List<String> imgsUrlDelete) throws java.io.IOException {
     List<Image> images = imageRepository.findByProductId(productId);
     for (String imgUrl : imgsUrlDelete) {
@@ -136,7 +168,7 @@ public List<Product> getProductByCategoryId(Integer id){
             Map<?,?> uploadResult = cloudinary.uploader().upload(image.getBytes(), ObjectUtils.emptyMap());
             //get url image
             String imageUrl = (String) uploadResult.get("secure_url");
-            System.out.println("key ảnh:"+uploadResult);
+            // System.out.println("key ảnh:"+uploadResult);
             imageUrls.add(imageUrl);
         }
         return imageUrls;

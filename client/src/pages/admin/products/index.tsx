@@ -7,7 +7,6 @@ import { IMG_SRC } from "@/common/constanst";
 import axios from "axios";
 import { IProduct } from "@/types/interface";
 import { GetServerSideProps } from "next";
-import ImageComponent from "@/Admin/components/ImageComponent";
 import { useGlobalStore } from "@/store/globalStore";
 import {
   deleteProductById,
@@ -151,7 +150,7 @@ function Products(props: ProductProps) {
             <table className="items-center border-spacing-y-2 text-white w-full bg-transparent border-separate ">
               <HeaderTable data={thHeader} />
               <tbody className=" w-full ">
-                {products?.map((product: IProduct, index: number) => {
+                {/* {products?.map((product: IProduct, index: number) => {
                   return (
                     <tr key={product.id} className="bg-gray-700 mt-2">
                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
@@ -207,7 +206,49 @@ function Products(props: ProductProps) {
                       </td>
                     </tr>
                   );
-                })}
+                })} */}
+                <tr className="bg-gray-700 mt-2">
+                  <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
+                    <div className="relative  rounded-full">
+                      <Image
+                        className="rounded-full  w-14 h-14 flex-shrink-0 object-cover"
+                        width={100}
+                        height={100}
+                        src={IMG_SRC.product}
+                        alt=""
+                      />
+                    </div>
+                    <span className="ml-3 font-bold text-white">
+                      ten san pham
+                    </span>
+                  </th>
+                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                    200.000đ
+                  </td>
+                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                    <i className="fas fa-circle text-orange-500 mr-2"></i>
+                    <span className="bg-saveBg rounded-[10px] px-3 py-[2px] block text-center overflow-hidden w-[50px]">
+                      50
+                    </span>
+                  </td>
+                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                    <button className="py-3 px-5 bg-orange-400 rounded-[5px]">
+                      <EditIcon />
+                    </button>
+                  </td>
+                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                    <button className="py-3 px-5 bg-red-500 rounded-[5px]">
+                      <DeleteIcon />
+                    </button>
+                  </td>
+                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                    <div className="flex">
+                      <button className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer">
+                        <BsEye className="leading-[0px]" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
               </tbody>
             </table>
             {products?.length === 0 && (

@@ -48,7 +48,7 @@ public class CategoryController {
             Pageable pageable = PageRequest.of(pageNum, itemsPerPage);
             Page<Category> categorys = categoryService.listAllCategory(pageable);
         
-            // Tạo danh sách ProductResponse từ danh sách Product
+            // Tạo danh sách categoryresponse từ danh sách category
             List<CategoryDetail> categoryRes = categorys.stream()
                 .map(category -> {
                     CategoryDetail categoryDetail = new CategoryDetail();
@@ -98,8 +98,10 @@ public class CategoryController {
             String message = "Danh mục có ID " + id + " không tồn tại";
             return ResponseEntity.ok(message);
         }
-            updateCategory.setId(id);
-            Category savedCategory = categoryService.saveCategory(updateCategory);
+            categoryExist.setName(updateCategory.getName());
+            categoryExist.setDescription(updateCategory.getDescription());
+            categoryExist.setSlug(updateCategory.getSlug());
+            Category savedCategory = categoryService.saveCategory(categoryExist);
             return ResponseEntity.ok(savedCategory);
     }
   //DELETE

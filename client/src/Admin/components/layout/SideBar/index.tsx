@@ -20,44 +20,44 @@ const sidebarLink: {
 }[] = [
   {
     id: 1,
-    title: "Home",
+    title: "Thống Kê",
     icon: <AiOutlineHome />,
     path: "/admin/home",
   },
   {
     id: 2,
-    title: "Category",
+    title: "Danh Mục",
     icon: <BiCategoryAlt />,
     path: "/admin/category",
   },
 
   {
     id: 3,
-    title: "Products",
+    title: "Sản Phẩm",
     icon: <BsDatabase />,
     path: "/admin/products",
   },
   {
     id: 4,
-    title: "Add product",
+    title: "Thêm Sản Phẩm",
     icon: <BsDatabaseAdd />,
     path: "/admin/add-product",
   },
   {
     id: 5,
-    title: "Orders",
+    title: "Đơn Hàng",
     icon: <AiOutlineShoppingCart />,
     path: "/admin/order",
   },
   {
     id: 6,
-    title: "Users",
+    title: "Tài Khoản",
     icon: <AiOutlineUser />,
     path: "/admin/user",
   },
   {
     id: 7,
-    title: "Setting",
+    title: "Cài Đặt",
     icon: <AiOutlineSetting />,
     path: "/admin/setting",
   },

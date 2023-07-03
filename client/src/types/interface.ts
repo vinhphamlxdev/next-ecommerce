@@ -28,3 +28,12 @@ export interface IPage {
   totalItems: number;
   totalPages: number;
 }
+export interface ISize {
+  id: number;
+  name: string;
+}
+
+export interface IColor {
+  id: number;
+  colorName: string;
+}

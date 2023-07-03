@@ -34,36 +34,25 @@ export default function Select({
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const values = JSON.parse(e.target.value);
-    const isExist = select.findIndex((value: any) => value.id === values.id);
-    if (isExist !== -1) {
-      return;
-    } else {
-      setSelect([...select, values]);
-    }
+    setSelect(values);
     console.log(select);
   };
-  const handleRemove = (id: string) => {
-    const newValues = select.filter((elm: any) => elm.id !== id);
-    setSelect(newValues);
+  const handleRemove = () => {
+    setSelect([]);
   };
 
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-        {select?.map((item: any, index: number) => {
-          return (
-            <div
-              key={index}
-              className="text-white flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs"
-            >
-              <span>{item.name}</span>
-              <i
-                onClick={() => handleRemove(item.id)}
-                className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
-              ></i>
-            </div>
-          );
-        })}
+        <div className="text-white  w-full capitalize flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs">
+          <>
+            <span>{select?.name}</span>
+            <i
+              onClick={() => handleRemove()}
+              className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
+            ></i>
+          </>
+        </div>
       </div>
       <div className="flex flex-col gap-y-1">
         <select
@@ -76,10 +65,14 @@ export default function Select({
           }}
           className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none"
         >
-          <option value={-1}>---Choose Category---</option>
+          <option value={-1}>---Chọn Danh Mục---</option>
           {categorys.map((value, index) => {
             return (
-              <option key={value.id} value={JSON.stringify(value)}>
+              <option
+                className="capitalize"
+                key={value.id}
+                value={JSON.stringify(value)}
+              >
                 {value.name}
               </option>
             );

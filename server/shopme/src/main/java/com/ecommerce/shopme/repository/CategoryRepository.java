@@ -11,6 +11,7 @@ import com.ecommerce.shopme.entity.Category;
 @Repository
 public interface CategoryRepository extends PagingAndSortingRepository<Category,Integer> {
     Category save(Category Category);
+    @Query("SELECT c FROM Category c WHERE c.id = :id")
     Category  findById(Integer id);
     void deleteById(Integer categoryId);
     //kt ton tai

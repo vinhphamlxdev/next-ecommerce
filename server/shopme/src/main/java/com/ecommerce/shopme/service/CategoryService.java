@@ -25,7 +25,7 @@ public Page<Category> listAllCategory(Pageable pageable) {
         return new PageImpl<>(allCategory);
     }
 }
-//get Category by id
+// //get Category by id
 public Category getCategoryById(int id) {
     return categoryRepository.findById(id);
 }

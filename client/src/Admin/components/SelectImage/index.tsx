@@ -108,7 +108,7 @@ export default function SelectImage(props: ISelectImageProps) {
           className="text-white flex gap-x-2 shadow-md justify-center items-center bg-pink-500 px-3 py-2 text-xs font-normal rounded-2xl cursor-pointer"
           htmlFor="img-product"
         >
-          Choose file
+          Chọn file ảnh
           <AiOutlineCloudUpload className="text-base  leading-[0px]" />
         </label>
         <input

@@ -48,13 +48,16 @@ import com.ecommerce.shopme.dto.ProductDTO;
 import com.ecommerce.shopme.config.CloudinaryConfig;
 import com.ecommerce.shopme.dto.ProductDetail;
 import com.ecommerce.shopme.entity.Category;
+import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Image;
 import com.ecommerce.shopme.entity.Product;
+import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
 import com.ecommerce.shopme.service.CategoryService;
 import com.ecommerce.shopme.service.ProductSevice;
 import com.ecommerce.shopme.utils.ProductListResponse;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
@@ -72,7 +75,7 @@ public class ProductController {
     //  private final Cloudinary cloudinary;
   
 
-    
+    //  @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products")
     public ResponseEntity<ProductListResponse> getAll(@RequestParam(defaultValue = "0") int pageNum,
     @RequestParam(defaultValue = "3") int itemsPerPage){
@@ -82,16 +85,23 @@ public class ProductController {
         List<ProductDetail> productResponses = products.stream()
             .map(product -> {
                 ProductDetail productDetail = new ProductDetail();
-                BeanUtils.copyProperties(product, productDetail);
-                List<CategorySummaryDTO> categorySumarys = new ArrayList<>();
-                for (Category category : product.getCategorys()) {
-                    CategorySummaryDTO categorySummaryDTO = new CategorySummaryDTO();
-                    BeanUtils.copyProperties(category, categorySummaryDTO);
-                    categorySumarys.add(categorySummaryDTO);
+                productDetail.setName(product.getName());
+                productDetail.setShortDescription(product.getShortDescription());
+                productDetail.setPrice(product.getPrice());
+                productDetail.setQuantity(product.getQuantity());
+                productDetail.setSlug(product.getSlug());
+                productDetail.setCategory(product.getCategory());
+
+                List<String> sizeNames = new ArrayList<>();
+                for (Size sizeName : product.getSizes()) {
+                    sizeNames.add(sizeName.getName());
                 }
-                productDetail.setCategorys(categorySumarys);
-                // Tạo CategoryproductDetail từ Category của sản phẩm
-                //xử lý ảnh
+                productDetail.setSizes(sizeNames);
+                   List<String> colorNames = new ArrayList<>();
+                for (Color colorName : product.getColors()) {
+                    colorNames.add(colorName.getColorName());
+                }
+                productDetail.setColors(colorNames);
                 List<String> imageUrls = new ArrayList<>();
                 for (Image image : product.getImages()) {
                     imageUrls.add(image.getImageUrl());
@@ -112,103 +122,126 @@ public class ProductController {
   
      return ResponseEntity.ok(productListResponse);
     }
-    @GetMapping("/products/{id}")
-    public ResponseEntity<?> getProductById(@PathVariable("id") @Positive(message = "Id san pham toi thieu la 0") Integer id){
-        Product productExist = productService.getProductById(id);
-        if (productExist==null) {
-            return ResponseEntity.notFound().build();
-        }
-            List<String> pathImgs = new ArrayList<>();
-                      for (Image imageUrls : productExist.getImages()) {
-                        pathImgs.add(imageUrls.getImageUrl());
-                    }
-            ProductDetail productDetail = new ProductDetail();
-            BeanUtils.copyProperties(productExist, productDetail);
-            productDetail.setImageUrls(pathImgs);
-            List<CategorySummaryDTO> categorySumarys = new ArrayList<>();
-            for (Category category : productExist.getCategorys()) {
-                CategorySummaryDTO categorySummaryDTO = new CategorySummaryDTO();
-                BeanUtils.copyProperties(category, categorySummaryDTO);
-                categorySumarys.add(categorySummaryDTO);
-            }
-            productDetail.setCategorys(categorySumarys);
-            Map<String,Object> response = new HashMap<>();
-            response.put("product", productDetail);
-            response.put("status", "success");
-                return ResponseEntity.ok(response);
-    }
-
+//     @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+//     @GetMapping("/products/{id}")
+//     public ResponseEntity<?> getProductById(@PathVariable("id") @Positive(message = "Id san pham toi thieu la 0") Integer id){
+//         Product productExist = productService.getProductById(id);
+//         if (productExist==null) {
+//             return ResponseEntity.notFound().build();
+//         }
+//             List<String> pathImgs = new ArrayList<>();
+//                       for (Image imageUrls : productExist.getImages()) {
+//                         pathImgs.add(imageUrls.getImageUrl());
+//                     }
+//             ProductDetail productDetail = new ProductDetail();
+//             BeanUtils.copyProperties(productExist, productDetail);
+//             productDetail.setImageUrls(pathImgs);
+//             List<CategorySummaryDTO> categorySumarys = new ArrayList<>();
+//             for (Category category : productExist.getCategorys()) {
+//                 CategorySummaryDTO categorySummaryDTO = new CategorySummaryDTO();
+//                 BeanUtils.copyProperties(category, categorySummaryDTO);
+//                 categorySumarys.add(categorySummaryDTO);
+//             }
+//             productDetail.setCategorys(categorySumarys);
+//             Map<String,Object> response = new HashMap<>();
+//             response.put("product", productDetail);
+//             response.put("status", "success");
+//                 return ResponseEntity.ok(response);
+//     }
+//     @RolesAllowed("ROLE_ADMIN")
     @PostMapping("/products")
     public ResponseEntity<?> addProduct(@ModelAttribute @Valid ProductDTO productRequest,
-     @RequestParam("categories") List<Integer> categoryIds) throws io.jsonwebtoken.io.IOException, IOException {
+     @RequestParam("category") Integer categoryId
+     ) throws io.jsonwebtoken.io.IOException, IOException {
             //lay danh muc tu co so du lieu
-            List<Category> categorys = categoryService.getCategoriesByIds(categoryIds);
-            if (categorys.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
+         Category category = categoryService.getCategoryById(categoryId);
+            if (category==null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục voi id"+categoryId);
             }
             // Lưu thông tin sản phẩm
             Product product = new Product();
-            BeanUtils.copyProperties(productRequest, product);
+            // BeanUtils.copyProperties(productRequest, product);
+            product.setName(productRequest.getName());
+            product.setShortDescription(productRequest.getShortDescription());
+            product.setPrice(productRequest.getPrice());
+            product.setQuantity(productRequest.getQuantity());
+            product.setSlug(product.getSlug());
+            product.setStatus(true);
              // Gán danh sách danh mục cho sản phẩm
-              product.setCategorys(categorys);
+              product.setCategory(category);
               Product createdProduct = productService.saveProduct(product);
-            //save img file
+                        //save img file
                          List<String> imgUrls = productService.saveImagesToCloudinary(productRequest.getImages());
                             for (String imgUrl : imgUrls) {
                                 productService.addImageToProduct(createdProduct.getId(), imgUrl);
                             }
+  
+                          //them mau cho san pham
+                           List<String> colorNames = productRequest.getColors();
+                            for (String colorName : colorNames) {
+                                productService.addColorToProduct(createdProduct.getId(), colorName);
+                            }
+                           List<String> sizeNames = productRequest.getSizes();
+                            for (String sizeName : sizeNames) {
+                                productService.addSizeToProduct(createdProduct.getId(), sizeName);
+                            }
+               
+  
+                            //them size vao san pham
+                            
              return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
   
  
-    //PUT
-    @PutMapping("/products/{productId}")
-    public ResponseEntity<?> updateProduct(@PathVariable Integer productId,
-     @ModelAttribute @Valid   ProductDTO productRequest,
-     @RequestParam("categories") List<Integer> categoryIds,
-   @RequestParam("imgsDelete") List<String> imgsDelete) throws IOException{
-            // Kiểm tra sản phẩm có tồn tại hay không
-        Product existingProduct = productService.getProductById(productId);
-        if (existingProduct == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm");
-        }
-        // Lấy danh sách danh mục từ danh sách mã danh mục
-        List<Category> categories = categoryService.getCategoriesByIds(categoryIds);
-        if (categories.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong tim thay danh muc");
-        }
-          // Cập nhật thông tin của sản phẩm dựa trên đối tượng updatedProduct
-            existingProduct.setName(productRequest.getName());
-            existingProduct.setPrice(productRequest.getPrice());
-            existingProduct.setDescription(productRequest.getDescription());
-            existingProduct.setQuantity(productRequest.getQuantity());
-              // Cập nhật danh sách danh mục cho sản phẩm
-              existingProduct.setCategorys(categories);
-      List<MultipartFile> images = productRequest.getImages();
-        if (images != null && !images.isEmpty()) {
-        List<String> imgUrls = productService.saveImagesToCloudinary(images);
-        for (String imgUrl : imgUrls) {
-        productService.addImageToProduct(existingProduct.getId(), imgUrl);
+//     //PUT
+//     @RolesAllowed("ROLE_ADMIN")
+//     @PutMapping("/products/{productId}")
+//     public ResponseEntity<?> updateProduct(@PathVariable Integer productId,
+//      @ModelAttribute @Valid   ProductDTO productRequest,
+//      @RequestParam("categories") List<Integer> categoryIds,
+//    @RequestParam("imgsDelete") List<String> imgsDelete) throws IOException{
+//             // Kiểm tra sản phẩm có tồn tại hay không
+//         Product existingProduct = productService.getProductById(productId);
+//         if (existingProduct == null) {
+//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm");
+//         }
+//         // Lấy danh sách danh mục từ danh sách mã danh mục
+//         List<Category> categories = categoryService.getCategoriesByIds(categoryIds);
+//         if (categories.isEmpty()) {
+//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong tim thay danh muc");
+//         }
+//           // Cập nhật thông tin của sản phẩm dựa trên đối tượng updatedProduct
+//             existingProduct.setName(productRequest.getName());
+//             existingProduct.setPrice(productRequest.getPrice());
+//             existingProduct.setDescription(productRequest.getDescription());
+//             existingProduct.setQuantity(productRequest.getQuantity());
+//               // Cập nhật danh sách danh mục cho sản phẩm
+//               existingProduct.setCategorys(categories);
+//       List<MultipartFile> images = productRequest.getImages();
+//         if (images != null && !images.isEmpty()) {
+//         List<String> imgUrls = productService.saveImagesToCloudinary(images);
+//         for (String imgUrl : imgUrls) {
+//         productService.addImageToProduct(existingProduct.getId(), imgUrl);
 
-        }
-         }
-            //xử lý xóa danh sách ảnh
-                productService.deleteImage(productId,imgsDelete);
-        //cập nhật sản phẩm
-            Product updatedProduct = productService.saveProduct(existingProduct);
+//         }
+//          }
+//             //xử lý xóa danh sách ảnh
+//                 productService.deleteImage(productId,imgsDelete);
+//         //cập nhật sản phẩm
+//             Product updatedProduct = productService.saveProduct(existingProduct);
             
-         return ResponseEntity.ok(updatedProduct);
-    }
-  //DELETE
-  @DeleteMapping("/products/{id}")
- public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id) throws IOException{
-        // Kiểm tra xem sản phẩm có tồn tại không
-        if (!productService.existsProductById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm với id:" +id);
-        }
-            // Xóa sản phẩm
-            productService.deleteProductById(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Xóa sản phẩm thành công");
- }
+//          return ResponseEntity.ok(updatedProduct);
+//     }
+//   //DELETE
+//   @DeleteMapping("/products/{id}")
+//  public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id) throws IOException{
+//         // Kiểm tra xem sản phẩm có tồn tại không
+//         if (!productService.existsProductById(id)) {
+//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm với id:" +id);
+//         }
+//             // Xóa sản phẩm
+//             productService.deleteProductById(id);
+//             return ResponseEntity.status(HttpStatus.OK).body("Xóa sản phẩm thành công");
+//  }
 
 }

@@ -64,7 +64,7 @@ export default function AllOrder(props: OrdersProps) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <p className="w-52 overflow-hidden">
-                    KTX KHU B ĐHQG TPHCM, Tỉnh Tiền Giang, Huyện Cái Bè
+                    Đai Hoc Tai Chinh TP HCM
                   </p>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -97,7 +97,7 @@ export default function AllOrder(props: OrdersProps) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <p className="w-52 overflow-hidden">
-                    KTX KHU B ĐHQG TPHCM, Tỉnh Tiền Giang, Huyện Cái Bè
+                    Đai Hoc Tai Chinh TP HCM
                   </p>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">

@@ -75,7 +75,7 @@ export default function AddCategory({
   return (
     <>
       <div className="p-3  flex shadow-lg flex-col gap-y-4 bg-white rounded-lg">
-        <h3 className="font-medium text-xl ">Add Category</h3>
+        <h3 className="font-medium text-xl ">Thêm Danh Mục</h3>
         <form
           onSubmit={categoryFormik.handleSubmit}
           className="flex flex-col gap-y-10"
@@ -84,16 +84,16 @@ export default function AddCategory({
             id="name"
             data={categoryFormik.values.name}
             setData={categoryFormik.handleChange}
-            label="Name"
-            placeholder="Please provide name category"
+            label="Tên danh mục"
+            placeholder="Vui lòng điền tên danh mục"
             error={categoryFormik.errors.name}
           />
           <Input
             id="description"
             data={categoryFormik.values.description}
             setData={categoryFormik.handleChange}
-            label="Description"
-            placeholder="Please provide description category"
+            label="Mô tả danh mục"
+            placeholder="Vui lòng điền mô tả danh mục"
             error={categoryFormik.errors.description}
           />
           <div className="btn-add-category flex justify-center items-center">
@@ -101,14 +101,14 @@ export default function AddCategory({
               disabled={isDisabled}
               style={disabledStyle}
               type="submit"
-              className={`add-category w-36 flex-shrink-0 h-11 select-none hover:opacity-80 transition-all bg-purple-600 px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center `}
+              className={`add-category w-[158px] flex-shrink-0 h-11 select-none hover:opacity-80 transition-all bg-purple-600 px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center `}
             >
               {isDisabled ? (
                 <LoadingButton />
               ) : (
                 <>
                   <i className="bi text-lg bi-cart-plus"></i>
-                  <span>Add category</span>
+                  <span>Thêm Danh Mục</span>
                 </>
               )}
             </button>

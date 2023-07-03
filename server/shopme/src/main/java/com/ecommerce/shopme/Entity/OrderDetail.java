@@ -13,7 +13,7 @@ public class OrderDetail {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private Integer amount;
-	private float productCost;
+	private float price;
     @ManyToOne
 	@JoinColumn(name = "product_id")
 	private Product product;

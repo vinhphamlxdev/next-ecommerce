@@ -3,8 +3,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.ecommerce.shopme.user.User;
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,11 +17,11 @@ public class Order {
     private Integer id;
     @Column(name = "full_name", length = 45, nullable = false)
     private String fullName;
-    @Column(name = "add_ress", length = 150, nullable = false)
+    @Column(name = "address", length = 150, nullable = false)
     private String address;
     @Column(name = "phone_number", length = 10, nullable = false)
     private Integer phoneNumber;
-    private float productCost;
+    private float price;
     private String status;
     
     @Temporal(TemporalType.TIMESTAMP)

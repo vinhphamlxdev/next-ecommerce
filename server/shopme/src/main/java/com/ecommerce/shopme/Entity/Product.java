@@ -22,6 +22,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -35,6 +36,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Table(name = "products")
 public class Product {
     @Id
@@ -45,13 +47,14 @@ public class Product {
     @NotBlank(message = "Tên sản phẩm không được để trống")
     @Length(min = 10,max = 70, message = "Tên sản phẩm tối thiểu 10 kí tự và tối đa là 70 kí tự")
     private String name;
-    @Lob
-    @Column(unique = true)
-    private String slug;
     
-    @Column(length = 512, nullable = false, name = "short_description")
+    @Column(name = "short_description", length = 512, nullable = false)
     @NotBlank(message = "Mô tả sản phẩm không được để trống")
-    private String description;
+    private String shortDescription;
+
+    
+    // @Column(name = "long_description", length = 512, nullable = true)
+    // private String longDescription;
 
     @Column(name = "price",nullable = false)
     @Min(value = 100000,message = "Giá tối thiểu phải là 100000")
@@ -63,106 +66,39 @@ public class Product {
     @Max(value = 500, message = "số lượng tối đa phải là 500")
     private Integer quantity;
 
-    @Column(name = "in_stock")
-    private Integer inStock;
 
-    @Column(name = "is_deleted")
-    private boolean isDeleted;
-
+    @Column(name = "status")
+    private boolean status;
+//Khi một đối tượng Product được lưu vào cơ sở dữ liệu, quan hệ "cascade" sẽ tự động 
+//lưu các đối tượng Image liên quan mà không cần phải lưu chúng một cách rõ ràng. Điều này có nghĩa là khi bạn lưu một Product mới và thêm các Image vào danh sách images
+//orphanRemoval = true trên một quan hệ một-nhiều, nó cho phép xóa tự động các đối tượng con khi 
+//chúng không còn được liên kết với đối tượng cha.
+    @Lob
+    @Column(unique = true)
+    private String slug;
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Image> images;
+    private List<Image> images = new ArrayList<>();
     
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "product_category",
-               joinColumns = @JoinColumn(name = "product_id"),
-               inverseJoinColumns = @JoinColumn(name = "category_id"))
-    private List<Category> categories;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
-    public Integer getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Color> colors = new ArrayList<>();
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
+    
+    @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Size> sizes = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
+    // @ManyToMany(cascade = CascadeType.ALL)
+    // @JoinTable(
+    //     name = "product_discount",
+    //     joinColumns = @JoinColumn(name="product_id"),
+    //     inverseJoinColumns = @JoinColumn(name="discount_id")
+    // )
+    // private List<Discount> discounts;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSlug() {
-        return slug;
-    }
-
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public float getPrice() {
-        return price;
-    }
-
-    public void setPrice(float price) {
-        this.price = price;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Integer getInStock() {
-        return inStock;
-    }
-
-    public void setInStock(Integer inStock) {
-        this.inStock = inStock;
-    }
-
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
-    public List<Image> getImages() {
-        return images;
-    }
-
-    public void setImages(List<Image> images) {
-       
-        this.images = images;
-    }
-
-    public List<Category> getCategorys() {
-        return categories;
-    }
-
-    public void setCategorys(List<Category> categorys) {
-        this.categories = categorys;
-    }
-
- 
-
-
-
-
+    // @OneToOne(mappedBy = "product")
+    // private Inventory inventory;
 }
 

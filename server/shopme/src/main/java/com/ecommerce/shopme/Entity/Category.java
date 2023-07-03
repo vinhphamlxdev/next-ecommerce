@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.slugify.Slugify;
 
 import jakarta.persistence.CascadeType;
@@ -42,12 +43,13 @@ public class Category {
     private String slug;
     @NotBlank(message = "Mô tả danh mục không được để trống")
     private String description;
-    private boolean enable;
     //cascade = CascadeType.ALL: để đảm bảo rằng khi một bản ghi category bị xóa, tất cả các sản phẩm liên quan sẽ được xóa theo
     //orphanRemoval = true: để đảm bảo rằng khi một sản phẩm không còn được liên kết với bất kỳ danh mục nào, nó sẽ được xóa khỏi cơ sở dữ liệu
-    @ManyToMany(mappedBy = "categories", fetch = FetchType.LAZY)
-    private List<Product> products;
-   
+    //mappedBy trường được chỉ định là trọng tâm của quan hệ
+   @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
+      private List<Product> products;
   
 
 }

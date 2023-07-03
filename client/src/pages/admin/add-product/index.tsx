@@ -9,20 +9,25 @@ import { UseAddProduct } from "@/hooks/useAddProduct";
 import { formData } from "@/utils/formData";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import SelectImage from "@/Admin/components/SelectImage";
-import { ICategory } from "@/types/interface";
+import { ICategory, IColor, ISize } from "@/types/interface";
 import { toast } from "react-toastify";
 import axios from "axios";
 import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "@/Admin/components/Loading/LoadingButton";
 import { createProduct } from "@/service/ProductApi";
+import ChooseSize from "@/Admin/components/ChooseSize";
+import ChooseColor from "@/Admin/components/ChosseColor";
 export interface AddProductProps {}
 
 export default function AddProduct(props: AddProductProps) {
-  const [select, setSelect] = useState<ICategory[] | any>();
+  const [select, setSelect] = useState<any>();
   const [imgs, setImgs] = useState<any>([]);
   const [files, setFile] = useState<File[]>([]);
+  const [sizes, setSizes] = useState<ISize[]>([]);
+  const [colors, setColors] = useState<IColor[]>([]);
   const router = useRouter();
 
+  console.log(sizes);
   const productFormik = useFormik({
     initialValues: {
       name: "",
@@ -49,22 +54,41 @@ export default function AddProduct(props: AddProductProps) {
     }),
 
     onSubmit: async (values) => {
-      if (!select || !select.length) {
-        toast.error("Vui lòng chọn danh mục");
+      if (sizes.length === 0) {
+        toast.error("Vui lòng chọn size sản phẩm");
         return;
       }
+      if (colors.length === 0) {
+        toast.error("Vui lòng chọn màu sản phẩm");
+        return;
+      }
+      if (!select) {
+        toast.error("Vui lòng chọn danh mục sản phẩm");
+        return;
+      }
+
       if (!imgs || !imgs.length) {
         toast.error("Vui lòng chọn ảnh sản phẩm");
         return;
       }
       const { name, price, description, quantity } = values;
-      const categoryIds = select.map((c: ICategory, index: number) => c.id);
+      const colorNames = colors.map((color) => color?.colorName);
+      const sizeNames = sizes.map((size, index) => size?.name);
+      console.log(sizeNames);
       const newFormData = new FormData();
       newFormData.append("name", name);
-      newFormData.append("description", description);
+      newFormData.append("shortDescription", description);
       newFormData.append("price", price);
       newFormData.append("quantity", quantity);
-      newFormData.append("categories", categoryIds);
+      newFormData.append("category", select?.id);
+      for (let index = 0; index < sizeNames.length; index++) {
+        const sizeName = sizeNames[index];
+        newFormData.append(`sizes[${index}]`, sizeName);
+      }
+      for (let index = 0; index < colorNames.length; index++) {
+        const colorName = colorNames[index];
+        newFormData.append(`colors[${index}]`, colorName);
+      }
       for (let index = 0; index < files.length; index++) {
         newFormData.append(`images[${index}]`, files[index]);
       }
@@ -79,7 +103,7 @@ export default function AddProduct(props: AddProductProps) {
         }
       );
       if (response.status === 201) {
-        router.push("/admin/products");
+        // router.push("/admin/products");
         toast.success("Thêm sản phẩm thành công");
       } else {
         toast.error("Thêm sản phẩm thất bại");
@@ -93,7 +117,7 @@ export default function AddProduct(props: AddProductProps) {
   return (
     <LayoutAdmin>
       <div className="add-product-page  p-3 bg-white shadow-md rounded-md">
-        <h3 className="font-medium text-xl">Add Product</h3>
+        <h3 className="font-medium mb-6 text-xl">Thêm Sản Phẩm</h3>
         <form
           onSubmit={productFormik.handleSubmit}
           encType="multipart/form-data"
@@ -103,35 +127,36 @@ export default function AddProduct(props: AddProductProps) {
             id="name"
             data={productFormik.values.name}
             setData={productFormik.handleChange}
-            label="Name"
-            placeholder="Please provide name product"
+            label="Tên sản phẩm"
+            placeholder="Vui lòng điền tên sản phẩm"
             error={productFormik.errors.name}
           />
           <Input
             id="description"
             data={productFormik.values.description}
             setData={productFormik.handleChange}
-            label="Description"
-            placeholder="Please provide description product"
+            label="Mô tả sản phẩm"
+            placeholder="Vui lòng điền mô tả sản phẩm"
             error={productFormik.errors.description}
           />
           <Input
             id="price"
             data={productFormik.values.price}
             setData={productFormik.handleChange}
-            label="Price"
-            placeholder="Please provide price product"
+            label="Giá sản phẩm"
+            placeholder="Vui lòng điền giá sản phẩm"
             error={productFormik.errors.price}
           />
           <Input
             id="quantity"
             data={productFormik.values.quantity}
             setData={productFormik.handleChange}
-            label="Quantity"
-            placeholder="Please provide quantity product"
+            label="Số lượng"
+            placeholder="Vui lòng điền số lượng sản phẩm"
             error={productFormik.errors.quantity}
           />
-
+          <ChooseSize sizes={sizes} setSizes={setSizes} id="sizes" />
+          <ChooseColor colors={colors} setColors={setColors} id="colors" />
           <Select
             id="selectOption"
             label=""
@@ -150,7 +175,7 @@ export default function AddProduct(props: AddProductProps) {
             type="submit"
             className="add-category hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center"
           >
-            {isDisabled ? <LoadingButton /> : <span>Add category</span>}
+            {isDisabled ? <LoadingButton /> : <span>Thêm sản phẩm</span>}
           </button>
         </form>
       </div>

@@ -35,7 +35,7 @@ export default function Input({
           placeholder={placeholder}
           value={data}
           onChange={setData}
-          className="outline-none w-full border border-gray-300 text-sm text-gray-400 px-3 py-2"
+          className="outline-none  w-full border border-gray-300 text-sm text-gray-400 px-3 py-2"
         />
         <span className="text-red-500 text-sm font-normal"> {error || ""}</span>
       </div>

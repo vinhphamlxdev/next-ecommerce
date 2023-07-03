@@ -66,7 +66,7 @@ export default function Category(props: CategoryProps) {
         <div className="admin-category mt-5 flex flex-col gap-y-4">
           <AddCategory categorys={categorys} setRender={setRender} />
           <div className="p-3 flex shadow-lg flex-col gap-y-4 bg-white rounded-lg">
-            <h3 className="font-medium text-xl ">All Category</h3>
+            <h3 className="font-medium text-xl ">Tất Cả Danh Mục</h3>
             {categorys &&
               categorys.map((c: any, index: number) => {
                 return (
