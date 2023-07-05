@@ -55,6 +55,7 @@ import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
 import com.ecommerce.shopme.service.CategoryService;
 import com.ecommerce.shopme.service.ProductSevice;
+import com.ecommerce.shopme.service.SizeService;
 import com.ecommerce.shopme.utils.ProductListResponse;
 
 import jakarta.annotation.security.RolesAllowed;
@@ -74,7 +75,6 @@ public class ProductController {
     Cloudinary cloudinary;
     //  private final Cloudinary cloudinary;
   
-
     //  @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products")
     public ResponseEntity<ProductListResponse> getAll(@RequestParam(defaultValue = "0") int pageNum,
@@ -85,6 +85,7 @@ public class ProductController {
         List<ProductDetail> productResponses = products.stream()
             .map(product -> {
                 ProductDetail productDetail = new ProductDetail();
+                productDetail.setId(product.getId());
                 productDetail.setName(product.getName());
                 productDetail.setShortDescription(product.getShortDescription());
                 productDetail.setPrice(product.getPrice());
@@ -123,31 +124,43 @@ public class ProductController {
      return ResponseEntity.ok(productListResponse);
     }
 //     @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
-//     @GetMapping("/products/{id}")
-//     public ResponseEntity<?> getProductById(@PathVariable("id") @Positive(message = "Id san pham toi thieu la 0") Integer id){
-//         Product productExist = productService.getProductById(id);
-//         if (productExist==null) {
-//             return ResponseEntity.notFound().build();
-//         }
-//             List<String> pathImgs = new ArrayList<>();
-//                       for (Image imageUrls : productExist.getImages()) {
-//                         pathImgs.add(imageUrls.getImageUrl());
-//                     }
-//             ProductDetail productDetail = new ProductDetail();
-//             BeanUtils.copyProperties(productExist, productDetail);
-//             productDetail.setImageUrls(pathImgs);
-//             List<CategorySummaryDTO> categorySumarys = new ArrayList<>();
-//             for (Category category : productExist.getCategorys()) {
-//                 CategorySummaryDTO categorySummaryDTO = new CategorySummaryDTO();
-//                 BeanUtils.copyProperties(category, categorySummaryDTO);
-//                 categorySumarys.add(categorySummaryDTO);
-//             }
-//             productDetail.setCategorys(categorySumarys);
-//             Map<String,Object> response = new HashMap<>();
-//             response.put("product", productDetail);
-//             response.put("status", "success");
-//                 return ResponseEntity.ok(response);
-//     }
+    @GetMapping("/products/{id}")
+    public ResponseEntity<?> getProductById(@PathVariable("id") @Positive(message = "Id san pham toi thieu la 0") Integer id){
+        Product productExist = productService.getProductById(id);
+        if (productExist==null) {
+            return ResponseEntity.notFound().build();
+        }
+          
+            ProductDetail productDetail = new ProductDetail();
+            productDetail.setId(productExist.getId());
+            productDetail.setName(productExist.getName());
+            productDetail.setShortDescription(productExist.getShortDescription());
+            productDetail.setPrice(productExist.getPrice());
+            productDetail.setQuantity(productExist.getQuantity());
+            productDetail.setStatus(true);
+            productDetail.setCategory(productExist.getCategory());
+
+              List<String> pathImgs = new ArrayList<>();
+                      for (Image imageUrls : productExist.getImages()) {
+                        pathImgs.add(imageUrls.getImageUrl());
+                    }
+                     productDetail.setImageUrls(pathImgs);
+               List<String> sizeNames = new ArrayList<>();
+                      for (Size sizeName : productExist.getSizes()) {
+                        sizeNames.add(sizeName.getName());
+                    }
+            productDetail.setSizes(sizeNames);
+                    
+             List<String> colorNames = new ArrayList<>();
+                      for (Color colorName : productExist.getColors()) {
+                        colorNames.add(colorName.getColorName());
+                    }
+            productDetail.setColors(colorNames);
+            Map<String,Object> response = new HashMap<>();
+            response.put("product", productDetail);
+            response.put("status", "success");
+                return ResponseEntity.ok(response);
+    }
 //     @RolesAllowed("ROLE_ADMIN")
     @PostMapping("/products")
     public ResponseEntity<?> addProduct(@ModelAttribute @Valid ProductDTO productRequest,
@@ -195,53 +208,77 @@ public class ProductController {
  
 //     //PUT
 //     @RolesAllowed("ROLE_ADMIN")
-//     @PutMapping("/products/{productId}")
-//     public ResponseEntity<?> updateProduct(@PathVariable Integer productId,
-//      @ModelAttribute @Valid   ProductDTO productRequest,
-//      @RequestParam("categories") List<Integer> categoryIds,
-//    @RequestParam("imgsDelete") List<String> imgsDelete) throws IOException{
-//             // Kiểm tra sản phẩm có tồn tại hay không
-//         Product existingProduct = productService.getProductById(productId);
-//         if (existingProduct == null) {
-//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm");
-//         }
-//         // Lấy danh sách danh mục từ danh sách mã danh mục
-//         List<Category> categories = categoryService.getCategoriesByIds(categoryIds);
-//         if (categories.isEmpty()) {
-//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong tim thay danh muc");
-//         }
-//           // Cập nhật thông tin của sản phẩm dựa trên đối tượng updatedProduct
-//             existingProduct.setName(productRequest.getName());
-//             existingProduct.setPrice(productRequest.getPrice());
-//             existingProduct.setDescription(productRequest.getDescription());
-//             existingProduct.setQuantity(productRequest.getQuantity());
-//               // Cập nhật danh sách danh mục cho sản phẩm
-//               existingProduct.setCategorys(categories);
-//       List<MultipartFile> images = productRequest.getImages();
-//         if (images != null && !images.isEmpty()) {
-//         List<String> imgUrls = productService.saveImagesToCloudinary(images);
-//         for (String imgUrl : imgUrls) {
-//         productService.addImageToProduct(existingProduct.getId(), imgUrl);
+    @PutMapping("/products/{productId}")
+    public ResponseEntity<?> updateProduct(@PathVariable Integer productId ,
+    @ModelAttribute @Valid ProductDTO productRequest,
+     @RequestParam("category") Integer categoryId,
+      @RequestParam("imgsDelete") List<String> imgsDelete,
+      @RequestParam("sizesDelete") List<String> sizesDelete,
+      @RequestParam("colorsDelete") List<String> colorDelete
+     ) throws IOException{
+            // Kiểm tra sản phẩm có tồn tại hay không
+        Product existingProduct = productService.getProductById(productId);
+        if (existingProduct == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm voi id:"+productId);
+        }
+        // Lấy danh sách danh mục từ danh sách mã danh mục
+           Category category = categoryService.getCategoryById(categoryId);
+              if (category==null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Khong tim thay danh muc");
+        }
+       
+          // Cập nhật thông tin của sản phẩm dựa trên đối tượng updatedProduct
+            existingProduct.setName(productRequest.getName());
+            existingProduct.setPrice(productRequest.getPrice());
+            existingProduct.setShortDescription(productRequest.getShortDescription());
+            existingProduct.setPrice(productRequest.getPrice());
+            existingProduct.setStatus(true);
+            existingProduct.setQuantity(productRequest.getQuantity());
+              // Cập nhật  danh mục cho sản phẩm
+              existingProduct.setCategory(category);
+      List<MultipartFile> images = productRequest.getImages();
+        if (!images.isEmpty()) {
+            //luu vao cloudinary
+        List<String> imgUrls = productService.saveImagesToCloudinary(images);
 
-//         }
-//          }
-//             //xử lý xóa danh sách ảnh
-//                 productService.deleteImage(productId,imgsDelete);
-//         //cập nhật sản phẩm
-//             Product updatedProduct = productService.saveProduct(existingProduct);
+        for (String imgUrl : imgUrls) {
+        productService.addImageToProduct(existingProduct.getId(), imgUrl);
+
+        }
+         }
+           
+            //xu ly luu size
+                List<String> sizeNames = productRequest.getSizes();
+                if (!sizeNames.isEmpty()) {
+                    for (String sizeName : sizeNames) {
+                        productService.addSizeToProduct(existingProduct.getId(), sizeName);
+                    }
+                }
+                 List<String> colorNames = productRequest.getColors();
+                if (!colorNames.isEmpty()) {
+                    for (String colorName : colorNames) {
+                        productService.addColorToProduct(existingProduct.getId(), colorName);
+                    }
+                }
+                 //xử lý xóa danh sách ảnh
+                productService.deleteImage(existingProduct.getId(),imgsDelete);
+                productService.deleteSize(existingProduct.getId(), sizesDelete);
+                productService.deleteColor(existingProduct.getId(), colorDelete);
+        //cập nhật sản phẩm
+            Product updatedProduct = productService.saveProduct(existingProduct);
             
-//          return ResponseEntity.ok(updatedProduct);
-//     }
+         return ResponseEntity.ok(updatedProduct);
+    }
 //   //DELETE
-//   @DeleteMapping("/products/{id}")
-//  public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id) throws IOException{
-//         // Kiểm tra xem sản phẩm có tồn tại không
-//         if (!productService.existsProductById(id)) {
-//             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm với id:" +id);
-//         }
-//             // Xóa sản phẩm
-//             productService.deleteProductById(id);
-//             return ResponseEntity.status(HttpStatus.OK).body("Xóa sản phẩm thành công");
-//  }
+  @DeleteMapping("/products/{id}")
+ public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id) throws IOException{
+        // Kiểm tra xem sản phẩm có tồn tại không
+        if (!productService.existsProductById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm với id:" +id);
+        }
+            // Xóa sản phẩm
+            productService.deleteProductById(id);
+            return ResponseEntity.status(HttpStatus.OK).body("Xóa sản phẩm thành công");
+ }
 
 }

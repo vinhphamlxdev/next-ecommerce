@@ -9,25 +9,24 @@ import { UseAddProduct } from "@/hooks/useAddProduct";
 import { formData } from "@/utils/formData";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import SelectImage from "@/Admin/components/SelectImage";
-import { ICategory, IColor, ISize } from "@/types/interface";
+import { ICategory } from "@/types/interface";
 import { toast } from "react-toastify";
 import axios from "axios";
 import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "@/Admin/components/Loading/LoadingButton";
 import { createProduct } from "@/service/ProductApi";
 import ChooseSize from "@/Admin/components/ChooseSize";
-import ChooseColor from "@/Admin/components/ChosseColor";
+import ChooseColor from "@/Admin/components/ChooseColor";
 export interface AddProductProps {}
 
 export default function AddProduct(props: AddProductProps) {
   const [select, setSelect] = useState<any>();
   const [imgs, setImgs] = useState<any>([]);
   const [files, setFile] = useState<File[]>([]);
-  const [sizes, setSizes] = useState<ISize[]>([]);
-  const [colors, setColors] = useState<IColor[]>([]);
+  const [sizes, setSizes] = useState<string[]>([]);
+  const [colors, setColors] = useState<string[]>([]);
   const router = useRouter();
 
-  console.log(sizes);
   const productFormik = useFormik({
     initialValues: {
       name: "",
@@ -44,13 +43,14 @@ export default function AddProduct(props: AddProductProps) {
         .min(30, "Mô tả nên nhiều hơn 30 kí tự")
         .required("Mô tả sản phẩm là bắt buộc"),
       price: Yup.number()
-        .min(100000, "Giá tối thiểu phải là 100000")
-        .max(1000000, "Giá tối đa phải là 1000000")
-        .required("Giá sản phẩm là bắt buộc"),
+        .min(0, "Giá tối thiểu phải là 0đ")
+        .required("Giá sản phẩm là bắt buộc")
+        .typeError("Giá sản phẩm phải là số"),
       quantity: Yup.number()
         .min(1, "Số lượng phải lớn hơn 0")
         .max(500, "Số lượng tối đa là 500")
-        .required("Số lượng là bắt buộc"),
+        .required("Số lượng là bắt buộc")
+        .typeError("Số lượng sản phẩm phải là số"),
     }),
 
     onSubmit: async (values) => {
@@ -72,21 +72,18 @@ export default function AddProduct(props: AddProductProps) {
         return;
       }
       const { name, price, description, quantity } = values;
-      const colorNames = colors.map((color) => color?.colorName);
-      const sizeNames = sizes.map((size, index) => size?.name);
-      console.log(sizeNames);
       const newFormData = new FormData();
       newFormData.append("name", name);
       newFormData.append("shortDescription", description);
       newFormData.append("price", price);
       newFormData.append("quantity", quantity);
       newFormData.append("category", select?.id);
-      for (let index = 0; index < sizeNames.length; index++) {
-        const sizeName = sizeNames[index];
+      for (let index = 0; index < sizes.length; index++) {
+        const sizeName = sizes[index];
         newFormData.append(`sizes[${index}]`, sizeName);
       }
-      for (let index = 0; index < colorNames.length; index++) {
-        const colorName = colorNames[index];
+      for (let index = 0; index < colors.length; index++) {
+        const colorName = colors[index];
         newFormData.append(`colors[${index}]`, colorName);
       }
       for (let index = 0; index < files.length; index++) {

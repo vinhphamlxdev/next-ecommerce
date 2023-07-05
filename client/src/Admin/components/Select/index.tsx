@@ -25,7 +25,6 @@ export default function Select({
     async function fetchCategorys() {
       const res = await getAllCategorys({});
       if (res && res.categorys) {
-        console.log(res.categorys);
         setCategorys(res.categorys);
       }
     }
@@ -35,24 +34,21 @@ export default function Select({
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const values = JSON.parse(e.target.value);
     setSelect(values);
-    console.log(select);
   };
-  const handleRemove = () => {
-    setSelect([]);
-  };
+  const handleRemove = () => setSelect([]);
 
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-        <div className="text-white  w-full capitalize flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs">
-          <>
+        {select.name && (
+          <div className="text-white  w-full capitalize flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs">
             <span>{select?.name}</span>
             <i
               onClick={() => handleRemove()}
               className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
             ></i>
-          </>
-        </div>
+          </div>
+        )}
       </div>
       <div className="flex flex-col gap-y-1">
         <select

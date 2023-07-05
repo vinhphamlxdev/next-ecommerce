@@ -17,5 +17,8 @@ public class SizeService {
     public List<Size> listAllSize(){
         return sizeRepository.findAll();
     }
+    public List<Size> getSizeByProductId(Integer productId){
+        return sizeRepository.findByProductId(productId);
+    }
     
 }

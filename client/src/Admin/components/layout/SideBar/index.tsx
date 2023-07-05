@@ -72,7 +72,7 @@ export default function SideBar(props: SidebarProps) {
       <div className="flex flex-col gap-y-4">
         <div className="flex flex-col">
           <div className="flex justify-center items-center">
-            <Image className="w-16 h-16" src={IMG_SRC.logo} alt="" />
+            <Image className="w-24 h-24" src={IMG_SRC.logo} alt="" />
           </div>
         </div>
         <div className="sidebar-menu-list flex flex-col gap-y-3">

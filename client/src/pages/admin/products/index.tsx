@@ -19,28 +19,28 @@ import Swal from "sweetalert2";
 import getMessage from "@/utils/getMessage";
 import { useRouter } from "next/router";
 import { useModalStore } from "@/store/modalStore";
-import ModalTest from "@/Admin/components/Modal/ModalProductDetail";
 import ModalProductEdit from "@/Admin/components/Modal/ModalProductEdit";
 import HeaderTable from "@/Admin/components/HeaderTable";
 import Pagination from "@/Admin/components/Pagination";
 import PaginationComponent from "@/Admin/components/Pagination";
+import ModalProductDetail from "@/Admin/components/Modal/ModalProductDetail";
 
 export interface ProductProps {}
 
 function Products(props: ProductProps) {
   const thHeader: string[] = [
-    "Name",
-    "Price",
-    "InStock",
-    "Edit",
-    "Delete",
-    "Detail",
+    "Tên sản phẩm",
+    "Giá",
+    "Số lượng",
+    "Chỉnh sửa",
+    "Xóa",
+    "Chi tiết",
   ];
   const router = useRouter();
   const { setLoading, isLoading } = useGlobalStore();
   const { setOpenEditProduct, setOpenDetailProduct } = useModalStore();
   const [products, setProducts] = React.useState<IProduct[]>();
-  const [product, setProduct] = React.useState<IProduct>();
+  const [product, setProduct] = React.useState<IProduct | null>(null);
   const [render, setRender] = React.useState<boolean>(false);
   const [pagination, setPagination] = React.useState({
     current: 1,
@@ -114,6 +114,7 @@ function Products(props: ProductProps) {
     const fetchProducts = async () => {
       try {
         const data = await getAllProducts(filters);
+        console.log(data);
         if (data && data?.products) {
           setProducts(data.products);
           const { page } = data;
@@ -137,20 +138,20 @@ function Products(props: ProductProps) {
           <div className="bg-slate-800 py-3 px-3  rounded-sm flex flex-col gap-y-3">
             <div className="flex justify-between p-3 items-center">
               <span className="text-white text-lg font-medium">
-                Product list
+                Danh Sách Sản Phẩm
               </span>
               <button
                 onClick={() => router.push("/admin/add-product")}
                 className="text-white font-normal text-sm bg-saveBg px-3 py-[6px] rounded-md"
               >
-                Add Product
+                Thêm Sản Phẩm
               </button>
             </div>
 
             <table className="items-center border-spacing-y-2 text-white w-full bg-transparent border-separate ">
               <HeaderTable data={thHeader} />
               <tbody className=" w-full ">
-                {/* {products?.map((product: IProduct, index: number) => {
+                {products?.map((product: IProduct, index: number) => {
                   return (
                     <tr key={product.id} className="bg-gray-700 mt-2">
                       <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
@@ -206,49 +207,7 @@ function Products(props: ProductProps) {
                       </td>
                     </tr>
                   );
-                })} */}
-                <tr className="bg-gray-700 mt-2">
-                  <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                    <div className="relative  rounded-full">
-                      <Image
-                        className="rounded-full  w-14 h-14 flex-shrink-0 object-cover"
-                        width={100}
-                        height={100}
-                        src={IMG_SRC.product}
-                        alt=""
-                      />
-                    </div>
-                    <span className="ml-3 font-bold text-white">
-                      ten san pham
-                    </span>
-                  </th>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    200.000đ
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    <i className="fas fa-circle text-orange-500 mr-2"></i>
-                    <span className="bg-saveBg rounded-[10px] px-3 py-[2px] block text-center overflow-hidden w-[50px]">
-                      50
-                    </span>
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    <button className="py-3 px-5 bg-orange-400 rounded-[5px]">
-                      <EditIcon />
-                    </button>
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    <button className="py-3 px-5 bg-red-500 rounded-[5px]">
-                      <DeleteIcon />
-                    </button>
-                  </td>
-                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                    <div className="flex">
-                      <button className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer">
-                        <BsEye className="leading-[0px]" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                })}
               </tbody>
             </table>
             {products?.length === 0 && (
@@ -271,8 +230,8 @@ function Products(props: ProductProps) {
             onPageChange={handlePageChange}
           />
         </div>
-        {product && <ModalProductEdit data={product} setRender={setRender} />}
-        {product && <ModalTest data={product} />}
+        <ModalProductEdit data={product} setRender={setRender} />
+        {product && <ModalProductDetail data={product} />}
         {isLoading && <LoadingSpinner />}
       </LayoutAdmin>
     </>

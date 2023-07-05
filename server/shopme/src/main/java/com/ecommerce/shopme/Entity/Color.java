@@ -19,7 +19,7 @@ public class Color {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(name = "color_name",length = 128, nullable = false, unique = true)
+    @Column(name = "color_name",length = 128, nullable = false, unique = false)
     @NotBlank(message = "Tên danh mục không được để trống")
     private String colorName;
    

@@ -1,5 +1,6 @@
 package com.ecommerce.shopme.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
@@ -33,10 +34,13 @@ public class ProductDTO {
     
     private String slug;
 
-     private List<MultipartFile> images;
+     private List<MultipartFile> images = new ArrayList<>();
 
      private List<String> sizes;
 
      private List<String> colors;
      private Category category;
+
+
+     
 }

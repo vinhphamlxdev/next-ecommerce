@@ -5,13 +5,14 @@ import InputModal from "../InputModal/InputModal";
 import { IProduct } from "@/types/interface";
 import Image from "next/image";
 import UseDisabled from "@/hooks/useDisabled";
+import { btnColorStyle } from "../ChooseColor";
 
 export interface IModalProductDetailProps {
   data: IProduct;
 }
 
 export default function ModalProductDetail({ data }: IModalProductDetailProps) {
-  const { categorys } = data;
+  const { category, sizes, colors } = data;
   const { isOpenDetailP, setOpenDetailProduct } = useModalStore();
   if (typeof document === "undefined")
     return <div className="modal_product-detail"></div>;
@@ -28,38 +29,79 @@ export default function ModalProductDetail({ data }: IModalProductDetailProps) {
       <div className="p-3 max-h-[550px] has-scrollbar rounded-md relative bg-white w-[550px]  inset-0 m-auto z-[600]">
         <div className="flex gap-y-3 flex-col">
           <div className="modal-choose-category">
-            <div className="text-base mb-3 font-medium">Category</div>
+            <div className="text-base mb-3 font-medium">Danh mục</div>
             <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-              <div className="text-white flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs">
-                {categorys &&
-                  categorys.map((category, index) => {
-                    return <div key={category.id}>{category?.name}</div>;
-                  })}
-              </div>
+              <div className="text-base capitalize">{category?.name}</div>
             </div>
           </div>
+          <div className="size-detail flex flex-col gap-y-3">
+            <div className="text-base  font-medium">Size</div>
+            <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
+              {sizes.length > 0 &&
+                sizes.map((sizeName: any, index: number) => {
+                  return (
+                    <div
+                      key={index}
+                      className="text-white w-14 flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs"
+                    >
+                      <span>{sizeName}</span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+          <div className="size-detail flex flex-col gap-y-3">
+            <div className="text-base  font-medium">Màu sắc</div>
+            <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
+              {colors.length > 0 &&
+                colors.map((colorName: string, index: number) => {
+                  return (
+                    <div
+                      key={index}
+                      className={`${btnColorStyle} ${
+                        colorName === "Đen"
+                          ? "bg-[#293241]"
+                          : colorName === "Trắng"
+                          ? "bg-[#adb5bd] text-black"
+                          : colorName === "Xanh Lá"
+                          ? "bg-saveBg"
+                          : colorName === "Xanh Da Trời"
+                          ? "bg-[#4cc9f0]"
+                          : ""
+                      } `}
+                    >
+                      <span>{colorName}</span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+
           <div className="grid grid-cols-3 gap-x-3">
             <InputModal
               disabled={true}
-              title="Name"
+              title="Tên sản phẩm"
               id="name"
               value={data?.name}
             />
             <InputModal
               disabled={true}
               id="price"
-              title="Price"
+              title="Giá"
               value={data?.price.toString()}
             />
             <InputModal
               disabled={true}
               id="quantity"
-              title="Quantity"
+              title="Số lượng"
               value={data?.quantity.toString()}
             />
           </div>
-          <div className="bg-[#f5f5f5] text-gray-500 h-14 p-3 flex gap-x-3">
-            {data?.description}
+          <div className="flex flex-col gap-y-3">
+            <div className="text-base font-medium">Mô tả</div>
+            <div className="bg-[#f5f5f5] text-gray-500 h-14 p-3 flex gap-x-3">
+              {data?.shortDescription}
+            </div>
           </div>
           <div className="grid grid-cols-3 gap-y-3 gap-x-3">
             {data?.imageUrls?.map((img, index) => {

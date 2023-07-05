@@ -89,6 +89,7 @@ public class ProductSevice {
 
             cloudinary.uploader().destroy(getPublicIdImage(image.getImageUrl()), ObjectUtils.emptyMap());
         }
+        
         imageRepository.deleteAll(images);
         productRepository.delete(product);
       
@@ -118,28 +119,39 @@ public void addImageToProduct(Integer productId, String imageUrl) {
 }
 public void addSizeToProduct(Integer productId,String sizeName){
      Optional<Product> optionalProduct = productRepository.findById(productId);
+    
      if (optionalProduct.isPresent()) {
         Product product = optionalProduct.get();
-        Size size = new Size();
-        size.setName(sizeName);
-        size.setProduct(product);
-         // Thêm size vào danh sách size của product
-        //  sizeRepository.save(size);
-         product.getSizes().add(size);
-         productRepository.save(product);
+
+            // Kiểm tra xem size đã tồn tại trong danh sách sizes của sản phẩm hay chưa
+        boolean sizeExists = product.getSizes().stream()
+                .anyMatch(size -> size.getName().equals(sizeName));
+  
+        if (!sizeExists) {
+            Size size = new Size();
+            size.setName(sizeName);
+            size.setProduct(product);
+            // Thêm size vào danh sách sizes của product
+            product.getSizes().add(size);
+            productRepository.save(product);
+        }
      }
 }
 public void addColorToProduct(Integer productId,String colorName){
      Optional<Product> optionalProduct = productRepository.findById(productId);
      if (optionalProduct.isPresent()) {
         Product product = optionalProduct.get();
-        Color color = new Color();
-        color.setColorName(colorName);
-        color.setProduct(product);
-         // Thêm size vào danh sách size của product
-        //  colorRepository.save(color);
-         product.getColors().add(color);
-         productRepository.save(product);
+         // Kiểm tra xem color đã tồn tại trong danh sách sizes của sản phẩm hay chưa
+         boolean colorExists = product.getColors().stream()
+         .anyMatch(color->color.getColorName().equals(colorName));
+         if (!colorExists) {
+             Color color = new Color();
+             color.setColorName(colorName);
+             color.setProduct(product);
+              // Thêm color vào danh sách color của product
+              product.getColors().add(color);
+              productRepository.save(product);
+         }
      }
 }
 // //Khi đã tìm thấy hình ảnh có URL trùng khớp với URL cần xóa,
@@ -152,6 +164,28 @@ public void deleteImage(Integer productId,List<String> imgsUrlDelete) throws jav
             if (image.getImageUrl().equals(imgUrl)) {
                 imageRepository.delete(image);
                 cloudinary.uploader().destroy(getPublicIdImage(image.getImageUrl()), ObjectUtils.emptyMap());
+                break;
+            }
+        }
+    }
+}
+public void deleteSize(Integer productId,List<String> sizeNamesDelete) throws java.io.IOException {
+    List<Size> sizes = sizeRepository.findByProductId(productId);
+    for (String sizeNameDelete : sizeNamesDelete) {
+        for (Size size : sizes) {
+            if (size.getName().equals(sizeNameDelete)) {
+                sizeRepository.delete(size);
+                break;
+            }
+        }
+    }
+}
+public void deleteColor(Integer productId,List<String> colorsDelete) throws java.io.IOException {
+    List<Color> colors = colorRepository.findByProductId(productId);
+    for (String colorNameDelete : colorsDelete) {
+        for (Color color : colors) {
+            if (color.getColorName().equals(colorNameDelete)) {
+                colorRepository.delete(color);
                 break;
             }
         }

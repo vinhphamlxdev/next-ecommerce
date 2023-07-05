@@ -57,13 +57,11 @@ public class Product {
     // private String longDescription;
 
     @Column(name = "price",nullable = false)
-    @Min(value = 100000,message = "Giá tối thiểu phải là 100000")
-    @Max(value = 1000000, message = "Giá tối đa phải là 1000000")
+    @Min(value = 0,message = "Giá tối thiểu phải là 0")
     private float price;
 
     @Column(name = "quantity",nullable = false)
     @Min(value = 1,message = "số lượng tối thiểu phải là 1")
-    @Max(value = 500, message = "số lượng tối đa phải là 500")
     private Integer quantity;
 
 

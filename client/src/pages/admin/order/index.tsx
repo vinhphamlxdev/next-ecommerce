@@ -12,40 +12,42 @@ export default function AllOrder(props: OrdersProps) {
   return (
     <LayoutAdmin>
       <div className="p-3 flex flex-col gap-y-3 rounded-sm bg-white shadow-md">
-        <h3 className=" font-medium text-xl">All order</h3>
+        <h3 className=" font-medium text-xl"></h3>
         <div className="bg-slate-800 py-3 px-3 rounded-sm flex flex-col gap-y-3">
           <div className="flex justify-between">
-            <span className="text-white text-lg font-medium">Order list</span>
+            <span className="text-white text-lg font-medium">
+              Danh Sách Đơn Hàng
+            </span>
             <select
               className="p-1 bg-white w-28 outline-none rounded-sm"
               name=""
               id=""
             >
               <option value="1">All</option>
-              <option value="2">Success</option>
-              <option value="3">Pending</option>
+              <option value="2">Đã Giao</option>
+              <option value="3">Đang xử lý</option>
             </select>
           </div>
           <table className="items-center border-spacing-y-2 text-white w-full bg-transparent border-separate ">
             <thead className="bg-gray-700">
               <tr>
                 <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                  Cutstomer
+                  Khách Hàng
                 </th>
                 <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                  Phone number
+                  Số Điện Thoại
                 </th>
                 <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                  Recipient
+                  Địa Chỉ
                 </th>
                 <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                  Status
+                  Trạng Thái
                 </th>
                 <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                  Total
+                  Tổng Tiền
                 </th>
                 <th className="px-6 align-middle border border-solid py-3 text-xs  border-l-0 border-r-0 border-transparent whitespace-nowrap font-semibold text-left   ">
-                  Detail
+                  Chi Tiết
                 </th>
               </tr>
             </thead>
@@ -64,7 +66,7 @@ export default function AllOrder(props: OrdersProps) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <p className="w-52 overflow-hidden">
-                    Đai Hoc Tai Chinh TP HCM
+                    Đai Hoc Tai Chinh - Marketing TP.HCM
                   </p>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
@@ -97,7 +99,7 @@ export default function AllOrder(props: OrdersProps) {
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <p className="w-52 overflow-hidden">
-                    Đai Hoc Tai Chinh TP HCM
+                    Đai Hoc Tai Chinh - Marketing TP.HCM
                   </p>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">

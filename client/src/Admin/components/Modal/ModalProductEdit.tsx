@@ -12,6 +12,8 @@ import UseDisabled from "@/hooks/useDisabled";
 import SelectImage from "../SelectImage";
 import LoadingButton from "../Loading/LoadingButton";
 import { LoadingSpinner } from "../Loading";
+import ChooseSize from "../ChooseSize";
+import ChooseColor from "../ChooseColor";
 
 export interface IModalProductEditProps {
   data: IProduct | any;
@@ -22,18 +24,20 @@ export default function ModalProductEdit({
   data,
   setRender,
 }: IModalProductEditProps) {
-  const [optionCategorys, setOptionCategory] = React.useState<
-    ICategory[] | any
-  >([]);
   const { isOpenEditP, setOpenEditProduct, isLoading, setLoading } =
     useModalStore((state) => state);
+  const [selectCategory, setCategory] = React.useState<ICategory[] | any>([]);
+  const [sizes, setSizes] = React.useState<string[]>([]);
+  const [colors, setColors] = React.useState<string[]>([]);
   const [imgs, setImgs] = React.useState<any>([]);
   const [files, setFile] = React.useState<File[]>([]);
   const [imgsDelete, setImgsDelete] = React.useState<string[] | any>([]);
+  const [sizesDelete, setSizesDelete] = React.useState<string[] | any>([]);
+  const [colorsDelete, setColorsDelete] = React.useState<string[] | any>([]);
   const productEditFormik = useFormik({
     initialValues: {
       name: data?.name,
-      description: data?.description,
+      shortDescription: data?.shortDescription,
       price: data?.price,
       quantity: data?.quantity,
     },
@@ -44,27 +48,39 @@ export default function ModalProductEdit({
   });
 
   const handleSubmitEditProduct = async (id: number) => {
-    const { name, price, description, quantity } = productEditFormik.values;
-    if (!optionCategorys || optionCategorys.length === 0) {
+    const { name, price, shortDescription, quantity } =
+      productEditFormik.values;
+    if (!selectCategory || selectCategory.length === 0) {
       toast.error("Vui lòng chọn danh mục sản phẩm");
       return;
     }
+
     if (!imgs || !imgs.length) {
       toast.error("Vui lòng chọn ảnh sản phẩm");
       return;
     }
 
-    const categoryIds = optionCategorys.map((c: ICategory) => c.id);
     const newFormData = new FormData();
     newFormData.append("name", name);
-    newFormData.append("description", description);
+    newFormData.append("shortDescription", shortDescription);
     newFormData.append("price", price);
     newFormData.append("quantity", quantity);
-    newFormData.append("categories", categoryIds);
+    newFormData.append("category", selectCategory?.id);
     for (let index = 0; index < files.length; index++) {
-      newFormData.append(`images[${index}]`, files[index]);
+      const imageFile = files[index];
+      newFormData.append(`images[${index}]`, imageFile);
+    }
+    for (let index = 0; index < sizes.length; index++) {
+      const sizeName = sizes[index];
+      newFormData.append(`sizes[${index}]`, sizeName);
+    }
+    for (let index = 0; index < colors.length; index++) {
+      const colorName = colors[index];
+      newFormData.append(`colors[${index}]`, colorName);
     }
     newFormData.append("imgsDelete", imgsDelete);
+    newFormData.append("sizesDelete", sizesDelete);
+    newFormData.append("colorsDelete", colorsDelete);
     const response = await axios.put(
       `http://localhost:8080/products/${id}`,
       newFormData,
@@ -92,8 +108,10 @@ export default function ModalProductEdit({
     if (!data) {
       return;
     }
-    setOptionCategory(data?.categorys);
+    setCategory(data?.category);
     setImgs(data?.imageUrls);
+    setSizes(data?.sizes);
+    setColors(data?.colors);
   }, [data]);
 
   if (typeof document === "undefined")
@@ -111,20 +129,35 @@ export default function ModalProductEdit({
       {isLoading && <LoadingSpinner />}
       <div className="p-3 max-h-[550px] has-scrollbar rounded-md relative bg-white w-[550px]  inset-0 m-auto z-[600]">
         <div className="flex gap-y-3 flex-col">
-          <div className="modal-choose-category">
-            <div className="text-base mb-3 font-medium">Category</div>
+          <div className="modal-choose-category flex flex-col gap-y-3">
+            <div className="text-base  mb-3 font-medium">Danh Mục</div>
             <Select
               id="selectOption"
               label=""
-              select={optionCategorys}
-              setSelect={setOptionCategory}
+              select={selectCategory}
+              setSelect={setCategory}
+            />
+            <ChooseSize
+              sizes={sizes}
+              setSizes={setSizes}
+              setDeleteSizes={setSizesDelete}
+              sizesDelete={sizesDelete}
+              id="sizes"
+            />
+            <ChooseColor
+              colorsDelete={colorsDelete}
+              setDeleteColors={setColorsDelete}
+              colors={colors}
+              setColors={setColors}
+              id="colors"
             />
           </div>
+
           <div className="grid grid-cols-3 gap-x-3">
             <InputModal
               disabled={false}
               change={true}
-              title="Name"
+              title="Tên sản phẩm"
               id="name"
               setData={productEditFormik.handleChange}
               value={productEditFormik.values.name || ""}
@@ -134,7 +167,7 @@ export default function ModalProductEdit({
               change={true}
               id="price"
               setData={productEditFormik.handleChange}
-              title="Price"
+              title="Giá"
               value={productEditFormik.values.price ?? ""}
             />
             <InputModal
@@ -142,9 +175,19 @@ export default function ModalProductEdit({
               change={true}
               id="quantity"
               setData={productEditFormik.handleChange}
-              title="Quantity"
+              title="Số lượng"
               value={productEditFormik.values.quantity ?? ""}
             />
+          </div>
+          <div className="edit-product-desc">
+            <div className="text-base mb-2 font-medium">Mô Tả</div>
+            <textarea
+              defaultValue={productEditFormik.values.shortDescription ?? ""}
+              className="bg-[#edede9] capitalize font-normal outline-none py-4 px-3 text-base text-gray-600 w-full resize-y"
+              name="description"
+              id="description"
+              onChange={productEditFormik.handleChange}
+            ></textarea>
           </div>
           <SelectImage
             file={files}
@@ -161,7 +204,7 @@ export default function ModalProductEdit({
             onClick={() => handleSubmitEditProduct(data?.id)}
             className="add-category hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center"
           >
-            <span>Save</span>
+            <span>Cập Nhật</span>
           </button>
         </div>
         <button

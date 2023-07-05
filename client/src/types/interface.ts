@@ -1,19 +1,21 @@
 export interface ICategory {
-  id?: number;
+  id: number;
   name: string;
+  slug: string;
   description: string;
-  enable?: boolean;
-  slug?: string;
 }
 export interface IProduct {
   id: number;
   name: string;
-  description: string;
+  shortDescription: string;
   price: number;
   quantity: number;
-  instock?: boolean;
+  status: boolean;
+  slug: any;
+  category: ICategory;
+  colors: string[];
+  sizes: string[];
   imageUrls: string[];
-  categorys: ICategory[];
 }
 export interface IOrder {
   id: number;
@@ -27,13 +29,4 @@ export interface IPage {
   itemsPerPage: number;
   totalItems: number;
   totalPages: number;
-}
-export interface ISize {
-  id: number;
-  name: string;
-}
-
-export interface IColor {
-  id: number;
-  colorName: string;
 }

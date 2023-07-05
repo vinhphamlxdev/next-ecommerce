@@ -21,10 +21,10 @@ export const createCategory = async (data: ICategory): Promise<any> => {
   return response;
 };
 export const updateCategory = async (
-  id: number | unknown,
-  data: ICategory
+  id: number | any,
+  data: any
 ): Promise<any> => {
-  const response = await axiosClient.put<ICategory>(`/categorys/${id}`, data);
+  const response = await axiosClient.put<any>(`/categorys/${id}`, data);
   return response;
 };
 export const deleteCategoryById = async (

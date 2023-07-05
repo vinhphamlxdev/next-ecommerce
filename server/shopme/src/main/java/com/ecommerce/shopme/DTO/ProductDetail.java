@@ -17,6 +17,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductDetail {
+    private Integer id;
     private String name;
     private String shortDescription;
     private float price;

@@ -17,7 +17,7 @@ export default function Header(props: HeaderProps) {
         <input
           className="bg-white pl-4 pr-10 py-2 flex-1  outline-none text-black"
           type="text"
-          placeholder="Search..."
+          placeholder="Tìm kiếm..."
         />
         <button className="text-[20px] text-gray-500 absolute top-[50%] right-2 translate-y-[-50%] ">
           <i className="bi bi-search"></i>
@@ -28,7 +28,11 @@ export default function Header(props: HeaderProps) {
           <i className="bi text-2xl text-gray-400 bi-sun"></i>
         </button>
         <button className="user-avatar cursor-pointer">
-          <Image className="w-8 h-8 rounded-full" src={IMG_SRC.logo} alt="" />
+          <Image
+            className="w-8 h-8 rounded-full object-cover"
+            src={IMG_SRC.avatar}
+            alt=""
+          />
         </button>
       </div>
     </header>

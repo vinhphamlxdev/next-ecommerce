@@ -23,7 +23,6 @@ export default function SelectImage(props: ISelectImageProps) {
     file,
     setDeleteImgs,
     deleteImgs,
-    colums = 5,
     columGap = 4,
   } = props;
   const [key, setKey] = React.useState(1);
@@ -34,7 +33,6 @@ export default function SelectImage(props: ISelectImageProps) {
     if (!check) {
       return;
     }
-
     let arr: any[] = [];
     let filesArr: any[] = [];
     //check is an array key:[0,1,2...]
@@ -58,9 +56,9 @@ export default function SelectImage(props: ISelectImageProps) {
   };
 
   const handleDeleteImg = (imgUrl: string, e: any) => {
-    console.log("imgUrl", imgUrl);
     const newImages = images.filter((img) => img != imgUrl);
     setImage(newImages);
+
     if (setDeleteImgs && imgUrl.startsWith("https")) {
       setDeleteImgs([...deleteImgs, imgUrl]);
     }
