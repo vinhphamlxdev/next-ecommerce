@@ -18,7 +18,7 @@ public class User implements UserDetails {
   private Integer id;
 
    @Column(nullable = false)
-  private String username;
+  private String fullName;
    @Column(nullable = false, length = 50, unique = true)
   private String email;
    @Column(nullable = false, length = 64)
@@ -37,12 +37,6 @@ public class User implements UserDetails {
 			)
 	private Set<Role> roles = new HashSet<>();
 
- public User(String email, String password,String username) {
-        this.email = email;
-        this.password = password;
-        this.username = username;
-    }
-     
   //dụng để trả về một danh sách các quyền (authorities) mà người dùng có.
   // Mỗi quyền được đại diện bởi một đối tượng GrantedAuthority.
   @Override
@@ -53,7 +47,17 @@ public class User implements UserDetails {
     }
     return authorities;
   }
-  
+
+
+
+  public User(String fullName, String email, String password) {
+    this.fullName = fullName;
+    this.email = email;
+    this.password = password;
+  }
+
+
+
   public Integer getId() {
     return id;
   }
@@ -62,8 +66,12 @@ public class User implements UserDetails {
     this.id = id;
   }
 
-  public void setUsername(String username) {
-    this.username = username;
+  public String getFullName() {
+    return fullName;
+  }
+
+  public void setFullName(String fullName) {
+    this.fullName = fullName;
   }
 
   public String getEmail() {
@@ -74,8 +82,16 @@ public class User implements UserDetails {
     this.email = email;
   }
 
+  public String getPassword() {
+    return password;
+  }
+
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public boolean isEnabled() {
+    return enabled;
   }
 
   public void setEnabled(boolean enabled) {
@@ -89,34 +105,34 @@ public class User implements UserDetails {
   public void setRoles(Set<Role> roles) {
     this.roles = roles;
   }
- public void addRole(Role role) {
-        this.roles.add(role);
-    }
-     
-  @Override
-  public boolean isAccountNonExpired() {
-    return true;
+  public void addRole(Role role) {
+    this.roles.add(role);
   }
-  @Override
-  public boolean isAccountNonLocked() {
-    return true;
-  }
-  @Override
-  public boolean isCredentialsNonExpired() {
-    return true;
-  }
-  @Override
-  public String getPassword() {
-    return password;
-  }
+
   @Override
   public String getUsername() {
-    return this.username;
+    // TODO Auto-generated method stub
+    return this.email;
   }
+
   @Override
-  public boolean isEnabled() {
-    return enabled;
+  public boolean isAccountNonExpired() {
+    // TODO Auto-generated method stub
+    return true;
   }
+
+  @Override
+  public boolean isAccountNonLocked() {
+    // TODO Auto-generated method stub
+    return true;
+  }
+
+  @Override
+  public boolean isCredentialsNonExpired() {
+    // TODO Auto-generated method stub
+    return true;
+  }
+  
 
 
 

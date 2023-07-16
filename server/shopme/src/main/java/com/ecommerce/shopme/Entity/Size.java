@@ -2,6 +2,8 @@ package com.ecommerce.shopme.entity;
 
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -27,7 +29,11 @@ public class Size {
     @Length(min = 1,max = 3, message = "Tên size tối thiểu 1 kí tự và tối đa là 3 kí tự")
     private String name;
    
+    private boolean isDelete;
     @ManyToOne
     @JoinColumn(name = "product_id")
+     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Product product;
+    
+
 }

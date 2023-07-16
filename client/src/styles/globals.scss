@@ -65,3 +65,81 @@ body {
 .Mui-selected {
   background-color: #ccccccc2 !important;
 }
+.slider-home-client {
+  .slider {
+    background-repeat: no-repeat;
+    background-attachment: scroll;
+    background-position: center center;
+    background-size: cover;
+    position: relative;
+  }
+  .slide__content {
+    &::after {
+      position: absolute;
+      content: "";
+      width: 5.5rem;
+      height: 0.1rem;
+      background: #fff;
+      left: 0;
+      top: 50%;
+      -webkit-transform: translatey(-50%);
+      transform: translatey(-50%);
+    }
+  }
+}
+.section-title {
+  font-size: 24px;
+  text-align: center;
+  font-weight: 600;
+  margin-top: 80px;
+  color: #555;
+  text-transform: uppercase;
+}
+.wrapper-layout {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.btn-increase,
+.btn-decrease {
+  line-height: 0;
+  font-weight: 300;
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  border: 1px solid rgb(228, 228, 228);
+  cursor: pointer;
+  text-align: center;
+  width: 40px;
+  height: 40px;
+  transition: all 0.4s ease-in-out 0s;
+  background-color: #f5f5f5;
+}
+.cart-quantity {
+  font-weight: 300;
+  border-top: 1px solid rgb(228, 228, 228);
+  border-bottom: 1px solid rgb(228, 228, 228);
+  text-align: center;
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+}
+.cart-quantity::-webkit-inner-spin-button,
+.cart-quantity::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.MuiSelect-select {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+.tippy-box {
+  font-size: 12px !important;
+}
+.tippy-content {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}

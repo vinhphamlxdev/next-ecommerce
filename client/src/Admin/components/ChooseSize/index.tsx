@@ -1,14 +1,42 @@
 import * as React from "react";
+import { ISize } from "@/types/interface";
+const { v4: uuidv4 } = require("uuid");
 
 export interface IChooseSizeProps {
-  sizes: string[];
-  setSizes: React.Dispatch<React.SetStateAction<string[]>>;
+  sizes: ISize[];
+  setSizes: React.Dispatch<React.SetStateAction<ISize[]>>;
   error?: string;
   id: string;
-  sizesDelete?: string[] | any;
-  setDeleteSizes?: React.Dispatch<React.SetStateAction<string[]>>;
+  sizesDelete?: number[] | any;
+  setDeleteSizes?: React.Dispatch<React.SetStateAction<number[]>>;
 }
-const sizesData = ["M", "S", "L", "XL", "XXL"];
+const sizesData: ISize[] = [
+  {
+    id: 1,
+    name: "M",
+    delete: false,
+  },
+  {
+    id: 2,
+    name: "S",
+    delete: false,
+  },
+  {
+    id: 3,
+    name: "L",
+    delete: false,
+  },
+  {
+    id: 4,
+    name: "XL",
+    delete: false,
+  },
+  {
+    id: 5,
+    name: "XXL",
+    delete: false,
+  },
+];
 export default function ChooseSize({
   sizes = [],
   setSizes,
@@ -19,51 +47,50 @@ export default function ChooseSize({
 }: IChooseSizeProps) {
   const [key, setKey] = React.useState(1);
   const handleChangeSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const sizeName = JSON.parse(e.target.value);
+    const sizeObj = JSON.parse(e.target.value);
     let arrSize = [];
-    const checkExist = sizesData.findIndex((size) => size === sizeName);
-    const checkDuplicate = sizes.some((size) => size === sizeName);
+
+    const checkExist = sizesData.findIndex(
+      (size) => size.name === sizeObj.name
+    );
+    console.log(sizeObj);
+    const checkDuplicate = sizes.some((size) => size.name === sizeObj.name);
     if (checkExist !== -1 && !checkDuplicate) {
-      arrSize.push(sizeName);
+      arrSize.push(sizeObj);
       setSizes([...sizes, ...arrSize]);
     }
-    const sizesNeedDelete = sizesData.filter((size) => {
-      return ![...sizes].includes(sizeName);
-    });
-    if (typeof setDeleteSizes === "function") {
-      setDeleteSizes(sizesNeedDelete);
-    }
-    console.log("size need delete:", sizesDelete);
   };
-  console.log("sizes", sizes);
-  const handleRemoveSize = (sizeName: string) => {
-    const newArrSizes = sizes.filter((size) => size !== sizeName);
+  const handleRemoveSize = (id: number) => {
+    const newArrSizes = sizes.filter((size) => size.id !== id);
     setSizes(newArrSizes);
 
     if (typeof setDeleteSizes === "function") {
-      setDeleteSizes([...sizesDelete, sizeName]);
-      console.log("size need delete:", sizesDelete);
+      setDeleteSizes([...sizesDelete, id]);
+      console.log("sizesDelete", sizesDelete);
     }
   };
+  console.log(sizes);
 
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
         {sizes.length > 0 &&
-          sizes.map((sizeName: any, index: number) => {
-            return (
-              <div
-                key={index}
-                className="text-white flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs"
-              >
-                <span>{sizeName}</span>
-                <i
-                  onClick={() => handleRemoveSize(sizeName)}
-                  className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
-                ></i>
-              </div>
-            );
-          })}
+          sizes
+            .filter((size) => !size.delete)
+            .map((size: ISize) => {
+              return (
+                <div
+                  key={size.id}
+                  className="text-white flex  gap-x-3 justify-center items-center px-3 py-[6px] rounded-xl font-light bg-saveBg text-xs"
+                >
+                  <span>{size.name}</span>
+                  <i
+                    onClick={() => handleRemoveSize(size?.id)}
+                    className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
+                  ></i>
+                </div>
+              );
+            })}
       </div>
       <div className="flex flex-col gap-y-1">
         <select
@@ -80,7 +107,7 @@ export default function ChooseSize({
           {sizesData.map((value, index) => {
             return (
               <option key={index} value={JSON.stringify(value)}>
-                {value}
+                {value.name}
               </option>
             );
           })}

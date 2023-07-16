@@ -7,7 +7,7 @@ import { useGlobalStore } from "@/store/globalStore";
 import slugify from "slugify";
 import axios from "axios";
 import { ICategory } from "@/types/interface";
-import getMessage from "@/utils/getMessage";
+import getMessage from "@/utils/notification";
 import { toast } from "react-toastify";
 import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "../Loading/LoadingButton";
@@ -34,7 +34,7 @@ export default function AddCategory({
         .max(30, "Tên danh mục tối đa 30 kí tự")
         .required("Tên danh mục là bắt buộc"),
       description: Yup.string()
-        .min(30, "Mô tả danh mục cần nhiều hơn 30 kí tự")
+        .min(20, "Mô tả danh mục cần nhiều hơn 20 kí tự")
         .required("Mô tả là bắt buộc"),
     }),
     onSubmit: async (values) => {

@@ -58,7 +58,7 @@ export default function User(props: IUserProps) {
               <tr className="bg-gray-700 mt-2">
                 <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
                   <Image
-                    src={IMG_SRC.product}
+                    src={IMG_SRC.avatar}
                     className="h-12 w-12 bg-white rounded-full border"
                     alt="..."
                   />
@@ -66,6 +66,52 @@ export default function User(props: IUserProps) {
                 </th>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <p aria-expanded="false">giakhiem@gmail.com</p>
+                </td>
+                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <button className="py-3 px-5 rounded-[5px] bg-activeBg">
+                    Khách Hàng
+                  </button>
+                </td>
+                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <button className="py-3 px-5 rounded-[5px] bg-activeBg">
+                    Hoạt Động
+                  </button>
+                </td>
+              </tr>
+              <tr className="bg-gray-700 mt-2">
+                <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
+                  <Image
+                    src={IMG_SRC.avatar}
+                    className="h-12 w-12 bg-white rounded-full border"
+                    alt="..."
+                  />
+                  <span className="ml-3 font-bold text-white ">Trung Huy</span>
+                </th>
+                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <p aria-expanded="false">trunghuy@gmail.com</p>
+                </td>
+                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <button className="py-3 px-5 rounded-[5px] bg-activeBg">
+                    Khách Hàng
+                  </button>
+                </td>
+                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <button className="py-3 px-5 rounded-[5px] bg-activeBg">
+                    Hoạt Động
+                  </button>
+                </td>
+              </tr>
+              <tr className="bg-gray-700 mt-2">
+                <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
+                  <Image
+                    src={IMG_SRC.avatar}
+                    className="h-12 w-12 bg-white rounded-full border"
+                    alt="..."
+                  />
+                  <span className="ml-3 font-bold text-white ">Dang Khoa</span>
+                </th>
+                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <p aria-expanded="false">dangkhoa02@gmail.com</p>
                 </td>
                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                   <button className="py-3 px-5 rounded-[5px] bg-activeBg">

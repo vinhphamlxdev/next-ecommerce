@@ -7,7 +7,7 @@ import axios from "axios";
 import { use } from "react";
 import { ICategory } from "@/types/interface";
 import Swal from "sweetalert2";
-import getMessage from "@/utils/getMessage";
+import getMessage from "@/utils/notification";
 import CategoryItem from "@/Admin/components/CategoryItem";
 import { useGlobalStore } from "@/store/globalStore";
 import { LoadingSkeleton } from "@/Admin/components/Loading";

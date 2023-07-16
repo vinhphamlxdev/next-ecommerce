@@ -5,7 +5,7 @@ import Select from "../Select";
 import InputModal from "../InputModal/InputModal";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ICategory, IProduct } from "@/types/interface";
+import { ICategory, IColor, IProduct, ISize } from "@/types/interface";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import UseDisabled from "@/hooks/useDisabled";
@@ -16,7 +16,7 @@ import ChooseSize from "../ChooseSize";
 import ChooseColor from "../ChooseColor";
 
 export interface IModalProductEditProps {
-  data: IProduct | any;
+  data: IProduct;
   setRender: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -27,13 +27,13 @@ export default function ModalProductEdit({
   const { isOpenEditP, setOpenEditProduct, isLoading, setLoading } =
     useModalStore((state) => state);
   const [selectCategory, setCategory] = React.useState<ICategory[] | any>([]);
-  const [sizes, setSizes] = React.useState<string[]>([]);
-  const [colors, setColors] = React.useState<string[]>([]);
+  const [sizes, setSizes] = React.useState<ISize[]>([]);
+  const [colors, setColors] = React.useState<IColor[]>([]);
   const [imgs, setImgs] = React.useState<any>([]);
   const [files, setFile] = React.useState<File[]>([]);
   const [imgsDelete, setImgsDelete] = React.useState<string[] | any>([]);
-  const [sizesDelete, setSizesDelete] = React.useState<string[] | any>([]);
-  const [colorsDelete, setColorsDelete] = React.useState<string[] | any>([]);
+  const [sizesDelete, setSizesDelete] = React.useState<number[] | any>([]);
+  const [colorsDelete, setColorsDelete] = React.useState<number[] | any>([]);
   const productEditFormik = useFormik({
     initialValues: {
       name: data?.name,
@@ -50,13 +50,38 @@ export default function ModalProductEdit({
   const handleSubmitEditProduct = async (id: number) => {
     const { name, price, shortDescription, quantity } =
       productEditFormik.values;
+
     if (!selectCategory || selectCategory.length === 0) {
       toast.error("Vui lòng chọn danh mục sản phẩm");
       return;
     }
-
+    if (price < 0) {
+      toast.error("Giá không hợp lệ");
+      return;
+    }
+    if (quantity < 0) {
+      toast.error("Số lượng không hợp lệ");
+      return;
+    }
+    if (!name) {
+      toast.error("Vui lòng nhập tên sản phẩm");
+      return;
+    }
+    if (!shortDescription) {
+      toast.error("Vui lòng nhập mô tả sản phẩm");
+      return;
+    }
     if (!imgs || !imgs.length) {
       toast.error("Vui lòng chọn ảnh sản phẩm");
+      return;
+    }
+    const checkExist = sizes.some((size) => !size.delete);
+    if (!checkExist || !sizes.length) {
+      toast.error("Vui lòng chọn size sản phẩm");
+      return;
+    }
+    if (!colors || !colors.length) {
+      toast.error("Vui lòng chọn màu sản phẩm");
       return;
     }
 
@@ -70,12 +95,14 @@ export default function ModalProductEdit({
       const imageFile = files[index];
       newFormData.append(`images[${index}]`, imageFile);
     }
-    for (let index = 0; index < sizes.length; index++) {
-      const sizeName = sizes[index];
+    const sizeNames = sizes.map((size: any) => size.name);
+    for (let index = 0; index < sizeNames.length; index++) {
+      const sizeName = sizeNames[index];
       newFormData.append(`sizes[${index}]`, sizeName);
     }
-    for (let index = 0; index < colors.length; index++) {
-      const colorName = colors[index];
+    const colorNames = colors.map((color: any) => color.colorName);
+    for (let index = 0; index < colorNames.length; index++) {
+      const colorName = colorNames[index];
       newFormData.append(`colors[${index}]`, colorName);
     }
     newFormData.append("imgsDelete", imgsDelete);
@@ -90,7 +117,6 @@ export default function ModalProductEdit({
         },
       }
     );
-    console.log(response);
     if (response.status === 200) {
       toast.success("Cập nhật sản phẩm thành công");
       setOpenEditProduct(false);
@@ -102,6 +128,8 @@ export default function ModalProductEdit({
       setFile([]);
       setImgsDelete([]);
       setOpenEditProduct(false);
+      setSizesDelete([]);
+      setColorsDelete([]);
     }
   };
   React.useEffect(() => {

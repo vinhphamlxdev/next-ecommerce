@@ -1,5 +1,7 @@
 package com.ecommerce.shopme.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +18,7 @@ public class OrderDetail {
 	private float price;
     @ManyToOne
 	@JoinColumn(name = "product_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private Product product;
     @ManyToOne
 	@JoinColumn(name = "order_id")

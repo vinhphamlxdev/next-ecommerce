@@ -3,6 +3,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.ecommerce.shopme.enums.OrderStatus;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,14 +21,13 @@ public class Order {
     private String fullName;
     @Column(name = "address", length = 150, nullable = false)
     private String address;
+    private String email;
     @Column(name = "phone_number", length = 10, nullable = false)
     private Integer phoneNumber;
-    private float price;
     private String status;
     
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
-    private float amount;
 
   @ManyToOne
     @JoinColumn(name = "user_id")
@@ -35,5 +36,7 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<OrderDetail> orderDetails = new HashSet<>();
 
+      @OneToMany(mappedBy = "order")
+	private Set<Product> products = new HashSet<>();
 
 }

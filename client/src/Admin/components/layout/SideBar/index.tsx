@@ -47,7 +47,7 @@ const sidebarLink: {
     id: 5,
     title: "Đơn Hàng",
     icon: <AiOutlineShoppingCart />,
-    path: "/admin/order",
+    path: "/admin/orders",
   },
   {
     id: 6,

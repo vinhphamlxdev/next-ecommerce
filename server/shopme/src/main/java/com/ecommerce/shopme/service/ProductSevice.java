@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.beans.BeanUtils;
@@ -23,6 +24,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Image;
+import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.entity.Product;
 import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
@@ -130,6 +132,7 @@ public void addSizeToProduct(Integer productId,String sizeName){
         if (!sizeExists) {
             Size size = new Size();
             size.setName(sizeName);
+            size.setDelete(false);
             size.setProduct(product);
             // Thêm size vào danh sách sizes của product
             product.getSizes().add(size);
@@ -147,6 +150,7 @@ public void addColorToProduct(Integer productId,String colorName){
          if (!colorExists) {
              Color color = new Color();
              color.setColorName(colorName);
+             color.setDelete(false);
              color.setProduct(product);
               // Thêm color vào danh sách color của product
               product.getColors().add(color);
@@ -169,23 +173,25 @@ public void deleteImage(Integer productId,List<String> imgsUrlDelete) throws jav
         }
     }
 }
-public void deleteSize(Integer productId,List<String> sizeNamesDelete) throws java.io.IOException {
+public void deleteSize(Integer productId,List<Integer> sizesDeleteId) throws java.io.IOException {
     List<Size> sizes = sizeRepository.findByProductId(productId);
-    for (String sizeNameDelete : sizeNamesDelete) {
+    for (Integer sizeNeedDelete : sizesDeleteId) {
         for (Size size : sizes) {
-            if (size.getName().equals(sizeNameDelete)) {
-                sizeRepository.delete(size);
+            if (size.getId().equals(sizeNeedDelete)) {
+               
+                size.setDelete(true);
                 break;
             }
-        }
+        }   
     }
+   
 }
-public void deleteColor(Integer productId,List<String> colorsDelete) throws java.io.IOException {
+public void deleteColor(Integer productId,List<Integer> colorsId) throws java.io.IOException {
     List<Color> colors = colorRepository.findByProductId(productId);
-    for (String colorNameDelete : colorsDelete) {
+    for (Integer colorIdNeedDelte : colorsId) {
         for (Color color : colors) {
-            if (color.getColorName().equals(colorNameDelete)) {
-                colorRepository.delete(color);
+            if (color.getId().equals(colorIdNeedDelte)) {
+                color.setDelete(true);
                 break;
             }
         }
@@ -208,4 +214,10 @@ public List<Product> getProductByCategoryId(Integer id){
         return imageUrls;
     }
 
+
+    //get by order
+    public Set<Product> getProductByOrder(Order order){
+        return productRepository.findByOrder(order);
+     }
+    
 }

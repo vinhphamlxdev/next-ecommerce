@@ -92,23 +92,21 @@ public class ProductController {
                 productDetail.setQuantity(product.getQuantity());
                 productDetail.setSlug(product.getSlug());
                 productDetail.setCategory(product.getCategory());
-
-                List<String> sizeNames = new ArrayList<>();
-                for (Size sizeName : product.getSizes()) {
-                    sizeNames.add(sizeName.getName());
+                List<Size> sizes = new ArrayList<>();
+                for (Size size : product.getSizes()) {
+                    sizes.add(size);
                 }
-                productDetail.setSizes(sizeNames);
-                   List<String> colorNames = new ArrayList<>();
-                for (Color colorName : product.getColors()) {
-                    colorNames.add(colorName.getColorName());
+                productDetail.setSizes(sizes);
+                   List<Color> colors = new ArrayList<>();
+                for (Color color : product.getColors()) {
+                    colors.add(color);
                 }
-                productDetail.setColors(colorNames);
+                productDetail.setColors(colors);
                 List<String> imageUrls = new ArrayList<>();
                 for (Image image : product.getImages()) {
                     imageUrls.add(image.getImageUrl());
                 }
                 productDetail.setImageUrls(imageUrls);
-                // productDetail.setCategory(category);
                 return productDetail;
             })
             .collect(Collectors.toList());
@@ -145,17 +143,17 @@ public class ProductController {
                         pathImgs.add(imageUrls.getImageUrl());
                     }
                      productDetail.setImageUrls(pathImgs);
-               List<String> sizeNames = new ArrayList<>();
-                      for (Size sizeName : productExist.getSizes()) {
-                        sizeNames.add(sizeName.getName());
+               List<Size> sizes = new ArrayList<>();
+                      for (Size size : productExist.getSizes()) {
+                        sizes.add(size);
                     }
-            productDetail.setSizes(sizeNames);
+            productDetail.setSizes(sizes);
                     
-             List<String> colorNames = new ArrayList<>();
-                      for (Color colorName : productExist.getColors()) {
-                        colorNames.add(colorName.getColorName());
+             List<Color> colors = new ArrayList<>();
+                      for (Color color : productExist.getColors()) {
+                        colors.add(color);
                     }
-            productDetail.setColors(colorNames);
+            productDetail.setColors(colors);
             Map<String,Object> response = new HashMap<>();
             response.put("product", productDetail);
             response.put("status", "success");
@@ -180,6 +178,7 @@ public class ProductController {
             product.setQuantity(productRequest.getQuantity());
             product.setSlug(product.getSlug());
             product.setStatus(true);
+            
              // Gán danh sách danh mục cho sản phẩm
               product.setCategory(category);
               Product createdProduct = productService.saveProduct(product);
@@ -198,10 +197,7 @@ public class ProductController {
                             for (String sizeName : sizeNames) {
                                 productService.addSizeToProduct(createdProduct.getId(), sizeName);
                             }
-               
-  
-                            //them size vao san pham
-                            
+                           
              return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
   
@@ -213,9 +209,10 @@ public class ProductController {
     @ModelAttribute @Valid ProductDTO productRequest,
      @RequestParam("category") Integer categoryId,
       @RequestParam("imgsDelete") List<String> imgsDelete,
-      @RequestParam("sizesDelete") List<String> sizesDelete,
-      @RequestParam("colorsDelete") List<String> colorDelete
+      @RequestParam("sizesDelete") List<Integer> sizesDelete,
+      @RequestParam("colorsDelete") List<Integer> colorDelete
      ) throws IOException{
+        System.out.println("id size can xoa: "+sizesDelete);
             // Kiểm tra sản phẩm có tồn tại hay không
         Product existingProduct = productService.getProductById(productId);
         if (existingProduct == null) {
@@ -266,7 +263,7 @@ public class ProductController {
                 productService.deleteColor(existingProduct.getId(), colorDelete);
         //cập nhật sản phẩm
             Product updatedProduct = productService.saveProduct(existingProduct);
-            
+                
          return ResponseEntity.ok(updatedProduct);
     }
 //   //DELETE

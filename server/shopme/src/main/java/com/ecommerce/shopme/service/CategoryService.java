@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.shopme.entity.Category;
+import com.ecommerce.shopme.entity.Product;
 import com.ecommerce.shopme.repository.CategoryRepository;
 
 @Service
@@ -43,7 +44,6 @@ public boolean existsCategoryById(Integer id){
 public List<Category> getCategoriesByIds(List<Integer> categoryIds) {
     return categoryRepository.findByIdIn(categoryIds);
 }
-
 
 
 }

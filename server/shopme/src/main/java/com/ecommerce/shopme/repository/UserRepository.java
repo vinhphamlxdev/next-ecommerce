@@ -12,13 +12,10 @@ import com.ecommerce.shopme.entity.User;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends PagingAndSortingRepository<User,Integer> {
-  User save(User user);
-   Optional<User> findById(Integer id);
-   Optional<User> findByUsername(String username);
+public interface UserRepository extends JpaRepository<User,Integer> {
  Optional<User> findByEmail(String email);
-   Boolean existsByEmail(String email);
-   Optional<User> findByUsernameOrEmail(String username, String email);
-   boolean existsByUsername(String username);
-    
+
+    Boolean existsByEmail(String email);
+
+
 }

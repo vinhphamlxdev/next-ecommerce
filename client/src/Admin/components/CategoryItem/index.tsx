@@ -2,7 +2,7 @@ import UseDisabled from "@/hooks/useDisabled";
 import { deleteCategoryById, updateCategory } from "@/service/CategoryApi";
 import axiosClient from "@/service/axiosClient";
 import { ICategory } from "@/types/interface";
-import getMessage from "@/utils/getMessage";
+import getMessage from "@/utils/notification";
 import axios from "axios";
 import { useFormik } from "formik";
 import * as React from "react";

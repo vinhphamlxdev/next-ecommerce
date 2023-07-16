@@ -9,7 +9,7 @@ import { UseAddProduct } from "@/hooks/useAddProduct";
 import { formData } from "@/utils/formData";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import SelectImage from "@/Admin/components/SelectImage";
-import { ICategory } from "@/types/interface";
+import { ICategory, IColor, ISize } from "@/types/interface";
 import { toast } from "react-toastify";
 import axios from "axios";
 import UseDisabled from "@/hooks/useDisabled";
@@ -23,8 +23,8 @@ export default function AddProduct(props: AddProductProps) {
   const [select, setSelect] = useState<any>();
   const [imgs, setImgs] = useState<any>([]);
   const [files, setFile] = useState<File[]>([]);
-  const [sizes, setSizes] = useState<string[]>([]);
-  const [colors, setColors] = useState<string[]>([]);
+  const [sizes, setSizes] = useState<ISize[] | any>([]);
+  const [colors, setColors] = useState<IColor[] | any>([]);
   const router = useRouter();
 
   const productFormik = useFormik({
@@ -37,10 +37,10 @@ export default function AddProduct(props: AddProductProps) {
     validationSchema: Yup.object({
       name: Yup.string()
         .min(10, "Tên sản phẩm cần nhiều hơn 3 kí tự")
-        .max(70, "Tên sản phẩm tối đa 20 kí tự")
+        .max(70, "Tên sản phẩm tối đa 70 kí tự")
         .required("Tên sản phẩm là bắt buộc"),
       description: Yup.string()
-        .min(30, "Mô tả nên nhiều hơn 30 kí tự")
+        .min(20, "Mô tả nên nhiều hơn 20 kí tự")
         .required("Mô tả sản phẩm là bắt buộc"),
       price: Yup.number()
         .min(0, "Giá tối thiểu phải là 0đ")
@@ -78,12 +78,14 @@ export default function AddProduct(props: AddProductProps) {
       newFormData.append("price", price);
       newFormData.append("quantity", quantity);
       newFormData.append("category", select?.id);
-      for (let index = 0; index < sizes.length; index++) {
-        const sizeName = sizes[index];
+      const sizeNames = sizes.map((size: any) => size.name);
+      for (let index = 0; index < sizeNames.length; index++) {
+        const sizeName = sizeNames[index];
         newFormData.append(`sizes[${index}]`, sizeName);
       }
-      for (let index = 0; index < colors.length; index++) {
-        const colorName = colors[index];
+      const colorNames = colors.map((color: any) => color.colorName);
+      for (let index = 0; index < colorNames.length; index++) {
+        const colorName = colorNames[index];
         newFormData.append(`colors[${index}]`, colorName);
       }
       for (let index = 0; index < files.length; index++) {
@@ -102,6 +104,7 @@ export default function AddProduct(props: AddProductProps) {
       if (response.status === 201) {
         // router.push("/admin/products");
         toast.success("Thêm sản phẩm thành công");
+        router.push("/admin/products");
       } else {
         toast.error("Thêm sản phẩm thất bại");
       }

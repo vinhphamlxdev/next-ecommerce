@@ -1,14 +1,32 @@
+import { IColor } from "@/types/interface";
 import * as React from "react";
 
 export interface IChooseColorProps {
-  colors: string[];
-  setColors: React.Dispatch<React.SetStateAction<string[]>>;
+  colors: IColor[];
+  setColors: React.Dispatch<React.SetStateAction<IColor[]>>;
   error?: string;
   id: string;
-  colorsDelete?: string[];
-  setDeleteColors?: React.Dispatch<React.SetStateAction<string[]>>;
+  colorsDelete?: number[] | any;
+  setDeleteColors?: React.Dispatch<React.SetStateAction<number[]>>;
 }
-const colorData: string[] = ["Đen", "Trắng", "Xanh Lá", "Xanh Da Trời"];
+const colorData = [
+  {
+    id: 1,
+    colorName: "Đen",
+  },
+  {
+    id: 2,
+    colorName: "Trắng",
+  },
+  {
+    id: 3,
+    colorName: "Xanh Lá",
+  },
+  {
+    id: 4,
+    colorName: "Xanh Da Trời",
+  },
+];
 export default function ChooseColor({
   colors = [],
   setColors,
@@ -19,43 +37,50 @@ export default function ChooseColor({
 }: IChooseColorProps) {
   const [key, setKey] = React.useState(1);
   const handleChangeSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const colorName = JSON.parse(e.target.value);
-    let arrColors = [];
-    const checkExist = colorData.findIndex((name) => name === colorName);
-    const checkDuplicate = colors.some((name) => name === colorName);
+    const colorObj = JSON.parse(e.target.value);
+    let arrSize = [];
+    const checkExist = colorData.findIndex(
+      (color: IColor) => color.colorName === colorObj.colorName
+    );
+    const checkDuplicate = colors.some(
+      (color) => color.colorName === colorObj.colorName
+    );
     if (checkExist !== -1 && !checkDuplicate) {
-      arrColors.push(colorName);
-      setColors([...colors, ...arrColors]);
+      arrSize.push(colorObj);
+      setColors([...colors, ...arrSize]);
     }
   };
-  const handleRemoveColor = (colorName: string) => {
-    const newArrcolors = colors.filter((name) => name !== colorName);
-    setColors(newArrcolors);
+  const handleRemoveColor = (id: number) => {
+    const newArrColors = colors.filter((color: any) => color.id !== id);
+    setColors(newArrColors);
+    if (typeof setDeleteColors === "function") {
+      setDeleteColors([...colorsDelete, id]);
+    }
   };
 
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
         {colors.length > 0 &&
-          colors.map((colorName: string, index: number) => {
+          colors.map((color: IColor, index: number) => {
             return (
               <div
                 key={index}
                 className={`${btnColorStyle} ${
-                  colorName === "Đen"
+                  color.colorName === "Đen"
                     ? "bg-[#293241]"
-                    : colorName === "Trắng"
+                    : color.colorName === "Trắng"
                     ? "bg-[#adb5bd] text-black"
-                    : colorName === "Xanh Lá"
+                    : color.colorName === "Xanh Lá"
                     ? "bg-saveBg"
-                    : colorName === "Xanh Da Trời"
+                    : color.colorName === "Xanh Da Trời"
                     ? "bg-[#4cc9f0]"
                     : ""
                 } `}
               >
-                <span>{colorName}</span>
+                <span>{color?.colorName}</span>
                 <i
-                  onClick={() => handleRemoveColor(colorName)}
+                  onClick={() => handleRemoveColor(color?.id)}
                   className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
                 ></i>
               </div>
@@ -77,7 +102,7 @@ export default function ChooseColor({
           {colorData.map((value, index) => {
             return (
               <option key={index} value={JSON.stringify(value)}>
-                {value}
+                {value?.colorName}
               </option>
             );
           })}

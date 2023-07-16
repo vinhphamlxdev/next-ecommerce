@@ -8,6 +8,7 @@ export interface IInputProps {
   placeholder: string;
   type?: string;
   error?: string;
+  isCheckout?: boolean;
 }
 
 export default function Input({
@@ -18,15 +19,18 @@ export default function Input({
   placeholder,
   type = "text",
   error,
+  isCheckout,
 }: IInputProps) {
   return (
     <div className="flex items-center gap-x-4">
-      <label
-        htmlFor={id}
-        className="text-gray-500 w-[150px] text-center text-sm"
-      >
-        {label}
-      </label>
+      {!isCheckout && (
+        <label
+          htmlFor={id}
+          className="text-gray-500 w-[150px] text-center text-sm"
+        >
+          {label}
+        </label>
+      )}
       <div className="name-category relative flex-1 w-full">
         <input
           id={id}

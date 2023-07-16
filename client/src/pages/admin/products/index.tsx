@@ -16,7 +16,7 @@ import {
 import { LoadingSkeleton, LoadingSpinner } from "@/Admin/components/Loading";
 import dynamic from "next/dynamic";
 import Swal from "sweetalert2";
-import getMessage from "@/utils/getMessage";
+import getMessage from "@/utils/notification";
 import { useRouter } from "next/router";
 import { useModalStore } from "@/store/modalStore";
 import ModalProductEdit from "@/Admin/components/Modal/ModalProductEdit";
@@ -24,10 +24,15 @@ import HeaderTable from "@/Admin/components/HeaderTable";
 import Pagination from "@/Admin/components/Pagination";
 import PaginationComponent from "@/Admin/components/Pagination";
 import ModalProductDetail from "@/Admin/components/Modal/ModalProductDetail";
-
-export interface ProductProps {}
-
-function Products(props: ProductProps) {
+import formatVnd from "@/utils/formatVnd";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+function Products() {
   const thHeader: string[] = [
     "Tên sản phẩm",
     "Giá",
@@ -37,8 +42,15 @@ function Products(props: ProductProps) {
     "Chi tiết",
   ];
   const router = useRouter();
+  const query = useQuery({ queryKey: ["products"], queryFn: getAllProducts });
+
   const { setLoading, isLoading } = useGlobalStore();
-  const { setOpenEditProduct, setOpenDetailProduct } = useModalStore();
+  const {
+    setOpenEditProduct,
+    setOpenDetailProduct,
+    isOpenEditP,
+    isOpenDetailP,
+  } = useModalStore();
   const [products, setProducts] = React.useState<IProduct[]>();
   const [product, setProduct] = React.useState<IProduct | null>(null);
   const [render, setRender] = React.useState<boolean>(false);
@@ -48,7 +60,7 @@ function Products(props: ProductProps) {
   });
   const [filters, setFilters] = React.useState({
     pageNum: 0,
-    itemsPerPage: 5,
+    itemsPerPage: 4,
   });
   const deleteProduct = (id: number, name: string) => {
     Swal.fire({
@@ -77,11 +89,10 @@ function Products(props: ProductProps) {
     setOpenEditProduct(true);
     try {
       const response = await getProductById(id);
+      console.log(response);
       setProduct(response?.product);
-      setLoading(false);
     } catch (error) {
       console.log(error);
-      setLoading(false);
     } finally {
       setLoading(false);
     }
@@ -104,7 +115,6 @@ function Products(props: ProductProps) {
     event: React.MouseEvent<HTMLButtonElement> | null,
     newPage: number
   ) => {
-    console.log(newPage);
     setFilters((prevFilter) => ({
       ...prevFilter,
       pageNum: newPage - 1,
@@ -169,7 +179,7 @@ function Products(props: ProductProps) {
                         </span>
                       </th>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        {product.price}đ
+                        {formatVnd(product.price.toString())}đ
                       </td>
                       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                         <i className="fas fa-circle text-orange-500 mr-2"></i>
@@ -230,8 +240,13 @@ function Products(props: ProductProps) {
             onPageChange={handlePageChange}
           />
         </div>
-        <ModalProductEdit data={product} setRender={setRender} />
-        {product && <ModalProductDetail data={product} />}
+        {product && isOpenEditP ? (
+          <ModalProductEdit data={product} setRender={setRender} />
+        ) : product && isOpenDetailP ? (
+          <ModalProductDetail data={product} />
+        ) : (
+          <></>
+        )}
         {isLoading && <LoadingSpinner />}
       </LayoutAdmin>
     </>

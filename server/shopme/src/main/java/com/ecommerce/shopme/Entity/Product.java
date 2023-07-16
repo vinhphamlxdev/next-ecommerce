@@ -45,7 +45,7 @@ public class Product {
 
     @Column(unique = true, length = 255, nullable = false)
     @NotBlank(message = "Tên sản phẩm không được để trống")
-    @Length(min = 10,max = 70, message = "Tên sản phẩm tối thiểu 10 kí tự và tối đa là 70 kí tự")
+    @Length(min = 1, message = "Tên sản phẩm ít nhất 1 kí tự")
     private String name;
     
     @Column(name = "short_description", length = 512, nullable = false)
@@ -80,6 +80,11 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
+
+      
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Color> colors = new ArrayList<>();

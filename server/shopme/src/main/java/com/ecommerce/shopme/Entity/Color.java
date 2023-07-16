@@ -1,4 +1,6 @@
 package com.ecommerce.shopme.entity;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,7 +25,9 @@ public class Color {
     @NotBlank(message = "Tên danh mục không được để trống")
     private String colorName;
    
+    private boolean isDelete;
     @ManyToOne
     @JoinColumn(name = "product_id")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Product product;
 }

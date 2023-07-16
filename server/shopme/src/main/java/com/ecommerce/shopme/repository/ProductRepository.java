@@ -6,10 +6,12 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.entity.Product;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 @Repository
@@ -25,5 +27,7 @@ public interface ProductRepository extends PagingAndSortingRepository<Product,In
 List<Product> findByCategoryId(@Param("categoryId") Integer categoryId);
 void delete(Product product);
 
+
+Set<Product> findByOrder(Order order);
 }
    

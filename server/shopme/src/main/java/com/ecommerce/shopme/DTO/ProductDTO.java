@@ -21,6 +21,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class ProductDTO {
     private Integer id;
+
+    @NotBlank(message = "Tên sản phẩm không được để trống")
     private String name;
     private String shortDescription;
 

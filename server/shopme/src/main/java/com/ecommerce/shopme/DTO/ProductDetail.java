@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ecommerce.shopme.entity.Category;
 import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Image;
+import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.entity.Product;
 import com.ecommerce.shopme.entity.Size;
 
@@ -25,8 +26,9 @@ public class ProductDetail {
     private boolean status;
     private String slug;
     private Category category;
-    private List<String> colors;
-    private List<String> sizes;
+    private List<Color> colors;
+    private List<Size> sizes;
     private List<String> imageUrls;
+    private Order order;
 
 }
