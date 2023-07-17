@@ -24,7 +24,10 @@ public class User implements UserDetails {
    @Column(nullable = false, length = 64)
   private String password;
   private boolean enabled;
-
+  
+    
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createdAt;
 
   //inverseJoinColumns định nghĩa cách ánh xạ các cột khóa ngoại trong bảng trung gian để 
   //thiết lập quan hệ nhiều-nhiều giữa "Role" và "User". Cột khóa ngoại user_id trong bảng
@@ -61,6 +64,7 @@ public class User implements UserDetails {
   public Integer getId() {
     return id;
   }
+  
 
   public void setId(Integer id) {
     this.id = id;
@@ -98,6 +102,19 @@ public class User implements UserDetails {
     this.enabled = enabled;
   }
 
+
+
+  public Date getCreatedAt() {
+    return createdAt;
+  }
+
+
+
+  public void setCreatedAt(Date createdAt) {
+    this.createdAt = createdAt;
+  }
+  
+
   public Set<Role> getRoles() {
     return roles;
   }
@@ -132,7 +149,7 @@ public class User implements UserDetails {
     // TODO Auto-generated method stub
     return true;
   }
-  
+
 
 
 

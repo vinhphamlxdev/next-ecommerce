@@ -7,8 +7,36 @@ import Input from "@/Admin/components/Input";
 import * as Yup from "yup";
 import Link from "next/link";
 import { useFormik } from "formik";
-import { createUser } from "@/service/auth";
+import { signUpUserFn } from "@/service/authApi";
+import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
+import { LoadingSpinner } from "@/Admin/components/Loading";
+import useDisabled from "@/hooks/useDisabled";
+import { useRouter } from "next/router";
+import { IUser } from "@/types/authInterface";
+import { useStateContext } from "@/context";
+import notification from "@/utils/notification";
+type FormStateType = Omit<IUser, "id">;
 export default function SignUp() {
+  const { dispatch, state } = useStateContext();
+  const router = useRouter();
+  const currentUser = state.authUser;
+
+  // ? Calling the Register Mutation
+  const { mutate, isLoading, data, isSuccess, mutateAsync } = useMutation(
+    (userData: any) => signUpUserFn(userData),
+    {
+      onSuccess(data: any) {
+        dispatch({ type: "SIGN_UP", payload: data?.user });
+        signupFormik.resetForm();
+      },
+      onError(error: any) {
+        notification(error?.response.data, "error");
+        console.log("loi ne:", error);
+      },
+    }
+  );
+
   const signupFormik = useFormik({
     initialValues: {
       fullName: "",
@@ -28,24 +56,34 @@ export default function SignUp() {
         ),
     }),
     onSubmit: async (values) => {
-      console.log(values);
       if (!values) {
         return;
       }
-      const response = await createUser(values);
-      console.log(response);
+      const result = await mutateAsync(values);
+      console.log(result);
+      if (result) {
+        toast.success("Đăng kí tài khoản thành công");
+        router.push("/client/home");
+      }
     },
     validateOnBlur: false,
     validateOnChange: false,
   });
+  React.useEffect(() => {
+    if (currentUser) {
+      router.push("/client/home");
+    }
+  }, []);
+  const { isDisabled, disabledStyle } = useDisabled(isLoading);
   return (
     <div className="inset-0 bg-[#ffcad4] bg-signup gap-x-5">
+      {isLoading && <LoadingSpinner />}
       <div className="wrapper-layout section">
         <div className="flex h-screen justify-center items-center">
           <div className="px-4 shadow-md py-6 flex flex-col w-[450px] sign-up-form  rounded-md bg-[#fff]">
-            <h3 className="text-secondary text-4xl font-semibold text-center">
+            <button className="text-secondary text-4xl font-semibold text-center">
               Đăng Kí
-            </h3>
+            </button>
             <form
               onSubmit={signupFormik.handleSubmit}
               className="flex flex-col gap-y-4 mt-4"
@@ -90,6 +128,8 @@ export default function SignUp() {
 
               <button
                 type="submit"
+                disabled={isDisabled}
+                style={disabledStyle}
                 className="h-[50px] bg-bgCheckout whitespace-nowrap w-full text-white font-light rounded-md text-base undefined"
               >
                 Đăng Kí

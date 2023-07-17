@@ -1,4 +1,4 @@
-import { axiosAuth } from "@/service/auth";
+import { axiosAuth } from "@/service/authApi";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 

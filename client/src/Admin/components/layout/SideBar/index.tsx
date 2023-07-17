@@ -28,7 +28,7 @@ const sidebarLink: {
     id: 2,
     title: "Danh Mục",
     icon: <BiCategoryAlt />,
-    path: "/admin/category",
+    path: "/admin/categorys",
   },
 
   {

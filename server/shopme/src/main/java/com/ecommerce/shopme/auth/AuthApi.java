@@ -1,7 +1,10 @@
 package com.ecommerce.shopme.auth;
 
  
+import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -51,12 +54,13 @@ public class AuthApi {
         public ResponseEntity<?> register(@RequestBody @Valid AuthRequest request) {
                 Optional<User> existUser = userService.getUserByEmail(request.getEmail());
                 if (existUser.isPresent()){
-                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email da ton tai");
+                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email đã tồn tại");
                 }
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         String password = passwordEncoder.encode(request.getPassword().toString());
         User createdUser = new User(request.getFullName(), request.getEmail(), password);
         createdUser.setEnabled(true);
+        createdUser.setCreatedAt(new Date());
                 createdUser.addRole(new Role(2, "ROLE_CUSTOMER"));
 
         userService.saveUser(createdUser);
@@ -66,12 +70,24 @@ public class AuthApi {
                 userDTO.setEmail(createdUser.getEmail());
                 userDTO.setEnabled(createdUser.isEnabled());
                 userDTO.setRoles(createdUser.getRoles());
-          return ResponseEntity.ok().body(userDTO);
+                userDTO.setCreatedAt(createdUser.getCreatedAt());
+                Map<String,Object> response = new HashMap<>();
+                response.put("status", "success");
+                response.put("user", userDTO);
+          return ResponseEntity.ok().body(response);
       
     }
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
-        
+        String email = request.getEmail();
+        String password = request.getPassword();
+        Optional<User> existUser = userService.getUserByEmail(email);
+                if (!existUser.isPresent()) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email không tồn tại!");    
+                }
+                if (!userService.isPasswordCorrect(existUser, password)) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sai mật khẩu!");
+                }
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(), request.getPassword())
@@ -84,8 +100,20 @@ public class AuthApi {
            authentication.getPrincipal(); //trả lại email user
             User user = (User) authentication.getPrincipal();
             String accessToken = jwtUtil.generateAccessToken(user);
-            AuthResponse response = new AuthResponse(user.getEmail(), accessToken);
-            return ResponseEntity.ok().body(response);
+        //     AuthResponse response = new AuthResponse(user.getEmail(), accessToken);
+        
+            UserDTO userDTO = new UserDTO();
+                userDTO.setId(user.getId());
+                userDTO.setFullName(user.getFullName());
+                userDTO.setEmail(user.getEmail());
+                userDTO.setEnabled(user.isEnabled());
+                userDTO.setRoles(user.getRoles());
+                userDTO.setCreatedAt(user.getCreatedAt());
+                Map<String,Object> response = new HashMap<>();
+                response.put("status", "success");
+                response.put("user", userDTO);
+                response.put("access_token",accessToken);
+          return ResponseEntity.ok().body(response);
       
     }
 }

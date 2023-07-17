@@ -42,7 +42,6 @@ function Products() {
     "Chi tiết",
   ];
   const router = useRouter();
-  const query = useQuery({ queryKey: ["products"], queryFn: getAllProducts });
 
   const { setLoading, isLoading } = useGlobalStore();
   const {
