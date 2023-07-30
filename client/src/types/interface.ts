@@ -1,8 +1,19 @@
 export interface ICategory {
   id?: number;
   name: string;
-  slug: string;
+  slug?: string;
   description: string;
+}
+export interface ICategoryResponse {
+  categorys: ICategory[];
+  page: IPage;
+  status: string;
+}
+export interface IPage {
+  current: number;
+  itemsPerPage: number;
+  totalItems: number;
+  totalPages: number;
 }
 export interface IProduct {
   id: number;
@@ -10,7 +21,7 @@ export interface IProduct {
   shortDescription: string;
   price: number;
   quantity: number;
-  status: boolean;
+  delete: boolean;
   slug: any;
   category?: ICategory;
   colors: IColor[];
@@ -53,4 +64,12 @@ export interface IOrder {
   products: any[];
   createdAt: string;
   totalPrice: number;
+}
+export interface IFilters {
+  pageNum: number;
+  itemsPerPage: number;
+}
+export interface IProductFilters {
+  pageNum: number;
+  itemsPerPage: number;
 }

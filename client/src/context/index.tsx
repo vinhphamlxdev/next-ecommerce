@@ -39,14 +39,6 @@ const stateReducer = (state: State, action: Action) => {
         authUser: action.payload,
       };
     }
-    case "LOG_OUT": {
-      localStorage.removeItem("user");
-      deleteFromCookie("access_token");
-      return {
-        ...state,
-        authUser: action.payload,
-      };
-    }
     case "LOG_IN": {
       if (action.payload) {
         localStorage.setItem("user", JSON.stringify(action.payload));
@@ -58,6 +50,15 @@ const stateReducer = (state: State, action: Action) => {
         authUser: action.payload,
       };
     }
+    case "LOG_OUT": {
+      localStorage.removeItem("user");
+      deleteFromCookie("access_token");
+      return {
+        ...state,
+        authUser: action.payload,
+      };
+    }
+
     default: {
       throw new Error(`Unhandled action type`);
     }

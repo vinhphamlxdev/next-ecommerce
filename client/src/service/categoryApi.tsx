@@ -1,35 +1,33 @@
-import axios from "axios";
-import { ICategory, IPage } from "@/types/interface";
-import axiosClient from "./axiosClient";
-export interface ICategorysResponse {
-  page: number;
-  status: string;
-  categorys: ICategory[];
-}
-export const getAllCategorys = async (params: any): Promise<any> => {
-  const response = await axiosClient.get<ICategorysResponse>(`/categorys`, {
-    params: params,
+import {
+  ICategory,
+  ICategoryResponse,
+  IFilters,
+  IProduct,
+} from "@/types/interface";
+import axiosConfig from "./axiosConfig";
+
+export const getAllCategory = async (param: any) => {
+  const response = await axiosConfig.get(`/categorys`, {
+    params: {
+      pageNum: param.pageNum || 0,
+      itemsPerPage: param.itemsPerPage || 5,
+    },
   });
+  return response.data;
+};
+export const getCategory = async (id: number) => {
+  const response = await axiosConfig.get(`/categorys/${id}`);
   return response;
 };
-export const getCategoryById = async (id: number): Promise<any> => {
-  const response = await axiosClient.get<any>(`/categorys/${id}`);
+export const createCategory = async (category: Omit<ICategory, "id">) => {
+  const response = await axiosConfig.post(`/categorys`, category);
   return response;
 };
-export const createCategory = async (data: ICategory): Promise<any> => {
-  const response = await axiosClient.post<ICategory>(`/categorys`, data);
+export const updateCategory = async (id: number, data: ICategory) => {
+  const response = await axiosConfig.put(`/categorys/${id}`, data);
   return response;
 };
-export const updateCategory = async (
-  id: number | any,
-  data: any
-): Promise<any> => {
-  const response = await axiosClient.put<any>(`/categorys/${id}`, data);
-  return response;
-};
-export const deleteCategoryById = async (
-  id: number | unknown
-): Promise<any> => {
-  const response = await axiosClient.delete(`/categorys/${id}`);
+export const deleteCategory = async (id: number) => {
+  const response = await axiosConfig.delete(`categorys/${id}`);
   return response;
 };

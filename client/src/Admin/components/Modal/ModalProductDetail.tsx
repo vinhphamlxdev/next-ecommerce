@@ -2,18 +2,41 @@ import { useModalStore } from "@/store/modalStore";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import InputModal from "../InputModal/InputModal";
-import { IProduct } from "@/types/interface";
+import { IColor, IProduct, ISize } from "@/types/interface";
 import Image from "next/image";
 import UseDisabled from "@/hooks/useDisabled";
 import { btnColorStyle } from "../ChooseColor";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { getProduct } from "@/service/ProductApi";
+import { toast } from "react-toastify";
+import { LoadingSpinner } from "../Loading";
+import getColorClassName from "@/utils/getColorClassName";
 
 export interface IModalProductDetailProps {
-  data: IProduct;
+  productId: number | null;
+  isOpenDetailP: boolean;
 }
 
-export default function ModalProductDetail({ data }: IModalProductDetailProps) {
-  const { category, sizes, colors } = data;
-  const { isOpenDetailP, setOpenDetailProduct } = useModalStore();
+export default function ModalProductDetail({
+  productId,
+  isOpenDetailP,
+}: IModalProductDetailProps) {
+  console.log(isOpenDetailP);
+  const { setOpenDetailProduct } = useModalStore();
+  const { data, isLoading } = useQuery({
+    queryKey: ["product", productId],
+    enabled: productId !== undefined,
+    queryFn: () => getProduct(productId as number),
+    onSuccess: (data) => {
+      console.log(data);
+    },
+    onError: (err) => {
+      toast.error("Có lỗi");
+    },
+  });
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
   if (typeof document === "undefined")
     return <div className="modal_product-detail"></div>;
   return ReactDOM.createPortal(
@@ -24,22 +47,22 @@ export default function ModalProductDetail({ data }: IModalProductDetailProps) {
     >
       <div
         onClick={() => setOpenDetailProduct(false)}
-        className="absolute inset-0 z-20 bg-black opacity-60 overlay "
+        className="absolute inset-0 z-20 bg-black opacity-20 overlay "
       ></div>
       <div className="p-3 max-h-[550px] has-scrollbar rounded-md relative bg-white w-[550px]  inset-0 m-auto z-[600]">
         <div className="flex gap-y-3 flex-col">
           <div className="modal-choose-category">
             <div className="text-base mb-3 font-medium">Danh mục</div>
             <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-              <div className="text-base capitalize">{category?.name}</div>
+              <div className="text-base capitalize">{data?.category?.name}</div>
             </div>
           </div>
           <div className="size-detail flex flex-col gap-y-3">
             <div className="text-base  font-medium">Size</div>
             <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-              {sizes.length > 0 &&
-                sizes
-                  .filter((size) => !size.delete)
+              {data?.sizes.length > 0 &&
+                data?.sizes
+                  .filter((size: ISize) => !size.delete)
                   .map((size: any, index: number) => {
                     return (
                       <div
@@ -55,22 +78,14 @@ export default function ModalProductDetail({ data }: IModalProductDetailProps) {
           <div className="size-detail flex flex-col gap-y-3">
             <div className="text-base  font-medium">Màu sắc</div>
             <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-              {colors.length > 0 &&
-                colors.map((color, index: number) => {
+              {data?.colors.length > 0 &&
+                data?.colors.map((color: IColor, index: number) => {
                   return (
                     <div
                       key={index}
-                      className={`${btnColorStyle} ${
-                        color.colorName === "Đen"
-                          ? "bg-[#293241]"
-                          : color.colorName === "Trắng"
-                          ? "bg-[#adb5bd] text-black"
-                          : color.colorName === "Xanh Lá"
-                          ? "bg-saveBg"
-                          : color.colorName === "Xanh Da Trời"
-                          ? "bg-[#4cc9f0]"
-                          : ""
-                      } `}
+                      className={`${btnColorStyle} ${getColorClassName(
+                        color.colorName
+                      )} `}
                     >
                       <span>{color.colorName}</span>
                     </div>
@@ -106,7 +121,7 @@ export default function ModalProductDetail({ data }: IModalProductDetailProps) {
             </div>
           </div>
           <div className="grid grid-cols-3 gap-y-3 gap-x-3">
-            {data?.imageUrls?.map((img, index) => {
+            {data?.imageUrls?.map((img: string, index: number) => {
               return (
                 <Image
                   key={index}

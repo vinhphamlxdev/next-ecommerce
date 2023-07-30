@@ -10,7 +10,7 @@ export interface IQuickViewProps {
 
 export default function QuickView({ item }: IQuickViewProps) {
   const { seletedProduct, showModalQuickView, setCloseModalQuickView } =
-    useModalStore((state) => state);
+    useModalStore();
   const handleCloseModalQuickView = () => setCloseModalQuickView();
   if (typeof document === "undefined")
     return <div className="modal-quickview"></div>;
@@ -25,7 +25,7 @@ export default function QuickView({ item }: IQuickViewProps) {
         className="absolute inset-0 z-20 bg-black opacity-60 overlay "
       ></div>
       <div className="w-[1000px]  bg-white rounded-[8px] overflow-hidden h-[550px]  relative z-50 max-h-full inset-0 m-auto modal-quickview p-4">
-        {seletedProduct && <ProductDetail item={seletedProduct} isQuickView />}
+        {seletedProduct && <ProductDetail item={seletedProduct} />}
         <button
           onClick={handleCloseModalQuickView}
           className="absolute text-lg hover:text-bgPrimary p-3 z-[300] text-secondary close-modal-quickview top-4 right-4 "

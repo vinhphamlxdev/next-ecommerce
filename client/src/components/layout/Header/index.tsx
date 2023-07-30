@@ -25,7 +25,7 @@ const navLinks = [
   },
   {
     id: 2,
-    href: "/client/product",
+    href: "/client/products",
     name: "Sản Phẩm",
   },
   {
@@ -40,7 +40,6 @@ export default function HeaderClient(props: IHeaderClientProps) {
   const pathname = usePathname();
   const { dispatch, state } = useStateContext();
   const user = state.authUser;
-  console.log(user);
   const onLogoutHandler = async () => {
     //delete user from local storage
     dispatch({ type: "LOG_OUT", payload: null });

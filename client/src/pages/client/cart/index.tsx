@@ -9,13 +9,12 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 
 const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
-  ssr: false, // Vô hiệu hóa server-side rendering (SSR)
+  ssr: false,
 });
 
-export interface ICartProps {}
-
-export default function Cart(props: ICartProps) {
-  const { cartItems } = useCartStore((state) => state);
+export default function Cart() {
+  const { cartItems } = useCartStore();
+  console.log(cartItems);
 
   return (
     <LayoutClient>
@@ -45,11 +44,11 @@ export default function Cart(props: ICartProps) {
               </div>
               {cartItems.length > 0 ? (
                 cartItems.map((item: IProduct, index: number) => {
-                  return <CartItem key={item.id} item={item} />;
+                  return <CartItem key={index} item={item} />;
                 })
               ) : (
                 <div className="my-3 text-2xl font-semibold text-center text-textPrimary">
-                  No product in the cart
+                  Không có sản phẩm trong giỏ hàng
                 </div>
               )}
             </div>
@@ -58,11 +57,11 @@ export default function Cart(props: ICartProps) {
                 <div className="flex items-center font-semibold gap-x-3 text-secondary">
                   Tổng tiền:
                   <span className="text-base font-medium text-bgPrimary">
-                    {formatVnd(calculateTotalPrice(cartItems).toString())}
+                    {formatVnd(calculateTotalPrice(cartItems).toString())}₫
                   </span>
                 </div>
                 <Link
-                  href="/client/product"
+                  href="/client/products"
                   className="text-base bg-[#f2f2f2] px-4 py-3 text-gray-700 font-bold hover:text-white hover:bg-blue-500 transition-all"
                 >
                   <i className="bi bi-arrow-left"></i>

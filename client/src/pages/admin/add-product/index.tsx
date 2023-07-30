@@ -5,7 +5,6 @@ import LayoutAdmin from "@/Admin/components/layout";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useRouter } from "next/router";
-import { UseAddProduct } from "@/hooks/useAddProduct";
 import { formData } from "@/utils/formData";
 import { AiOutlineCloudUpload } from "react-icons/ai";
 import SelectImage from "@/Admin/components/SelectImage";
@@ -17,16 +16,30 @@ import LoadingButton from "@/Admin/components/Loading/LoadingButton";
 import { createProduct } from "@/service/ProductApi";
 import ChooseSize from "@/Admin/components/ChooseSize";
 import ChooseColor from "@/Admin/components/ChooseColor";
-export interface AddProductProps {}
-
-export default function AddProduct(props: AddProductProps) {
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+export default function AddProduct() {
   const [select, setSelect] = useState<any>();
   const [imgs, setImgs] = useState<any>([]);
   const [files, setFile] = useState<File[]>([]);
   const [sizes, setSizes] = useState<ISize[] | any>([]);
   const [colors, setColors] = useState<IColor[] | any>([]);
   const router = useRouter();
-
+  const { data, isLoading, error, isSuccess, mutate } = useMutation({
+    mutationFn: (formData: FormData) => createProduct(formData),
+    onSuccess: () => {
+      toast.success("Thêm sản phẩm thành công");
+      productFormik.resetForm();
+      setImgs([]);
+      setFile([]);
+      setSizes([]);
+      setColors([]);
+      router.push("/admin/products");
+    },
+    onError: (err: any) => {
+      toast.error(`${err?.response?.data}`);
+      console.log("Coloi:", err);
+    },
+  });
   const productFormik = useFormik({
     initialValues: {
       name: "",
@@ -78,12 +91,12 @@ export default function AddProduct(props: AddProductProps) {
       newFormData.append("price", price);
       newFormData.append("quantity", quantity);
       newFormData.append("category", select?.id);
-      const sizeNames = sizes.map((size: any) => size.name);
+      const sizeNames = sizes.map((size: ISize) => size.name);
       for (let index = 0; index < sizeNames.length; index++) {
         const sizeName = sizeNames[index];
         newFormData.append(`sizes[${index}]`, sizeName);
       }
-      const colorNames = colors.map((color: any) => color.colorName);
+      const colorNames = colors.map((color: IColor) => color.colorName);
       for (let index = 0; index < colorNames.length; index++) {
         const colorName = colorNames[index];
         newFormData.append(`colors[${index}]`, colorName);
@@ -92,28 +105,12 @@ export default function AddProduct(props: AddProductProps) {
         newFormData.append(`images[${index}]`, files[index]);
       }
 
-      const response = await axios.post(
-        `http://localhost:8080/products`,
-        newFormData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-      if (response.status === 201) {
-        // router.push("/admin/products");
-        toast.success("Thêm sản phẩm thành công");
-        router.push("/admin/products");
-      } else {
-        toast.error("Thêm sản phẩm thất bại");
-      }
-      console.log(response);
+      mutate(newFormData);
     },
     validateOnBlur: false,
     validateOnChange: false,
   });
-  const { isDisabled, disabledStyle } = UseDisabled(productFormik.isSubmitting);
+  const { isDisabled, disabledStyle } = UseDisabled(isLoading);
   return (
     <LayoutAdmin>
       <div className="add-product-page  p-3 bg-white shadow-md rounded-md">

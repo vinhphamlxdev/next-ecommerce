@@ -1,18 +1,20 @@
 package com.ecommerce.shopme.service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.ecommerce.shopme.entity.Category;
 import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Image;
 import com.ecommerce.shopme.entity.Order;
@@ -49,15 +52,48 @@ public class ProductSevice {
     SizeRepository sizeRepository;
     @Autowired
     ColorRepository colorRepository;
-    public Page<Product> listAll(Pageable pageable) {
-      
-        if (pageable.isPaged()) {
-            return productRepository.findAll(pageable);
-        } else {
-            List<Product> allProducts = productRepository.findAll(Pageable.unpaged()).getContent();
-            return new PageImpl<>(allProducts);
-        }
+  
+    public Page<Product> listByPageProduct(Integer pageNumber, Integer itemsPerpage, String sortField,
+    String sortDir
+    ) {
+        if (sortField!=null && !sortField.isEmpty()) {
+            String mappedSortField = mapSortField(sortField);
+            Pageable pageable = PageRequest.of(pageNumber, itemsPerpage,
+            sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+            : Sort.by(mappedSortField).descending()
+            );
+                return productRepository.findAll(pageable);
     }
+         Pageable pageable = PageRequest.of(pageNumber, itemsPerpage
+            );
+    return productRepository.findAll(pageable);
+}
+
+public Page<Product> listByPageProductAndCategorySlug(int pageNum, int itemsPerPage, String categorySlug,
+String sortField,
+    String sortDir
+) {
+    if (sortField!=null && !sortField.isEmpty()) {
+                    String mappedSortField = mapSortField(sortField);
+
+             Pageable pageable = PageRequest.of(pageNum, itemsPerPage,
+            sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+            : Sort.by(mappedSortField).descending()
+            );
+                return productRepository.findByCategorySlug(categorySlug, pageable);
+    }
+    Pageable pageable = PageRequest.of(pageNum, itemsPerPage);
+   
+    return productRepository.findByCategorySlug(categorySlug, pageable);
+}
+private String mapSortField(String sortField) {
+    switch (sortField) {
+        case "createdat":
+            return "createdAt";
+        default:
+            return sortField; 
+    }
+}
 //     //get product by id
     public Product getProductById(Integer id) {
         
@@ -119,6 +155,13 @@ public void addImageToProduct(Integer productId, String imageUrl) {
         // Xử lý khi không tìm thấy sản phẩm với id tương ứng
     }
 }
+public boolean checkDuplicate(String name){
+    Product productSameName = productRepository.findByName(name);
+    if (productSameName!=null) {
+        return true;
+    }
+    return false;
+}
 public void addSizeToProduct(Integer productId,String sizeName){
      Optional<Product> optionalProduct = productRepository.findById(productId);
     
@@ -163,6 +206,7 @@ public void addColorToProduct(Integer productId,String colorName){
 // //Việc tiếp tục duyệt qua các hình ảnh không cần thiết sẽ tăng độ phức tạp của thuật toán và làm mất thời gian thực hiện.
 public void deleteImage(Integer productId,List<String> imgsUrlDelete) throws java.io.IOException {
     List<Image> images = imageRepository.findByProductId(productId);
+   
     for (String imgUrl : imgsUrlDelete) {
         for (Image image : images) {
             if (image.getImageUrl().equals(imgUrl)) {
@@ -173,33 +217,30 @@ public void deleteImage(Integer productId,List<String> imgsUrlDelete) throws jav
         }
     }
 }
-public void deleteSize(Integer productId,List<Integer> sizesDeleteId) throws java.io.IOException {
+public void deleteSize(Integer productId,Set<Integer> sizesDeleteId,Set<String> sizeNotDeletes) throws java.io.IOException {
     List<Size> sizes = sizeRepository.findByProductId(productId);
-    for (Integer sizeNeedDelete : sizesDeleteId) {
-        for (Size size : sizes) {
-            if (size.getId().equals(sizeNeedDelete)) {
-               
-                size.setDelete(true);
-                break;
-            }
-        }   
-    }
-   
-}
-public void deleteColor(Integer productId,List<Integer> colorsId) throws java.io.IOException {
-    List<Color> colors = colorRepository.findByProductId(productId);
-    for (Integer colorIdNeedDelte : colorsId) {
-        for (Color color : colors) {
-            if (color.getId().equals(colorIdNeedDelte)) {
-                color.setDelete(true);
-                break;
-            }
+    for (Size size : sizes) {
+        if (sizesDeleteId.contains(size.getId())) {
+            size.setDelete(true);
+        }
+        if (sizeNotDeletes.contains(size.getName())) {
+            size.setDelete(false);
         }
     }
 }
-public List<Product> getProductByCategoryId(Integer id){
-    return productRepository.findByCategoryId(id);
+public void deleteColor(Integer productId,Set<Integer> colorsDeleteId,Set<String> colorNotDeletes) throws java.io.IOException {
+    List<Color> colors = colorRepository.findByProductId(productId);
+        for (Color color : colors) {
+           if (colorsDeleteId.contains(color.getId())) {
+            color.setDelete(true);
+           }
+           if (colorNotDeletes.contains(color.getColorName())) {
+                    color.setDelete(false);
+           }
+        }
+     
 }
+
     //nhận vào là fie ảnh trả ra danh sách path ảnh để lưu vào db
      public List<String> saveImagesToCloudinary(List<MultipartFile> images) throws IOException, java.io.IOException {
      
@@ -219,5 +260,8 @@ public List<Product> getProductByCategoryId(Integer id){
     public Set<Product> getProductByOrder(Order order){
         return productRepository.findByOrder(order);
      }
-    
+     public List<Product> getProductByCategoryId(Integer id){
+    return productRepository.findByCategoryId(id);
+}
+
 }

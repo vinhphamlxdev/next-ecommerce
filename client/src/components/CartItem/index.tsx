@@ -19,11 +19,11 @@ export default function CartItem({ item }: ICartItemProps) {
     sizes,
   } = item;
   const { setQuantityCart, deleteFromCart } = useCartStore((state) => state);
-  const updateQuantity = (type: any) => {
-    setQuantityCart({ id, type });
+  const updateQuantity = (type: string, product: IProduct) => {
+    setQuantityCart({ type, product });
   };
-  const handleDeleteCartItem = (productId: number) => {
-    deleteFromCart(productId);
+  const handleDeleteCartItem = (newProduct: IProduct) => {
+    deleteFromCart(newProduct);
   };
   return (
     <div className=" flex py-3 border-t-0 border-b border-gray-300 cart-row">
@@ -31,37 +31,41 @@ export default function CartItem({ item }: ICartItemProps) {
         <div className="relative flex-shrink-0 flex items-center cursor-pointer">
           <img className="rounded-md w-28" src={imageUrls[0]} alt="" />
         </div>
-        <div className="flex flex-col items-start justify-center p-2">
+        <div className="flex flex-col gap-y-2 items-start justify-center p-2">
           <h5 className="text-base font-semibold transition-all duration-500 cursor-pointer text-secondary whitespace-nowrap hover:text-primary">
             {name}
           </h5>
+          <div className="flex gap-x-2 items-center">
+            <span>{sizes[0]?.name}</span>
+            <span>{colors[0]?.colorName}</span>
+          </div>
           <span></span>
         </div>
       </div>
       <div className="grid w-full  gap-x-3 grid-cols-4">
         <div className="flex items-center justify-center text-base font-semibold flex-center text-secondary">
-          {formatVnd(price.toString())}
+          {formatVnd(price.toString())}₫
         </div>
         <div className="flex items-center justify-center">
           <div
-            onClick={() => updateQuantity("-")}
+            onClick={() => updateQuantity("-", item)}
             className="select-none btn-decrease"
           >
             -
           </div>
           <div className="cart-quantity">{quantity}</div>
           <div
-            onClick={() => updateQuantity("+")}
+            onClick={() => updateQuantity("+", item)}
             className="select-none btn-increase"
           >
             +
           </div>
         </div>
         <div className="flex items-center justify-center text-base font-semibold text-secondary">
-          <span>{formatVnd((price * quantity).toString())}</span>
+          <span>{formatVnd((price * quantity).toString())}₫</span>
         </div>
         <div
-          onClick={() => handleDeleteCartItem(id)}
+          onClick={() => handleDeleteCartItem(item)}
           className="flex justify-center items-center"
         >
           <i className="text-xl font-semibold transition-all duration-500 cursor-pointer select-none text-bgPrimary bi bi-trash" />

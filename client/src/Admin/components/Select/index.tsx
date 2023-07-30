@@ -1,9 +1,16 @@
 import * as React from "react";
 import { GetCategorySimple as getCategory } from "../../../hooks/useCategory";
 import { GrFormClose } from "react-icons/gr";
-import { ICategory } from "@/types/interface";
+import { ICategory, IFilters } from "@/types/interface";
 import axios from "axios";
-import { getAllCategorys } from "@/service/CategoryApi";
+import {
+  useQuery,
+  useMutation,
+  useQueryClient,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { getAllCategory } from "@/service/CategoryApi";
 export interface SelectProps {
   label?: string;
   select: any;
@@ -20,23 +27,24 @@ export default function Select({
   error,
 }: SelectProps) {
   const [key, setKey] = React.useState(1);
-  const [categorys, setCategorys] = React.useState<ICategory[]>([]);
-  React.useEffect(() => {
-    async function fetchCategorys() {
-      const res = await getAllCategorys({});
-      if (res && res.categorys) {
-        setCategorys(res.categorys);
-      }
-    }
-    fetchCategorys();
-  }, []);
+
+  const [filters, setFilters] = React.useState<IFilters>({
+    pageNum: 0,
+    itemsPerPage: 10,
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const values = JSON.parse(e.target.value);
     setSelect(values);
   };
   const handleRemove = () => setSelect([]);
-
+  const { isError, data, refetch, isLoading } = useQuery({
+    queryKey: ["categorys", filters],
+    queryFn: () => getAllCategory(filters),
+    onError: (err) => {
+      console.log(err);
+    },
+  });
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
@@ -62,7 +70,7 @@ export default function Select({
           className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none"
         >
           <option value={-1}>---Chọn Danh Mục---</option>
-          {categorys.map((value, index) => {
+          {data?.categorys.map((value: ICategory, index: number) => {
             return (
               <option
                 className="capitalize"

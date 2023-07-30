@@ -5,13 +5,13 @@ import * as React from "react";
 export interface IPaginationProps {
   totalPages: number;
   pageCurrent: number;
-  onPageChange?: any;
+  onPageChange: (event: React.ChangeEvent<unknown>, page: number) => void;
 }
 
 export default function PaginationComponent({
   totalPages,
   pageCurrent,
-  onPageChange = null,
+  onPageChange,
 }: IPaginationProps) {
   return (
     <div className="text-center flex justify-center items-center mt-7">

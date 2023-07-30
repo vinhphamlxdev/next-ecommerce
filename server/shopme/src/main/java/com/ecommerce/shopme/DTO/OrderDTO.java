@@ -15,13 +15,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderDTO {
-    private Integer id;
+  
     private String fullName;
     private String address;
     private String email;
-    private Integer phoneNumber;
+    private String phoneNumber;
     private Date createdAt;
     private List<OrderDetailDTO> orderDetails;
     private User user;
-    private Set<Product> products = new HashSet<>();
+  
 }

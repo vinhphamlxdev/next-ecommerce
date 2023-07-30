@@ -14,9 +14,7 @@ import { BsPieChart } from "react-icons/bs";
 import { IoStatsChartOutline } from "react-icons/io5";
 import { BiMoneyWithdraw } from "react-icons/bi";
 
-export interface IHomeAdminProps {}
-
-export default function HomeAdmin(props: IHomeAdminProps) {
+export default function HomeAdmin() {
   return (
     <LayoutAdmin>
       <div className="mt-5 dashboard-layout">

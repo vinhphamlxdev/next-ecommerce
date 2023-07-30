@@ -7,4 +7,5 @@ export const IMG_SRC = {
   slider2: require("../assets/slider2.webp"),
   slider3: require("../assets/slider3.jpg"),
   signup: require("../assets/signup.svg"),
+  footer: require("../assets/footer.webp"),
 };

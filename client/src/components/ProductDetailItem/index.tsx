@@ -9,14 +9,19 @@ import handleAddToCart from "@/utils/handleAddToCart";
 import { useCartStore } from "@/store/cartStore";
 import { usePathname } from "next/navigation";
 import { useModalStore } from "@/store/modalStore";
+import getColorClassName from "@/utils/getColorClassName";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
+import Image from "next/image";
+import { toast } from "react-toastify";
 export interface IProductDetailProps {
   item: IProduct;
-  isQuickView: boolean;
+  className?: string;
 }
 
 export default function ProductDetail({
   item,
-  isQuickView,
+  className,
 }: IProductDetailProps) {
   const {
     imageUrls,
@@ -26,12 +31,19 @@ export default function ProductDetail({
     sizes,
     price,
     category,
+    colors,
   } = item;
   const [imgPreview, setImgPreview] = React.useState<string>(imageUrls[0]);
   const handlePreviewProduct = (url: string) => setImgPreview(url);
   const [quantity, setQuantity] = React.useState<number>(1);
-  const { addToCart } = useCartStore((state) => state);
+  const { addToCart } = useCartStore();
   const { setCloseModalQuickView } = useModalStore((state) => state);
+  const [selectedSize, setSelectedSize] = React.useState<string>(
+    sizes[0]?.name
+  );
+  const [selectedColor, setSelectedColor] = React.useState<string>(
+    colors[0]?.colorName
+  );
   const handleInc = () => {
     setQuantity(quantity + 1);
   };
@@ -49,6 +61,14 @@ export default function ProductDetail({
     } else {
       setQuantity(+value);
     }
+  };
+  const handleSizeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setSelectedSize(value);
+  };
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setSelectedColor(value);
   };
   return (
     <StyledProductDetailItem className="flex  gap-x-5">
@@ -80,59 +100,135 @@ export default function ProductDetail({
               })}
         </div>
       </div>
-      <div className="flex flex-1 flex-col gap-y-4">
-        <h3 className="text-3xl pr-9 font-semibold text-secondary">
+      <div className="flex flex-1 flex-col gap-y-4 p-3">
+        <h3 className="text-xl product-detail__name pr-9 font-semibold">
           {item.name}
         </h3>
         <div className="flex gap-x-3">
-          <span className="text-lg font-medium text-bgPrimary">
+          <span className="text-lg product-detail__price  text-gray-600 font-semibold">
             {formatVnd(item.price.toString())}₫
           </span>
         </div>
-
-        <span className="text-base text-textPrimary">{shortDescription}</span>
-
-        <div className="flex items-center font-normal cursor-pointer text-secondary hover:text-bgPrimary gap-x-3">
-          <i className=" leading-[0px] text-inherit bi-heart"></i>
-          Thêm Vào Danh Sách Yêu Thích
+        <div className="flex flex-col gap-y-3">
+          <span className="text-lg font-medium">Màu Sắc:</span>
+          <div className="flex items-center gap-x-2">
+            {colors?.length > 0 &&
+              colors.map((color) => {
+                return (
+                  <div
+                    key={color.id}
+                    data-value={color.colorName}
+                    className={`swatch-element w-9 h-9 rounded-full border  flex justify-center items-center ${
+                      selectedColor === color.colorName ? "border-gray-600" : ""
+                    }`}
+                  >
+                    <input
+                      className="hidden"
+                      id={`swatch-${color.colorName}`}
+                      type="radio"
+                      name="color-option"
+                      value={color.colorName}
+                      onChange={handleColorChange}
+                      checked={selectedColor === color.colorName}
+                    />
+                    <Tippy content={`${color.colorName}`}>
+                      <label
+                        className={`color-label cursor-pointer flex justify-center items-center w-7 h-7 rounded-full  select-none  border 
+                        ${getColorClassName(color.colorName)}
+                        `}
+                        htmlFor={`swatch-${color.colorName}`}
+                      ></label>
+                    </Tippy>
+                  </div>
+                );
+              })}
+          </div>
         </div>
-        {isQuickView ? (
+        <div className="flex flex-col gap-y-3">
+          <span className="text-base text-[#707070] font-medium">
+            Kích thước:
+          </span>
+          <div className="flex items-center gap-x-3">
+            {sizes?.length > 0 &&
+              sizes.map((size) => {
+                return (
+                  <div
+                    key={size.id}
+                    data-value={size.name}
+                    className="swatch-element"
+                  >
+                    <input
+                      className="hidden"
+                      id={`swatch-${size.name}`}
+                      type="radio"
+                      name="size-option"
+                      value={size.name}
+                      onChange={handleSizeChange}
+                      checked={selectedSize === size.name}
+                    />
+                    <label
+                      className={`size-label cursor-pointer flex justify-center items-center w-8 h-8  select-none  border  ${
+                        selectedSize === size.name
+                          ? "bg-bgPrimary border-bgPrimary text-white"
+                          : "text-bgPrimary  bg-white   border-gray-400"
+                      }`}
+                      htmlFor={`swatch-${size.name}`}
+                    >
+                      {size.name}
+                    </label>
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+        {/* {isQuickView ? (
           <></>
         ) : (
           <div className="relative">
             <Button
-              onClick={() => handleAddToCart(item, quantity, addToCart)}
+              onClick={() =>
+                handleAddToCart(
+                  item,
+                  quantity,
+                  selectedSize,
+                  selectedColor,
+                  addToCart
+                )
+              }
               className="btn-add-to-cart"
             >
               Mua Ngay
             </Button>
           </div>
-        )}
+        )} */}
 
-        <div className="flex items-center gap-x-2">
-          <span className="text-lg font-semibold text-secondary">
-            Danh mục:
+        <div className="flex flex-col gap-y-2">
+          <span className="text-base text-[#707070] font-medium">
+            Số lượng:
           </span>
-          <span className="text-base uppercase font-normal text-gray-500">
-            {category?.name}
-          </span>
-        </div>
-        <div className="flex gap-x-3">
-          <Quantity
-            onChange={handleQuantityChange}
-            handleDec={handleDec}
-            handleInc={handleInc}
-            value={quantity}
-          />
-          <Button
-            onClick={() => {
-              handleAddToCart(item, quantity, addToCart);
-              setCloseModalQuickView();
-            }}
-            className="btn-add-to-cart"
-          >
-            Thêm Vào Giỏ Hàng
-          </Button>
+          <div className="flex gap-x-3">
+            <Quantity
+              onChange={handleQuantityChange}
+              handleDec={handleDec}
+              handleInc={handleInc}
+              value={quantity}
+            />
+            <Button
+              onClick={() => {
+                handleAddToCart(
+                  item,
+                  quantity,
+                  selectedSize,
+                  selectedColor,
+                  addToCart
+                );
+                setCloseModalQuickView();
+              }}
+              className="btn-add-to-cart"
+            >
+              Thêm Vào Giỏ Hàng
+            </Button>
+          </div>
         </div>
       </div>
     </StyledProductDetailItem>

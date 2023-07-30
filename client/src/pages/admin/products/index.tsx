@@ -8,11 +8,6 @@ import axios from "axios";
 import { IProduct } from "@/types/interface";
 import { GetServerSideProps } from "next";
 import { useGlobalStore } from "@/store/globalStore";
-import {
-  deleteProductById,
-  getAllProducts,
-  getProductById,
-} from "@/service/ProductApi";
 import { LoadingSkeleton, LoadingSpinner } from "@/Admin/components/Loading";
 import dynamic from "next/dynamic";
 import Swal from "sweetalert2";
@@ -25,13 +20,13 @@ import Pagination from "@/Admin/components/Pagination";
 import PaginationComponent from "@/Admin/components/Pagination";
 import ModalProductDetail from "@/Admin/components/Modal/ModalProductDetail";
 import formatVnd from "@/utils/formatVnd";
-import {
-  useQuery,
-  useMutation,
-  useQueryClient,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { getAllProduct } from "@/service/ProductApi";
+import ProductItemAdmin from "@/Admin/components/ProductItem";
+import usePaginationAndFilters, {
+  FiltersState,
+  PaginationState,
+} from "@/hooks/usePaginationAndFilters";
 function Products() {
   const thHeader: string[] = [
     "Tên sản phẩm",
@@ -39,107 +34,37 @@ function Products() {
     "Số lượng",
     "Chỉnh sửa",
     "Xóa",
-    "Chi tiết",
+    "Trạng thái",
   ];
   const router = useRouter();
-
-  const { setLoading, isLoading } = useGlobalStore();
-  const {
-    setOpenEditProduct,
-    setOpenDetailProduct,
-    isOpenEditP,
-    isOpenDetailP,
-  } = useModalStore();
-  const [products, setProducts] = React.useState<IProduct[]>();
-  const [product, setProduct] = React.useState<IProduct | null>(null);
-  const [render, setRender] = React.useState<boolean>(false);
-  const [pagination, setPagination] = React.useState({
+  const initialPagination: PaginationState = {
     current: 1,
-    tolalPages: 3,
-  });
-  const [filters, setFilters] = React.useState({
-    pageNum: 0,
-    itemsPerPage: 4,
-  });
-  const deleteProduct = (id: number, name: string) => {
-    Swal.fire({
-      text: `Bạn muốn xóa sản phẩm: ${name}`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    })
-      .then(async (result) => {
-        if (result.isConfirmed) {
-          const res = await deleteProductById(id);
-          getMessage("Đã xóa sản phẩm thành công!", "success");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setRender((r) => !r);
-      });
+    totalPages: 3,
   };
-  const handleEditProduct = async (id: number) => {
-    setLoading(true);
-    setOpenEditProduct(true);
-    try {
-      const response = await getProductById(id);
-      console.log(response);
-      setProduct(response?.product);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const handleViewDetail = async (id: number) => {
-    setLoading(true);
-    setOpenDetailProduct(true);
-    try {
-      const response = await getProductById(id);
-      setProduct(response?.product);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-  const handlePageChange = (
-    event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
-  ) => {
-    setFilters((prevFilter) => ({
-      ...prevFilter,
-      pageNum: newPage - 1,
-    }));
-  };
-  React.useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getAllProducts(filters);
-        console.log(data);
-        if (data && data?.products) {
-          setProducts(data.products);
-          const { page } = data;
-          setPagination({
-            current: page?.current,
-            tolalPages: page?.totalPages,
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [render, filters]);
 
+  const initialFilters: FiltersState = {
+    pageNum: 0,
+    itemsPerPage: 6,
+    category: "",
+    sortby: "",
+  };
+  const { filters, handlePageChange, pagination, setFilters, setPagination } =
+    usePaginationAndFilters(initialPagination, initialFilters);
+
+  const { isError, data, error, refetch, isLoading } = useQuery({
+    queryKey: ["products", filters],
+    queryFn: () => getAllProduct(filters),
+    onSuccess: (data) => {
+      const { page } = data;
+      setPagination({
+        current: page?.current,
+        totalPages: page?.totalPages,
+      });
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
   return (
     <>
       <LayoutAdmin>
@@ -160,71 +85,23 @@ function Products() {
             <table className="items-center border-spacing-y-2 text-white w-full bg-transparent border-separate ">
               <HeaderTable data={thHeader} />
               <tbody className=" w-full ">
-                {products?.map((product: IProduct, index: number) => {
+                {data?.products?.map((product: IProduct, index: number) => {
                   return (
-                    <tr key={product.id} className="bg-gray-700 mt-2">
-                      <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                        <div className="relative  rounded-full">
-                          <Image
-                            className="rounded-full  w-14 h-14 flex-shrink-0 object-cover"
-                            width={100}
-                            height={100}
-                            src={product?.imageUrls[0]}
-                            alt=""
-                          />
-                        </div>
-                        <span className="ml-3 font-bold text-white">
-                          {product.name}
-                        </span>
-                      </th>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        {formatVnd(product.price.toString())}đ
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        <i className="fas fa-circle text-orange-500 mr-2"></i>
-                        <span className="bg-saveBg rounded-[10px] px-3 py-[2px] block text-center overflow-hidden w-[50px]">
-                          {product.quantity}
-                        </span>
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        <button
-                          onClick={() => handleEditProduct(product.id)}
-                          className="py-3 px-5 bg-orange-400 rounded-[5px]"
-                        >
-                          <EditIcon />
-                        </button>
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        <button
-                          onClick={() =>
-                            deleteProduct(product.id, product.name)
-                          }
-                          className="py-3 px-5 bg-red-500 rounded-[5px]"
-                        >
-                          <DeleteIcon />
-                        </button>
-                      </td>
-                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                        <div className="flex">
-                          <button
-                            onClick={() => handleViewDetail(product?.id)}
-                            className="bg-pink-700 rounded-[10px] px-3 py-[2px] cursor-pointer"
-                          >
-                            <BsEye className="leading-[0px]" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                    <ProductItemAdmin
+                      item={product}
+                      key={product.id}
+                      filters={filters}
+                    />
                   );
                 })}
               </tbody>
             </table>
-            {products?.length === 0 && (
+            {data?.products?.length === 0 && (
               <div className="text-white text-xl text-center">
                 Chưa có sản phẩm
               </div>
             )}
-            {!products && (
+            {isLoading && (
               <LoadingSkeleton
                 columns={1}
                 height={50}
@@ -234,19 +111,11 @@ function Products() {
             )}
           </div>
           <PaginationComponent
-            totalPages={pagination?.tolalPages}
+            totalPages={pagination?.totalPages}
             pageCurrent={pagination?.current}
             onPageChange={handlePageChange}
           />
         </div>
-        {product && isOpenEditP ? (
-          <ModalProductEdit data={product} setRender={setRender} />
-        ) : product && isOpenDetailP ? (
-          <ModalProductDetail data={product} />
-        ) : (
-          <></>
-        )}
-        {isLoading && <LoadingSpinner />}
       </LayoutAdmin>
     </>
   );

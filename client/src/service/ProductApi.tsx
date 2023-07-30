@@ -1,44 +1,40 @@
-import { IProduct } from "@/types/interface";
-import axiosClient from "./axiosClient";
+import { ICategory, IProduct } from "@/types/interface";
+import axiosConfig from "./axiosConfig";
+import axios from "axios";
 
-export const getAllProducts = async (params: any): Promise<any> => {
-  const response = await axiosClient.get<any>(`/products`, {
-    params: params,
+export const getAllProduct = async (param: any) => {
+  const response = await axiosConfig.get(`/products`, {
+    params: {
+      pageNum: param.pageNum || 0,
+      itemsPerPage: param.itemsPerPage || 5,
+      category: param.category || "",
+      sortfield: param.sortField || "",
+      sortdir: param.sortDir || "",
+    },
   });
-  return response;
+  return response.data;
 };
-export const getProductById = async (id: number): Promise<any> => {
-  const response = await axiosClient.get(`/products/${id}`);
-  return response;
-};
-
-export const deleteProductById = async (id: number): Promise<any> => {
-  const response = await axiosClient.delete(`/products/${id}`);
-  return response;
+export const getProduct = async (id: number | string) => {
+  const response = await axiosConfig.get(`/products/${id}`);
+  return response.data.product;
 };
 export const createProduct = async (formData: FormData) => {
-  const response = await axiosClient.post<any>(`/products`, formData, {
+  const response = await axiosConfig.post(`/products`, formData, {
     headers: {
       "Content-Type": "multipart/form-data",
     },
   });
-  return response;
+  return response.data;
 };
-export const updateProduct = async ({
-  id,
-  formData,
-}: {
-  id: string;
-  formData: FormData;
-}) => {
-  const response = await axiosClient.patch<IProduct>(
-    `products/${id}`,
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
-  return response;
+export const updateProduct = async (id: number, formData: FormData) => {
+  const response = await axiosConfig.put(`/products/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+export const deleteProduct = async (id: number | string) => {
+  const response = await axiosConfig.delete(`products/${id}`);
+  return response.data;
 };

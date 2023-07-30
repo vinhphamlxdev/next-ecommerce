@@ -4,12 +4,16 @@ import { toast } from "react-toastify";
 
 function handleAddToCart(
   product: IProduct,
-  quantity = 1,
+  quantity: number,
+  newSize: string,
+  newColor: string,
   addToCart: (newProduct: IProduct) => void
 ) {
   addToCart({
     ...product,
-    quantity: quantity,
+    sizes: product.sizes.filter((size) => size.name === newSize),
+    colors: product.colors.filter((color) => color.colorName === newColor),
+    quantity,
   });
   toast.success("Thêm vào giỏ hàng thành công 😍");
 }

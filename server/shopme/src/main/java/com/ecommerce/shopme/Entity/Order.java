@@ -1,6 +1,8 @@
 package com.ecommerce.shopme.entity;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.ecommerce.shopme.enums.OrderStatus;
@@ -22,8 +24,8 @@ public class Order {
     @Column(name = "address", length = 150, nullable = false)
     private String address;
     private String email;
-    @Column(name = "phone_number", length = 10, nullable = false)
-    private Integer phoneNumber;
+    @Column(name = "phone_number", length = 11, nullable = false)
+    private String phoneNumber;
     private String status;
     
     @Temporal(TemporalType.TIMESTAMP)
@@ -36,7 +38,6 @@ public class Order {
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
 	private Set<OrderDetail> orderDetails = new HashSet<>();
 
-      @OneToMany(mappedBy = "order")
-	private Set<Product> products = new HashSet<>();
+
 
 }

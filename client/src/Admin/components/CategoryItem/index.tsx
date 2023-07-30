@@ -1,7 +1,5 @@
 import UseDisabled from "@/hooks/useDisabled";
-import { deleteCategoryById, updateCategory } from "@/service/CategoryApi";
-import axiosClient from "@/service/axiosClient";
-import { ICategory } from "@/types/interface";
+import { ICategory, IFilters } from "@/types/interface";
 import getMessage from "@/utils/notification";
 import axios from "axios";
 import { useFormik } from "formik";
@@ -12,26 +10,41 @@ import slugify from "slugify";
 import Swal from "sweetalert2";
 import * as Yup from "yup";
 import LoadingButton from "../Loading/LoadingButton";
-
+import { useRouter } from "next/router";
+import notification from "@/utils/notification";
+import {
+  createCategory,
+  getCategory,
+  updateCategory,
+} from "@/service/CategoryApi";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import DeleteCategoryButton from "./DeleteCategoryButton";
 export interface ICategoryItemProps {
   category: ICategory;
-  index: number;
-  setData: React.Dispatch<React.SetStateAction<ICategory[]>>;
-  data: ICategory[];
-  categorys: ICategory[];
   id: number;
-  setRender: React.Dispatch<React.SetStateAction<boolean>>;
+  filters: IFilters;
 }
 
 export default function CategoryItem({
   category,
-  index,
-  setData,
-  categorys,
   id,
-  setRender,
+  filters,
 }: ICategoryItemProps) {
   const [edit, setEdit] = React.useState<boolean>(false);
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { isLoading, data, isSuccess, mutate } = useMutation({
+    mutationFn: (category: Omit<ICategory, "id">) =>
+      updateCategory(id, category),
+    onSuccess(data: any) {
+      queryClient.setQueryData(["category", id], data);
+      toast.success("Cập nhật danh mục thành công");
+    },
+    onError(error: any) {
+      notification(error?.response.data, "error");
+      console.log("Có lỗi:", error);
+    },
+  });
 
   const categoryFormik = useFormik({
     initialValues: {
@@ -40,59 +53,34 @@ export default function CategoryItem({
     },
 
     onSubmit: async (values) => {
-      try {
-        let data = {
-          name: values.name,
-          slug: slugify(values.name),
-          description: values.description,
-        };
-        const response = await updateCategory(id, data);
-        if (response.status === 500) {
-          toast.error("Cập nhật danh mục that bai");
-        } else {
-          toast.success("Cập nhật danh mục thành công");
-        }
-        console.log(response);
-        setEdit(false);
-      } catch (error) {
-        console.log("co loi:", error);
-        setEdit(false);
+      if (!values.description || !values.name) {
+        toast.error("Tên danh mục hoặc mô tả là bắt buộc");
+        return;
       }
+      if (values.name.length < 5) {
+        toast.error("Tên danh mục tối thiểu 5 kí tự");
+        return;
+      }
+      if (values.description.length < 20) {
+        toast.error("Mô tả danh mục tối thiểu 20 kí tự");
+        return;
+      }
+      let data = {
+        name: values.name,
+        description: values.description,
+      };
+
+      mutate(data);
+      setEdit(false);
     },
   });
-  const deleteCatgory = (id: number | any, name: string) => {
-    Swal.fire({
-      text: `Bạn muốn xóa danh mục: ${name}`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    })
-      .then(async (result) => {
-        if (result.isConfirmed) {
-          const res = await deleteCategoryById(id);
-          getMessage("Đã xóa danh mục thành công!", "success");
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      })
-      .finally(() => {
-        setRender((r) => !r);
-        setEdit(false);
-      });
-  };
 
-  const { disabledStyle, isDisabled } = UseDisabled(
-    categoryFormik.isSubmitting
-  );
+  const { disabledStyle, isDisabled } = UseDisabled(isLoading);
   return (
     <div className="flex flex-col gap-y-3">
       <div className="flex flex-col all-category gap-y-5 bg-white px-3 py-2 shadow-md">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-x-2">
-            {/* <span className="text-gray-500 text-base">{index + 1})</span> */}
             {!edit && (
               <i
                 onClick={() => setEdit(true)}
@@ -100,12 +88,10 @@ export default function CategoryItem({
               ></i>
             )}
           </div>
-          <button
-            onClick={() => deleteCatgory(category.id, category.name)}
-            className="delete-category "
-          >
-            <i className="bi text-red-500 text-xl cursor-pointer bi-trash"></i>
-          </button>
+          <DeleteCategoryButton
+            filters={filters}
+            categoryId={id}
+          ></DeleteCategoryButton>
         </div>
         <form
           onSubmit={categoryFormik.handleSubmit}

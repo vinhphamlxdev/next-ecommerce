@@ -23,12 +23,11 @@ public class ProductDetail {
     private String shortDescription;
     private float price;
     private Integer quantity;
-    private boolean status;
+    private boolean isDelete;
     private String slug;
     private Category category;
     private List<Color> colors;
     private List<Size> sizes;
     private List<String> imageUrls;
-    private Order order;
 
 }

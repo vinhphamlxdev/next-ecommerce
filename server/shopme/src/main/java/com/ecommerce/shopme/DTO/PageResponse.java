@@ -2,7 +2,6 @@ package com.ecommerce.shopme.dto;
 
 import lombok.*;
 
-@Data
 @NoArgsConstructor
 public class PageResponse <T> {
     private T current;
@@ -16,6 +15,30 @@ public class PageResponse <T> {
         this.totalItems = totalItems;// Tổng số mục
         this.totalPages = totalPages;// Tổng số trang
         // this.lastPage = lastPage;//trang cuoi
+    }
+    public T getCurrent() {
+        return current;
+    }
+    public void setCurrent(T current) {
+        this.current = current;
+    }
+    public T getItemsPerPage() {
+        return itemsPerPage;
+    }
+    public void setItemsPerPage(T itemsPerPage) {
+        this.itemsPerPage = itemsPerPage;
+    }
+    public T getTotalItems() {
+        return totalItems;
+    }
+    public void setTotalItems(T totalItems) {
+        this.totalItems = totalItems;
+    }
+    public T getTotalPages() {
+        return totalPages;
+    }
+    public void setTotalPages(T totalPages) {
+        this.totalPages = totalPages;
     }
     
 }

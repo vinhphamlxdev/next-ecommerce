@@ -24,6 +24,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -47,7 +49,7 @@ public class Product {
     @NotBlank(message = "Tên sản phẩm không được để trống")
     @Length(min = 1, message = "Tên sản phẩm ít nhất 1 kí tự")
     private String name;
-    
+
     @Column(name = "short_description", length = 512, nullable = false)
     @NotBlank(message = "Mô tả sản phẩm không được để trống")
     private String shortDescription;
@@ -64,9 +66,16 @@ public class Product {
     @Min(value = 1,message = "số lượng tối thiểu phải là 1")
     private Integer quantity;
 
+    @Column(name = "created_at",nullable = false)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date createdAt;
 
-    @Column(name = "status")
-    private boolean status;
+   @Column(name = "updated_at",nullable = true)
+  @Temporal(TemporalType.TIMESTAMP)
+  private Date updatedAt;
+
+    @Column(name = "isDelete")
+    private boolean isDelete;
 //Khi một đối tượng Product được lưu vào cơ sở dữ liệu, quan hệ "cascade" sẽ tự động 
 //lưu các đối tượng Image liên quan mà không cần phải lưu chúng một cách rõ ràng. Điều này có nghĩa là khi bạn lưu một Product mới và thêm các Image vào danh sách images
 //orphanRemoval = true trên một quan hệ một-nhiều, nó cho phép xóa tự động các đối tượng con khi 

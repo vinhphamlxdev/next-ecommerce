@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,155 +20,113 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.ecommerce.shopme.dto.OrderDTO;
 import com.ecommerce.shopme.dto.OrderDetailDTO;
 import com.ecommerce.shopme.enums.OrderStatus;
-
 import com.ecommerce.shopme.dto.OrderDTO;
 import com.ecommerce.shopme.dto.PageResponse;
+import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.entity.OrderDetail;
 import com.ecommerce.shopme.entity.Product;
+import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.OrderNotFoundException;
+import com.ecommerce.shopme.request.OrderRequest;
+import com.ecommerce.shopme.response.OrderResponse;
 import com.ecommerce.shopme.service.OrderDetailService;
 import com.ecommerce.shopme.service.OrderService;
 import com.ecommerce.shopme.service.ProductSevice;
-import com.ecommerce.shopme.utils.CustomResponse;
-import com.ecommerce.shopme.utils.OrderListResponse;
-
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-
-@CrossOrigin(origins = "http://localhost:4000", maxAge = -1)
+@CrossOrigin(origins = "http://localhost:4000", maxAge = -1,allowedHeaders = "*")
 @RestController
 public class OrderController {
-    
     @Autowired
     private OrderService orderService;
     @Autowired ProductSevice productSevice;
     @Autowired OrderDetailService orderDetailService;
-
-//GET
 @GetMapping("/orders")
 public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "0") int pageNum,
 @RequestParam(defaultValue = "5") int itemPerPage){
         Pageable pageable = PageRequest.of(pageNum, itemPerPage);
         Page<Order> orders = orderService.listAllOrder(pageable);
           // Tạo danh sách OrderResponse từ danh sách order
-          List<OrderDetailDTO> orderDetailDTOs = orders.stream()
-          .map(order -> {
-            OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
-            orderDetailDTO.setId(order.getId());
-            orderDetailDTO.setFullName(order.getFullName());
-              orderDetailDTO.setEmail(order.getEmail());
-              orderDetailDTO.setAddress(order.getAddress());
-              orderDetailDTO.setPhoneNumber(order.getPhoneNumber());
-              orderDetailDTO.setCreatedAt(order.getCreatedAt());
-              List<OrderDetail> orderDetails = orderDetailService.getOrderDetailsByOrderId(order.getId());
-              List<Product> products = new ArrayList<>();
-    int totalQuantity= 0;
-    float totalPrice = 0.0f;
-      for (OrderDetail orderDetail : orderDetails) {
-        Product product = orderDetail.getProduct();
-        product.setQuantity(orderDetail.getAmount());
-        products.add(product);
-               totalQuantity+=product.getQuantity();
-               totalPrice+=product.getPrice()*product.getQuantity();
+        List<OrderResponse> orderResponses = orders.stream().map(order->{
+            OrderResponse orderResponse = new OrderResponse();
+            orderResponse.setId(order.getId());
+            orderResponse.setFullName(order.getFullName());
+            orderResponse.setEmail(order.getEmail());
+            orderResponse.setAddress(order.getAddress());
+            orderResponse.setCreatedAt(order.getCreatedAt());
+            orderResponse.setPhoneNumber(order.getPhoneNumber());
+             List<OrderDetail> orderDetails =   orderDetailService.getOrderDetailsByOrderId(order.getId());
+             orderResponse.setOrderDetails(orderDetails);
+            float total_Price = 0;
+             for (OrderDetail orderDetail : orderDetails) {
+                total_Price+=orderDetail.getTotalPrice();
+             }
+             orderResponse.setTotalPrice(total_Price);
 
-      }
-       orderDetailDTO.setProducts(products);
-      orderDetailDTO.setTotalAmount(totalQuantity);
-      orderDetailDTO.setTotalPrice(totalPrice);
-            return orderDetailDTO;
-          })
-          .collect(Collectors.toList());
-          OrderListResponse ordersResponse = new OrderListResponse();
-          ordersResponse.setStatus("Success");
-          ordersResponse.setOrders(orderDetailDTOs);
-          ordersResponse.setPage(new PageResponse<>(orders.getNumber(),
-           orders.getSize(),
-            orders.getNumberOfElements(),
-             orders.getTotalPages()));
-             return ResponseEntity.ok(ordersResponse);
+            return orderResponse;
+        }).collect(Collectors.toList());
+ Map<String, Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("orders", orderResponses);
+          PageResponse paggination = new PageResponse<>();
+                paggination.setCurrent(orders.getNumber());
+                paggination.setItemsPerPage(orders.getSize());
+                paggination.setTotalItems(orders.getTotalElements());
+                paggination.setTotalPages(orders.getTotalPages());
+                response.put("page", paggination);
+             return ResponseEntity.ok(response);
 
 }
-
-@GetMapping("/orders/{id}")
-public ResponseEntity<?> getOrderDetail(@PathVariable int id) throws OrderNotFoundException{
+  @PostMapping("/orders")
+  public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderRequest){
+    List<Product> insufficientProducts = new ArrayList<>();
+    for (OrderDetailDTO orderDetailDTO : orderRequest.getOrderDetails()) {
+        Product existProduct = productSevice.getProductById(orderDetailDTO.getProductId());
+        float amount = existProduct.getQuantity() - orderDetailDTO.getQuantity();
+        if (amount < 0) {
+            insufficientProducts.add(existProduct);
+        }
+    }
+    if (!insufficientProducts.isEmpty()) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sản phẩm không đủ số lượng");
+    } else {
+        orderService.placeOrder(orderRequest);
+        return new ResponseEntity<>("Đặt hàng thành công!", HttpStatus.OK);
+    }
+  }
+  @GetMapping("/orders/{id}")
+public ResponseEntity<?> getOrderDetail(@PathVariable int id) {
     Order existOrder = orderService.getOrderById(id);
 
     if (existOrder==null) {
       return ResponseEntity.notFound().build();
       
       }
-    List<OrderDetail> orderDetails =   orderDetailService.getOrderDetailsByOrderId(id);
-    List<Product> products = new ArrayList<>();
-    int totalQuantity= 0;
-    float totalPrice = 0.0f;
-      for (OrderDetail orderDetail : orderDetails) {
-        Product product = orderDetail.getProduct();
-        product.setQuantity(orderDetail.getAmount());
-        products.add(product);
-               totalQuantity+=product.getQuantity();
-               totalPrice+=product.getPrice()*product.getQuantity();
-
-      }
-      OrderDetailDTO orderDetailDTO = new OrderDetailDTO();
-      orderDetailDTO.setId(existOrder.getId());
-      orderDetailDTO.setFullName(existOrder.getFullName());
-      orderDetailDTO.setEmail(existOrder.getEmail());
-      orderDetailDTO.setAddress(existOrder.getAddress());
-      orderDetailDTO.setPhoneNumber(existOrder.getPhoneNumber());
-      orderDetailDTO.setCreatedAt(existOrder.getCreatedAt());
-      orderDetailDTO.setProducts(products);
-      orderDetailDTO.setTotalAmount(totalQuantity);
-      orderDetailDTO.setTotalPrice(totalPrice);
-      orderDetailDTO.setStatus("PENDING");
-       Map<String,Object> response = new HashMap<>();
-            response.put("order", orderDetailDTO);
-            response.put("status", "success");
-                return ResponseEntity.ok(response);
+        List<OrderDetail> orderDetails =   orderDetailService.getOrderDetailsByOrderId(id);
+        Map<String,Object> response = new HashMap<>();
+        OrderResponse order = new OrderResponse();
+        order.setId(existOrder.getId());
+        order.setFullName(existOrder.getFullName());
+        order.setEmail(existOrder.getEmail());
+        order.setPhoneNumber(existOrder.getPhoneNumber());
+        order.setAddress(existOrder.getAddress());
+        order.setCreatedAt(existOrder.getCreatedAt());
+        order.setOrderDetails(orderDetails);
+        float total_Price = 0;
+             for (OrderDetail orderDetail : orderDetails) {
+                total_Price+=orderDetail.getTotalPrice();
+             }
+             order.setTotalPrice(total_Price);
+        order.setStatus("PENDING");
+        response.put("status", "success");
+        response.put("order", order);
+        
+      return ResponseEntity.ok(response);
+   
+     
 }
-    //POST
-    @PostMapping("/orders")
-    public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderRequest) {
-      Order createOrder = new Order();
-      createOrder.setFullName(orderRequest.getFullName());
-      createOrder.setPhoneNumber(orderRequest.getPhoneNumber());
-      createOrder.setAddress(orderRequest.getAddress());
-      createOrder.setEmail(orderRequest.getEmail());
-      OrderStatus statusPending = OrderStatus.PENDING;;
-
-      createOrder.setStatus("PENDING");
-      createOrder.setCreatedAt(new Date());
-  
-   orderService.saveOrder(createOrder);
- 
-      for (Product product : orderRequest.getProducts()) {
-          Product existProduct = productSevice.getProductById(product.getId());
-          if (existProduct==null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy san pham voi id"+product.getId());
-        }
-        int updateQuantity = existProduct.getQuantity() - product.getQuantity();
-        existProduct.setQuantity(updateQuantity);
-      // existProduct.setOrder(createOrder);
-      // productSevice.saveProduct(existProduct);
-
-        //
-          OrderDetail orderDetail = new OrderDetail();
-          orderDetail.setAmount(product.getQuantity());
-          orderDetail.setPrice(product.getQuantity()*product.getPrice());
-          orderDetail.setProduct(existProduct);
-          orderDetail.setOrder(createOrder);
-          orderDetailService.saveOrderDetail(orderDetail);
-
-      }
-       Map<String,Object> response = new HashMap<>();
-            response.put("order", createOrder);
-            response.put("status", "success");
-                return ResponseEntity.ok(response);
-
-       
-    }
 }

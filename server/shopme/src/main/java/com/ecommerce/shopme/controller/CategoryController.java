@@ -20,49 +20,42 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-
 import com.ecommerce.shopme.dto.CategoryDTO;
-import com.ecommerce.shopme.dto.CategoryDetail;
 import com.ecommerce.shopme.dto.PageResponse;
 import com.ecommerce.shopme.entity.Category;
 import com.ecommerce.shopme.entity.Product;
 import com.ecommerce.shopme.service.CategoryService;
 import com.ecommerce.shopme.service.ProductSevice;
-import com.ecommerce.shopme.utils.CustomResponse;
-
+import com.ecommerce.shopme.utils.SlugUtils;
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
-
-@CrossOrigin(origins = "http://localhost:4000", maxAge = -1)
+@CrossOrigin(origins = "http://localhost:4000", maxAge = -1,allowedHeaders = "*")
 @RestController
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
     @Autowired 
     ProductSevice productSevice;
-        //GET
+
+               @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
         @GetMapping("/categorys")
-        public ResponseEntity<?> getAllCategory(@RequestParam(defaultValue = "0") int pageNum,
-        @RequestParam(defaultValue = "4") int itemsPerPage){
-            Pageable pageable = PageRequest.of(pageNum, itemsPerPage);
-            Page<Category> categorys = categoryService.listAllCategory(pageable);
+        public ResponseEntity<?> getAllCategory( @RequestParam(defaultValue = "0") int pageNum,
+        @RequestParam(defaultValue = "3") int itemsPerPage){
+            Page<Category> page = categoryService.listByPageCategory(pageNum,itemsPerPage);
+            List<Category> listCategorys = page.getContent();
+             Map<String,Object> response = new HashMap<>();
+                response.put("status", "success");
+                response.put("categorys", listCategorys);
+             PageResponse paggination = new PageResponse<>();
+                    paggination.setCurrent(page.getNumber());
+                    paggination.setItemsPerPage(page.getSize());
+                    paggination.setTotalItems(page.getTotalElements());
+                    paggination.setTotalPages(page.getTotalPages());
+                    response.put("page", paggination);
+                      return ResponseEntity.ok(response);
         
-            // Tạo danh sách categoryresponse từ danh sách category
-            List<CategoryDetail> categoryRes = categorys.stream()
-                .map(category -> {
-                    CategoryDetail categoryDetail = new CategoryDetail();
-                    BeanUtils.copyProperties(category, categoryDetail);
-                    return categoryDetail;
-                })
-                .collect(Collectors.toList());
-                CustomResponse customResponse = new CustomResponse();
-                customResponse.setStatus("success");
-                customResponse.setCategorys(categoryRes);
-                customResponse.setPage(new PageResponse<>(categorys.getNumber(), categorys.getSize(), categorys.getTotalElements(),categorys.getTotalPages()));
-                return ResponseEntity.ok(customResponse);
         }
-        
+        @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
         @GetMapping("/categorys/{id}")
         public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id) {
             Category categoryExist = categoryService.getCategoryById(id);
@@ -83,16 +76,17 @@ public class CategoryController {
 
             }
         }
-       
+    @RolesAllowed("ROLE_ADMIN")
         @PostMapping("/categorys")
-        public ResponseEntity<Category> addCategory(@RequestBody @Valid Category category) {
-                Category createdCategory = categoryService.saveCategory(category);
+        public ResponseEntity<Category> addCategory(@RequestBody @Valid CategoryDTO categoryDTO) {
+                Category createdCategory = categoryService.saveCategory(categoryDTO);
                 return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
         }
         
         //PUT
+    @RolesAllowed("ROLE_ADMIN")
     @PutMapping("/categorys/{id}")
-    public ResponseEntity<?> updateCategory(@PathVariable Integer id, @RequestBody Category updateCategory){
+    public ResponseEntity<?> updateCategory(@PathVariable Integer id, @RequestBody CategoryDTO updateCategory){
         Category categoryExist = categoryService.getCategoryById(id);
         if (categoryExist == null) {
             String message = "Danh mục có ID " + id + " không tồn tại";
@@ -100,11 +94,14 @@ public class CategoryController {
         }
             categoryExist.setName(updateCategory.getName());
             categoryExist.setDescription(updateCategory.getDescription());
-            categoryExist.setSlug(updateCategory.getSlug());
-            Category savedCategory = categoryService.saveCategory(categoryExist);
-            return ResponseEntity.ok(savedCategory);
+            categoryExist.setSlug(SlugUtils.createSlug(updateCategory.getName()));
+            Category updatatecCategory = categoryService.updateCategory(categoryExist);
+            return ResponseEntity.ok(updatatecCategory);
     }
   //DELETE
+         
+       
+    @RolesAllowed("ROLE_ADMIN")
   @DeleteMapping("/categorys/{id}")
  public ResponseEntity<?> deleteProductById(@PathVariable Integer id) throws IOException{
         // Kiểm tra xem danh muc có tồn tại không

@@ -2,27 +2,30 @@ import * as React from "react";
 import Input from "../Input";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { UseAddCategory } from "@/hooks/useCategory";
 import { useGlobalStore } from "@/store/globalStore";
-import slugify from "slugify";
-import axios from "axios";
-import { ICategory } from "@/types/interface";
+import { ICategory, IFilters } from "@/types/interface";
 import getMessage from "@/utils/notification";
 import { toast } from "react-toastify";
 import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "../Loading/LoadingButton";
 import { createCategory } from "@/service/CategoryApi";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 export interface AddCategoryProps {
-  setRender: React.Dispatch<React.SetStateAction<boolean>>;
   categorys: ICategory[];
+  filters: IFilters;
 }
 
-export default function AddCategory({
-  setRender,
-  categorys,
-}: AddCategoryProps) {
-  const { isLoading, setLoading } = useGlobalStore((state) => state);
+export default function AddCategory({ categorys, filters }: AddCategoryProps) {
+  const { mutate, isLoading } = useMutation({
+    mutationFn: (data: Omit<ICategory, "id" | "slug">) => createCategory(data),
+    onSuccess: () => {
+      categoryFormik.resetForm();
+      toast.success("Thêm danh mục thành công");
+    },
+    onError: (err) => {
+      toast.error(`Có lỗi ${err}`);
+    },
+  });
   const categoryFormik = useFormik({
     initialValues: {
       name: "",
@@ -30,8 +33,8 @@ export default function AddCategory({
     },
     validationSchema: Yup.object({
       name: Yup.string()
-        .min(10, "Tên danh mục cần nhiều hơn 10 kí tự")
-        .max(30, "Tên danh mục tối đa 30 kí tự")
+        .min(5, "Tên danh mục tối thiểu 5 kí tự")
+        .max(50, "Tên danh mục tối đa 50 kí tự")
         .required("Tên danh mục là bắt buộc"),
       description: Yup.string()
         .min(20, "Mô tả danh mục cần nhiều hơn 20 kí tự")
@@ -44,7 +47,6 @@ export default function AddCategory({
       let data = {
         name: values.name,
         description: values.description,
-        slug: slugify(values.name),
       };
       let checkDuplicate = categorys.some((c) => c.name === data.name);
       if (checkDuplicate) {
@@ -54,23 +56,12 @@ export default function AddCategory({
         );
         return;
       }
-      try {
-        const response = await createCategory(data);
-        categoryFormik.resetForm();
-        toast.success("Thêm danh mục thành công");
-      } catch (error) {
-        console.log(error);
-        toast.error("Thêm danh mục thất bại");
-      } finally {
-        setRender((prevR) => !prevR);
-      }
+      mutate(data);
     },
     validateOnBlur: false,
     validateOnChange: false,
   });
-  const { disabledStyle, isDisabled } = UseDisabled(
-    categoryFormik.isSubmitting
-  );
+  const { disabledStyle, isDisabled } = UseDisabled(isLoading);
 
   return (
     <>

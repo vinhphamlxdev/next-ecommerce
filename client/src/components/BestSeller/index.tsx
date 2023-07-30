@@ -2,7 +2,7 @@ import { LoadingSkeleton } from "@/Admin/components/Loading";
 import { IMG_SRC } from "@/common/constanst";
 import { useGlobalStore } from "@/store/globalStore";
 import * as React from "react";
-import ProductItem from "../ProductItem";
+import ProductItem from "../Producttem";
 import LoadingProduct from "@/Admin/components/Loading/LoadingProduct";
 import { IProduct } from "@/types/interface";
 import styled from "styled-components";
@@ -16,7 +16,7 @@ export default function BestSeller({ data }: IBestSellerProps) {
     <StyledBestSeller className="section-populars">
       <div className="pb-12">
         <div className="section-title">
-          <h4 className="inline-block pb-2 border-2 border-t-0 border-r-0 border-l-0 border-b-gray-500">
+          <h4 className="inline-block mt-10 pb-2 border-2 border-t-0 border-r-0 border-l-0 border-b-gray-500">
             Bán Chạy Nhất
           </h4>
         </div>
@@ -25,8 +25,8 @@ export default function BestSeller({ data }: IBestSellerProps) {
           <LoadingProduct />
         ) : (
           <>
-            <div className="grid gap-y-5 grid-cols-3 gap-x-7">
-              {data.length > 0 &&
+            <div className="grid gap-y-5 grid-cols-4 gap-x-7">
+              {data?.length > 0 &&
                 data?.map((product: any, index: number) => {
                   return <ProductItem key={product.id} item={product} />;
                 })}

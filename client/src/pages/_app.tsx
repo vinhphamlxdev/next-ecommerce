@@ -1,13 +1,13 @@
+import * as React from "react";
 import "@/styles/globals.scss";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-// import { ReactQueryDevtools } from "react-query/devtools";
-import type { AppProps } from "next/app";
-import * as React from "react";
 
+import type { AppProps } from "next/app";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { StateContextProvider } from "@/context";
 import { CookiesProvider } from "react-cookie";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -20,7 +20,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <QueryClientProvider client={queryClient}>
       <StateContextProvider>
         <Component {...pageProps} />
-        {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+        <ReactQueryDevtools initialIsOpen={false} />
         <ToastContainer />
       </StateContextProvider>
     </QueryClientProvider>

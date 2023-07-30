@@ -21,7 +21,7 @@ export default function LayoutClient(props: LayoutClientProps) {
   );
   return (
     <div
-      className={`${manrope.className} w-full  transition-colors duration-300 min-h-screen`}
+      className={`${manrope.className} w-full overflow-hidden  transition-colors duration-300 min-h-screen`}
     >
       <HeaderClient />
       {seletedProduct && showModalQuickView && (

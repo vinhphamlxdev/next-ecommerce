@@ -8,6 +8,7 @@ export interface ILoadingSkeletonProps {
   count: number;
   columnRow?: number;
   height?: number;
+  className?: string;
 }
 
 export default function LoadingSkeleton({
@@ -16,10 +17,11 @@ export default function LoadingSkeleton({
   columnRow = 0,
   count = 1,
   height = 10,
+  className,
 }: ILoadingSkeletonProps) {
   return (
     <div
-      className={`grid gap-y-${columnRow} grid-cols-${columns} gap-x-${columnGap}`}
+      className={`grid gap-y-${columnRow} grid-cols-${columns} gap-x-${columnGap} ${className}`}
     >
       {new Array(count).fill(0).map((e: any, index: number) => {
         return (

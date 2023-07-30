@@ -19,7 +19,8 @@ import io.jsonwebtoken.UnsupportedJwtException;
 @Component
 public class JwtTokenUtil {
     private static final long EXPIRE_DURATION = 24 * 60 * 60 * 1000; // 24 hour
-     
+    // private static final long EXPIRE_DURATION = Long.MAX_VALUE;
+
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
      

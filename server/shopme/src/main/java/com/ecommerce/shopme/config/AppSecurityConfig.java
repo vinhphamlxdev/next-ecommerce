@@ -56,10 +56,10 @@ public class AppSecurityConfig {
      @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
+        http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-         
         http.authorizeHttpRequests()
-               .requestMatchers("/auth/login","/auth/register", "/users","/products/**","categorys").permitAll()
+               .requestMatchers("/auth/login","/auth/register").permitAll()
                 .anyRequest().authenticated();
             http.exceptionHandling()
                     .authenticationEntryPoint(
@@ -74,4 +74,6 @@ public class AppSecurityConfig {
         http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }  
+
+    
 }

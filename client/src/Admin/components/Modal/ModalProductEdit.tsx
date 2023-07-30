@@ -14,18 +14,20 @@ import LoadingButton from "../Loading/LoadingButton";
 import { LoadingSpinner } from "../Loading";
 import ChooseSize from "../ChooseSize";
 import ChooseColor from "../ChooseColor";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { getProduct, updateProduct } from "@/service/ProductApi";
 
 export interface IModalProductEditProps {
-  data: IProduct;
-  setRender: React.Dispatch<React.SetStateAction<boolean>>;
+  productId: number;
+  isOpenEditP: boolean;
+  setSelectedId: React.Dispatch<React.SetStateAction<any>>;
 }
 
 export default function ModalProductEdit({
-  data,
-  setRender,
+  productId,
+  isOpenEditP,
+  setSelectedId,
 }: IModalProductEditProps) {
-  const { isOpenEditP, setOpenEditProduct, isLoading, setLoading } =
-    useModalStore((state) => state);
   const [selectCategory, setCategory] = React.useState<ICategory[] | any>([]);
   const [sizes, setSizes] = React.useState<ISize[]>([]);
   const [colors, setColors] = React.useState<IColor[]>([]);
@@ -34,6 +36,52 @@ export default function ModalProductEdit({
   const [imgsDelete, setImgsDelete] = React.useState<string[] | any>([]);
   const [sizesDelete, setSizesDelete] = React.useState<number[] | any>([]);
   const [colorsDelete, setColorsDelete] = React.useState<number[] | any>([]);
+  const { setOpenEditProduct } = useModalStore();
+  const queryClient = useQueryClient();
+  console.log(productId);
+  const { data, isLoading: isLoadingGet } = useQuery({
+    queryKey: ["product", productId],
+    queryFn: () => getProduct(productId),
+    enabled: productId !== undefined,
+    onSuccess: (data) => {
+      setCategory(data?.category);
+      setImgs(data?.imageUrls);
+      const newSizes = data?.sizes?.filter(
+        (size: { delete: any }) => !size.delete
+      );
+      const newColors = data?.colors?.filter(
+        (color: { delete: any }) => !color.delete
+      );
+      setSizes(newSizes);
+      setColors(newColors);
+    },
+    onError: (err: any) => {
+      toast.error("Có lỗi:", err);
+    },
+  });
+  const { isLoading, mutate } = useMutation({
+    mutationFn: (formData: FormData) =>
+      updateProduct(productId as number, formData),
+    onSuccess: (data) => {
+      setFile([]);
+      setImgsDelete([]);
+      setOpenEditProduct(false);
+
+      toast.success("Cập nhật sản phẩm thành công");
+    },
+    onError: () => {
+      setOpenEditProduct(false);
+      setFile([]);
+      setImgsDelete([]);
+      setSizesDelete([]);
+      setColorsDelete([]);
+      toast.error("Cập nhật sản phẩm thất bại");
+    },
+    onSettled: () => {
+      setSelectedId(null);
+    },
+  });
+
   const productEditFormik = useFormik({
     initialValues: {
       name: data?.name,
@@ -80,8 +128,9 @@ export default function ModalProductEdit({
       toast.error("Vui lòng chọn size sản phẩm");
       return;
     }
-    if (!colors || !colors.length) {
-      toast.error("Vui lòng chọn màu sản phẩm");
+    const checkExistColor = colors.some((color) => !color.delete);
+    if (!checkExistColor || !colors.length) {
+      toast.error("Vui lòng chọn màu sản phẩm sản phẩm");
       return;
     }
 
@@ -108,40 +157,15 @@ export default function ModalProductEdit({
     newFormData.append("imgsDelete", imgsDelete);
     newFormData.append("sizesDelete", sizesDelete);
     newFormData.append("colorsDelete", colorsDelete);
-    const response = await axios.put(
-      `http://localhost:8080/products/${id}`,
-      newFormData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    if (response.status === 200) {
-      toast.success("Cập nhật sản phẩm thành công");
-      setOpenEditProduct(false);
-      setRender((prevR) => !prevR);
-      setFile([]);
-      setImgsDelete([]);
-    } else {
-      toast.error("Cập nhật sản phẩm thất bại");
-      setFile([]);
-      setImgsDelete([]);
-      setOpenEditProduct(false);
-      setSizesDelete([]);
-      setColorsDelete([]);
-    }
+    mutate(newFormData);
   };
-  React.useEffect(() => {
-    if (!data) {
-      return;
-    }
-    setCategory(data?.category);
-    setImgs(data?.imageUrls);
-    setSizes(data?.sizes);
-    setColors(data?.colors);
-  }, [data]);
-
+  const handleCloseModal = () => {
+    setOpenEditProduct(false);
+    setSelectedId(null);
+  };
+  if (isLoadingGet) {
+    return <LoadingSpinner />;
+  }
   if (typeof document === "undefined")
     return <div className="modal_product-detail"></div>;
   return ReactDOM.createPortal(
@@ -151,8 +175,8 @@ export default function ModalProductEdit({
       }`}
     >
       <div
-        onClick={() => setOpenEditProduct(false)}
-        className="absolute inset-0 z-20 bg-black opacity-60 overlay "
+        onClick={handleCloseModal}
+        className="absolute inset-0 z-20 bg-[#000] opacity-20 overlay"
       ></div>
       {isLoading && <LoadingSpinner />}
       <div className="p-3 max-h-[550px] has-scrollbar rounded-md relative bg-white w-[550px]  inset-0 m-auto z-[600]">
@@ -168,15 +192,15 @@ export default function ModalProductEdit({
             <ChooseSize
               sizes={sizes}
               setSizes={setSizes}
-              setDeleteSizes={setSizesDelete}
               sizesDelete={sizesDelete}
+              setDeleteSizes={setSizesDelete}
               id="sizes"
             />
             <ChooseColor
-              colorsDelete={colorsDelete}
-              setDeleteColors={setColorsDelete}
               colors={colors}
               setColors={setColors}
+              colorsDelete={colorsDelete}
+              setDeleteColors={setColorsDelete}
               id="colors"
             />
           </div>
@@ -229,14 +253,14 @@ export default function ModalProductEdit({
           />
           <button
             type="submit"
-            onClick={() => handleSubmitEditProduct(data?.id)}
+            onClick={() => handleSubmitEditProduct(productId as number)}
             className="add-category hover:opacity-80 transition-all bg-saveBg px-3 text-sm   py-2 rounded-md text-white gap-x-3 flex justify-center items-center"
           >
             <span>Cập Nhật</span>
           </button>
         </div>
         <button
-          onClick={() => setOpenEditProduct(false)}
+          onClick={handleCloseModal}
           className="absolute text-lg hover:text-bgPrimary p-3 z-[300] text-secondary close-modal-quickview -top-1  right-1 "
         >
           <i className="bi bi-x-lg"></i>

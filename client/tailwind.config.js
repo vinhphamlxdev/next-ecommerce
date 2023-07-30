@@ -11,6 +11,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        textColor: "#333",
         bgMenu: "#edede9",
         saveBg: "#8ac926",
         activeBg: "#8ac926",

@@ -146,3 +146,31 @@ body {
 .user-avatar:hover .popup-user {
   display: block;
 }
+.order-admin,
+.admin-user {
+  .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root {
+    color: #fff;
+  }
+  .css-10w330c-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
+    color: #fff;
+  }
+}
+
+.center-block {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.product-image:hover .product-action {
+  display: flex;
+}
+.product-detail-page {
+  .product-detail__name {
+    font-size: 26px;
+  }
+  .product-detail__price {
+    font-size: 20px;
+    color: #000;
+  }
+}

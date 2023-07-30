@@ -6,7 +6,6 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import slugify from "slugify";
 import axios from "axios";
-import { addressApi } from "@/service/AddressApi";
 import { styled } from "styled-components";
 import Link from "next/link";
 import { useCartStore } from "@/store/cartStore";
@@ -14,21 +13,51 @@ import notification from "@/utils/notification";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import formatVnd from "@/utils/formatVnd";
-import { IProduct } from "@/types/interface";
+import { IOrder, IProduct } from "@/types/interface";
 import calculateTotalPrice from "@/utils/calculateTotalPrice";
-import { createOrder } from "@/service/OrderApi";
 import dynamic from "next/dynamic";
 import { LoadingSpinner } from "@/Admin/components/Loading";
 import useDisabled from "@/hooks/useDisabled";
+import { createOrder } from "@/service/OrderApi";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { getAllAddress } from "@/service/AddressApi";
+
+type IDistrict = {
+  code: number;
+  codename: string;
+  division_type: string;
+  name: string;
+  province_code: number;
+  wards: any[];
+};
+type IProvince = {
+  code: number;
+  codename: string;
+  division_type: string;
+  name: string;
+  phone_code: number;
+  districts: IDistrict[];
+};
 const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
   ssr: false,
 });
 export default function Checkout() {
-  const { deleteAllCart } = useCartStore((state) => state);
-  const [provinces, setProvinces] = React.useState<any>([]);
-  const [districts, setDistricts] = React.useState<any>([]);
-  const { cartItems } = useCartStore((state) => state);
+  const { deleteAllCart, cartItems } = useCartStore();
+  const [districts, setDistricts] = React.useState<IDistrict[]>([]);
   const router = useRouter();
+  const { mutate, isLoading } = useMutation({
+    mutationFn: (data: any) => createOrder(data),
+    onSuccess: (data) => {
+      console.log("response:", data);
+      checkoutFormik.resetForm();
+      toast.success("Đặt hàng thành công");
+      deleteAllCart();
+    },
+    onError: (err: any) => {
+      toast.error(` ${err?.response?.data}`);
+    },
+  });
+
   const checkoutFormik = useFormik({
     initialValues: {
       fullName: "",
@@ -56,12 +85,15 @@ export default function Checkout() {
       if (!values) {
         return;
       }
-      const productOrders = cartItems?.map((item) => {
+      const invoice = cartItems.map((cart) => {
         return {
-          product: item.id,
-          amount: item.quantity,
+          productId: cart.id,
+          colorId: cart.colors[0].id,
+          sizeId: cart.sizes[0].id,
+          quantity: cart.quantity,
         };
       });
+
       const data = {
         fullName: values.fullName,
         email: values.email,
@@ -74,51 +106,46 @@ export default function Checkout() {
           values.province
         }`,
 
-        products: [...cartItems],
+        orderDetails: invoice,
       };
-      const response = await createOrder(data);
-      if (response.status !== "success") {
-        toast.error("Đặt hàng thất bại!");
-      }
-      toast.success("Đặt hàng thành công");
-      deleteAllCart();
-      router.push("/client/product");
-
-      console.log(response);
+      mutate(data);
     },
     validateOnBlur: false,
     validateOnChange: false,
   });
-  const handleChooseCity = (event: any, item: any) => {
+  const handleChooseCity = (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    item: any
+  ) => {
     setDistricts(item.districts);
   };
   React.useEffect(() => {
     if (!cartItems.length) {
-      router.push("/client/product");
+      router.push("/client/products");
       toast.warning("Giỏ hàng đang trống");
     }
-  }, []);
-  React.useEffect(() => {
-    async function fetchProvinces() {
-      try {
-        const response = await axios.get(addressApi.getAllAddress());
-        if (response.data) {
-          setProvinces(response.data);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    }
-    fetchProvinces();
-  }, []);
+  }, [cartItems]);
+
+  const {
+    data: addressData,
+    isLoading: isLoadingAddress,
+    error,
+  } = useQuery({
+    queryKey: ["address"],
+    queryFn: () => getAllAddress(),
+    onSuccess: (data) => {
+      // console.log("address data:", data);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
   const priceShipping = 35000;
-  const { isDisabled, disabledStyle } = useDisabled(
-    checkoutFormik.isSubmitting
-  );
+  const { isDisabled, disabledStyle } = useDisabled(isLoading);
 
   return (
     <div className="checkout-page pt-10 ">
-      {checkoutFormik.isSubmitting && <LoadingSpinner />}
+      {isLoading && <LoadingSpinner />}
       <div className="wrapper-layout">
         <div className="checkout-layout">
           <h3 className="text-lg font-medium text-gray-600">
@@ -175,17 +202,18 @@ export default function Checkout() {
                     name="province"
                     className="w-full"
                   >
-                    {provinces.map((item: any, index: number) => {
-                      return (
-                        <MenuItem
-                          onClick={(e) => handleChooseCity(e, item)}
-                          key={item.code}
-                          value={item.name}
-                        >
-                          {item.name}
-                        </MenuItem>
-                      );
-                    })}
+                    {addressData?.length > 0 &&
+                      addressData.map((item: IProvince, index: number) => {
+                        return (
+                          <MenuItem
+                            onClick={(e) => handleChooseCity(e, item)}
+                            key={item.code}
+                            value={item.name}
+                          >
+                            {item.name}
+                          </MenuItem>
+                        );
+                      })}
                   </Select>
                 </div>
                 <div className="relative">
@@ -200,7 +228,7 @@ export default function Checkout() {
                     value={checkoutFormik.values.districtAddress}
                     onChange={checkoutFormik.handleChange}
                   >
-                    {districts.map((district: any, index: number) => {
+                    {districts.map((district: IDistrict, index: number) => {
                       return (
                         <MenuItem key={district.code} value={district.name}>
                           {district.name}
@@ -247,7 +275,7 @@ export default function Checkout() {
             <div className="order-information flex flex-col gap-y-4 border border-b-0 border-gray-300 p-3 bg-[#fafafa]">
               <div className="order-list py-3 pr-3  flex flex-col gap-y-4 h-[250px] has-scrollbar">
                 {cartItems.length > 0 &&
-                  cartItems.map((product) => {
+                  cartItems.map((product, index) => {
                     const {
                       colors,
                       id,
@@ -259,7 +287,7 @@ export default function Checkout() {
                     } = product;
                     return (
                       <div
-                        key={id}
+                        key={index}
                         className="flex items-center px-2 py-2 bg-white border-b border-gray-300 rounded-md"
                       >
                         <div className="relative">
@@ -271,7 +299,7 @@ export default function Checkout() {
                             />
                           </div>
                           <span className="absolute -top-[10px] -right-2 w-5 h-5 flex justify-center items-center text-sm font-light leading-[0] text-white bg-bgCheckout rounded-full ">
-                            2
+                            {quantity}
                           </span>
                         </div>
                         <div className="flex items-center justify-between w-full pl-4">
@@ -279,34 +307,21 @@ export default function Checkout() {
                             <span className="text-base font-light text-textPrimary">
                               {name}
                             </span>
+                            <div className="flex text-sm font-light text-gray-500 items-center gap-x-2">
+                              <span>{sizes[0]?.name}</span>
+                              <span>{colors[0]?.colorName}</span>
+                            </div>
                             <p className="text-xs font-light text-textColor"></p>
                           </div>
                           <span className="text-sm font-light text-textPrimary">
-                            {formatVnd(price.toString())}₫
+                            {formatVnd((price * quantity).toString())}₫
                           </span>
                         </div>
                       </div>
                     );
                   })}
               </div>
-              <div className="py-5 border-t border-b border-gray-300 place-order">
-                <div className="flex justify-between mb-3">
-                  <span className="text-sm font-light text-secondary">
-                    Tạm Tính
-                  </span>
-                  <p className="text-sm font-light text-textPrimary">
-                    {formatVnd(calculateTotalPrice(cartItems).toString())}₫
-                  </p>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm font-light text-secondary">
-                    Phí vận chuyển
-                  </span>
-                  <p className="text-sm font-light text-textPrimary">
-                    {formatVnd(priceShipping.toString())}₫
-                  </p>
-                </div>
-              </div>
+
               <div className="flex items-center justify-between mt-4">
                 <span className="text-xl font-light text-secondary">
                   Tổng cộng

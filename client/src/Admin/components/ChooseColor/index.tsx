@@ -1,4 +1,5 @@
 import { IColor } from "@/types/interface";
+import getColorClassName from "@/utils/getColorClassName";
 import * as React from "react";
 
 export interface IChooseColorProps {
@@ -11,20 +12,39 @@ export interface IChooseColorProps {
 }
 const colorData = [
   {
-    id: 1,
-    colorName: "Đen",
+    id: "$2a$10fewlUMSLbvue8TX2Alcx",
+    colorName: "Black",
+    delete: false,
   },
   {
-    id: 2,
-    colorName: "Trắng",
+    id: "$2a$10$ZUMSLbvfue8TX2Alcxd",
+    colorName: "White",
+    delete: false,
   },
   {
-    id: 3,
-    colorName: "Xanh Lá",
+    id: "$2a$10$ZUMSLbvuhe8TX2Alcdsf",
+    colorName: "Green",
+    delete: false,
   },
   {
-    id: 4,
-    colorName: "Xanh Da Trời",
+    id: "$2a$10$ZUMSLbsvue8TX2Alcxhds",
+    colorName: "Blue",
+    delete: false,
+  },
+  {
+    id: "$2a$10$ZUMSpkomdse8TX2Alklcxhds",
+    colorName: "Dark Red",
+    delete: false,
+  },
+  {
+    id: "$2a$10$Zdasdiojiomdse8TX2cxhds",
+    colorName: "Belge",
+    delete: false,
+  },
+  {
+    id: "$2a$10$ZdamlkiojiomdsmkTX2cxhds",
+    colorName: "Metal Blue",
+    delete: false,
   },
 ];
 export default function ChooseColor({
@@ -36,25 +56,34 @@ export default function ChooseColor({
   setDeleteColors,
 }: IChooseColorProps) {
   const [key, setKey] = React.useState(1);
-  const handleChangeSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleChangeColor = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const colorObj = JSON.parse(e.target.value);
-    let arrSize = [];
+    let arrColor = [];
+
     const checkExist = colorData.findIndex(
-      (color: IColor) => color.colorName === colorObj.colorName
+      (color) => color.colorName === colorObj.colorName
     );
     const checkDuplicate = colors.some(
       (color) => color.colorName === colorObj.colorName
     );
     if (checkExist !== -1 && !checkDuplicate) {
-      arrSize.push(colorObj);
-      setColors([...colors, ...arrSize]);
+      arrColor.push(colorObj);
+      const colorNotDelete = colors.map((color) => {
+        return {
+          ...color,
+          delete: false,
+        };
+      });
+      setColors([...colorNotDelete, ...arrColor]);
     }
   };
   const handleRemoveColor = (id: number) => {
-    const newArrColors = colors.filter((color: any) => color.id !== id);
+    const newArrColors = colors.filter((size) => size.id !== id);
     setColors(newArrColors);
     if (typeof setDeleteColors === "function") {
-      setDeleteColors([...colorsDelete, id]);
+      if (typeof id === "number") {
+        setDeleteColors([...colorsDelete, id]);
+      }
     }
   };
 
@@ -62,30 +91,24 @@ export default function ChooseColor({
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
         {colors.length > 0 &&
-          colors.map((color: IColor, index: number) => {
-            return (
-              <div
-                key={index}
-                className={`${btnColorStyle} ${
-                  color.colorName === "Đen"
-                    ? "bg-[#293241]"
-                    : color.colorName === "Trắng"
-                    ? "bg-[#adb5bd] text-black"
-                    : color.colorName === "Xanh Lá"
-                    ? "bg-saveBg"
-                    : color.colorName === "Xanh Da Trời"
-                    ? "bg-[#4cc9f0]"
-                    : ""
-                } `}
-              >
-                <span>{color?.colorName}</span>
-                <i
-                  onClick={() => handleRemoveColor(color?.id)}
-                  className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
-                ></i>
-              </div>
-            );
-          })}
+          colors
+            .filter((color) => !color.delete)
+            .map((color: IColor, index: number) => {
+              return (
+                <div
+                  key={index}
+                  className={`${btnColorStyle} ${getColorClassName(
+                    color.colorName
+                  )} `}
+                >
+                  <span>{color?.colorName}</span>
+                  <i
+                    onClick={() => handleRemoveColor(color?.id)}
+                    className="bi bi-x-lg text-white leading-[0px] text-xs cursor-pointer "
+                  ></i>
+                </div>
+              );
+            })}
       </div>
       <div className="flex flex-col gap-y-1">
         <select
@@ -93,7 +116,7 @@ export default function ChooseColor({
           name={id}
           id={id}
           onChange={(e) => {
-            handleChangeSize(e);
+            handleChangeColor(e);
             setKey((key) => key + 1);
           }}
           className="border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 outline-none"

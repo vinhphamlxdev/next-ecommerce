@@ -39,5 +39,16 @@ public List<OrderDetail> getOrderDetailsByOrderId(Integer orderId) {
     return orderDetailRepository.findByOrderId(orderId);
 }
 
+
+public boolean checkExistProductHasOrder(Integer productId) {
+    OrderDetail orderExist =  orderDetailRepository.findByProductId(productId);
+    if (orderExist!=null) {
+        return true;
+    }
+    return false;
+}
+
+
+
 }
 

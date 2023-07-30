@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
 import { useStateContext } from "@/context";
-import { loginUser } from "@/service/authApi";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
@@ -17,6 +16,7 @@ import useDisabled from "@/hooks/useDisabled";
 import { LoadingSpinner } from "@/Admin/components/Loading";
 import { useGlobalStore } from "@/store/globalStore";
 import notification from "@/utils/notification";
+import { loginUser } from "@/service/authApi";
 export default function SignIn() {
   const router = useRouter();
   const { dispatch, state } = useStateContext();
@@ -66,7 +66,7 @@ export default function SignIn() {
     if (currentUser) {
       router.push("/client/home");
     }
-  }, []);
+  }, [currentUser]);
   const { isDisabled, disabledStyle } = useDisabled(isLoading);
   return (
     <div className="inset-0 bg-[#ffcad4] bg-signup gap-x-5">

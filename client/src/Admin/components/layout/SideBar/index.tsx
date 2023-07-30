@@ -53,7 +53,7 @@ const sidebarLink: {
     id: 6,
     title: "Tài Khoản",
     icon: <AiOutlineUser />,
-    path: "/admin/user",
+    path: "/admin/users",
   },
   {
     id: 7,

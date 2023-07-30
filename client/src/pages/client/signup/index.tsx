@@ -7,7 +7,6 @@ import Input from "@/Admin/components/Input";
 import * as Yup from "yup";
 import Link from "next/link";
 import { useFormik } from "formik";
-import { signUpUserFn } from "@/service/authApi";
 import { toast } from "react-toastify";
 import { useMutation } from "@tanstack/react-query";
 import { LoadingSpinner } from "@/Admin/components/Loading";
@@ -16,15 +15,18 @@ import { useRouter } from "next/router";
 import { IUser } from "@/types/authInterface";
 import { useStateContext } from "@/context";
 import notification from "@/utils/notification";
+import { useGlobalStore } from "@/store/globalStore";
+import { registerUser } from "@/service/authApi";
 type FormStateType = Omit<IUser, "id">;
 export default function SignUp() {
   const { dispatch, state } = useStateContext();
   const router = useRouter();
   const currentUser = state.authUser;
+  const { showPassword, setShowPassword } = useGlobalStore();
 
   // ? Calling the Register Mutation
   const { mutate, isLoading, data, isSuccess, mutateAsync } = useMutation(
-    (userData: any) => signUpUserFn(userData),
+    (userData: any) => registerUser(userData),
     {
       onSuccess(data: any) {
         dispatch({ type: "SIGN_UP", payload: data?.user });
@@ -42,6 +44,7 @@ export default function SignUp() {
       fullName: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
     validationSchema: Yup.object({
       fullName: Yup.string().required("Họ tên là bắt buộc"),
@@ -54,16 +57,25 @@ export default function SignUp() {
           /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
           "Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
         ),
+      confirmPassword: Yup.string()
+        .required("Xác nhận mật khẩu là bắt buộc")
+        .oneOf([Yup.ref("password")], "Mật khẩu xác nhận không trùng khớp"),
     }),
     onSubmit: async (values) => {
       if (!values) {
         return;
       }
-      const result = await mutateAsync(values);
+      const { fullName, email, password } = values;
+      const data = {
+        fullName,
+        email,
+        password,
+      };
+      console.log(data);
+      const result = await mutateAsync(data);
       console.log(result);
       if (result) {
         toast.success("Đăng kí tài khoản thành công");
-        router.push("/client/home");
       }
     },
     validateOnBlur: false,
@@ -73,8 +85,9 @@ export default function SignUp() {
     if (currentUser) {
       router.push("/client/home");
     }
-  }, []);
+  }, [currentUser]);
   const { isDisabled, disabledStyle } = useDisabled(isLoading);
+
   return (
     <div className="inset-0 bg-[#ffcad4] bg-signup gap-x-5">
       {isLoading && <LoadingSpinner />}
@@ -116,16 +129,44 @@ export default function SignUp() {
                 <div className="form-field">
                   <Input
                     id="password"
-                    type="password"
+                    type={`${showPassword ? "text" : "password"}`}
                     isCheckout
                     data={signupFormik.values.password}
                     setData={signupFormik.handleChange}
-                    placeholder="Password"
+                    placeholder="Mật khẩu"
                     error={signupFormik.errors.password}
                   />
+                  <i
+                    onClick={() => setShowPassword()}
+                    className={`bi absolute ${
+                      showPassword ? "bi-eye" : "bi-eye-slash"
+                    }  right-2 text-base cursor-pointer ${
+                      signupFormik.errors.password ? "top-5" : "top-2/4"
+                    }  -translate-y-2/4`}
+                  ></i>
                 </div>
               </div>
-
+              <div className="relative">
+                <div className="form-field">
+                  <Input
+                    id="confirmPassword"
+                    type={`${showPassword ? "text" : "password"}`}
+                    isCheckout
+                    data={signupFormik.values.confirmPassword}
+                    setData={signupFormik.handleChange}
+                    placeholder="Xác nhận mật khẩu"
+                    error={signupFormik.errors.confirmPassword}
+                  />
+                  <i
+                    onClick={() => setShowPassword()}
+                    className={`bi absolute ${
+                      showPassword ? "bi-eye" : "bi-eye-slash"
+                    }  right-2 text-base cursor-pointer ${
+                      signupFormik.errors.password ? "top-5" : "top-2/4"
+                    }  -translate-y-2/4`}
+                  ></i>
+                </div>
+              </div>
               <button
                 type="submit"
                 disabled={isDisabled}

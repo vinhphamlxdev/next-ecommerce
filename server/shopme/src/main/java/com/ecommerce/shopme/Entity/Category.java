@@ -8,7 +8,6 @@ import java.util.Set;
 import org.hibernate.validator.constraints.Length;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.slugify.Slugify;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -36,7 +35,7 @@ public class Category {
     private Integer id;
     @Column(length = 128, nullable = false, unique = true)
     @NotBlank(message = "Tên danh mục không được để trống")
-    @Length(min = 10,max = 70, message = "Tên danh mục tối thiểu 10 kí tự và tối đa là 70 kí tự")
+    @Length(min = 5,max = 50, message = "Tên danh mục tối thiểu 5 kí  tự tối đa 40 kí tự")
     private String name;
     @NotBlank(message = "slug không được để trống")
     @Column(name = "slug",length = 64, nullable = false, unique = true)
@@ -48,7 +47,6 @@ public class Category {
     //mappedBy trường được chỉ định là trọng tâm của quan hệ
    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-
       private List<Product> products;
   
 

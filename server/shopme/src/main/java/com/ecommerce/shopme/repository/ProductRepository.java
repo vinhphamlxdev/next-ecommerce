@@ -1,5 +1,7 @@
 package com.ecommerce.shopme.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
@@ -27,7 +29,11 @@ public interface ProductRepository extends PagingAndSortingRepository<Product,In
 List<Product> findByCategoryId(@Param("categoryId") Integer categoryId);
 void delete(Product product);
 
-
+@Query("SELECT p FROM Product p  WHERE p.name = :name")
+Product findByName(String name);
 Set<Product> findByOrder(Order order);
+
+Page<Product> findByCategorySlug(String categorySlug, Pageable pageable);
+
 }
    

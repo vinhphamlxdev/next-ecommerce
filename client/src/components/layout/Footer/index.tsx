@@ -48,16 +48,16 @@ export default function Footer(props: IFooterProps) {
           <div className="h-32 relative">
             <div className="w-64 h-32 relative overflow-hidden">
               <img
-                src="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/348255501_732866475256780_516209269543825346_n.png?stp=dst-png_s280x280&_nc_cat=110&ccb=1-7&_nc_sid=dd9801&_nc_ohc=KPR9fCFpQ3EAX-_DNR9&_nc_ht=scontent.fsgn19-1.fna&oh=00_AfAzENYHR6gGacaGcHErHuK-RBdL7sbULhRyViAkqPBVPw&oe=64B658AD"
+                src="https://product.hstatic.net/1000321269/product/typoflame1_d06ca57b84ed47c884bf7c2020d25d03_master.jpg"
                 alt=""
               />
             </div>
             <div className="clear-fix px-3 flex items-center gap-x-3">
-              <img
+              {/* <img
                 className="w-12 h-12"
                 src="https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-1/333973720_148309664752997_8700433039816522932_n.jpg?stp=cp0_dst-jpg_p50x50&_nc_cat=104&ccb=1-7&_nc_sid=dbb9e7&_nc_ohc=ek7DoEukDikAX_FOGlx&_nc_ht=scontent.fsgn19-1.fna&oh=00_AfBx2W5uv51KrY_boVeW9D-KAbciWPbOwqTluSLdckZ5nQ&oe=64B7C699"
                 alt=""
-              />
+              /> */}
               <span className="text-black">Fashion</span>
             </div>
             <div className="px-2 flex gap-x-2 cursor-pointer absolute bottom-2 left-4 rounded-sm py-2 bg-white">

@@ -7,44 +7,43 @@ import { useGlobalStore } from "@/store/globalStore";
 import { IOrder } from "@/types/interface";
 import { getAllOrder } from "@/service/OrderApi";
 import OrderItem from "@/Admin/components/OrderItem";
-export interface OrdersProps {}
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { LoadingSkeleton } from "@/Admin/components/Loading";
+import PaginationComponent from "@/Admin/components/Pagination";
+import usePaginationAndFilters, {
+  FiltersState,
+  PaginationState,
+} from "@/hooks/usePaginationAndFilters";
 
-export default function AllOrder(props: OrdersProps) {
-  const { isSticky, setBgHeader } = useGlobalStore((state) => state);
-  const [orders, setOrders] = React.useState<IOrder[] | any>();
-  const [order, setOrder] = React.useState<IOrder | null>(null);
-  const [pagination, setPagination] = React.useState({
+export default function AllOrder() {
+  const initialPagination: PaginationState = {
     current: 1,
-    tolalPages: 3,
-  });
-  const [filters, setFilters] = React.useState({
+    totalPages: 3,
+  };
+  const initialFilters: FiltersState = {
     pageNum: 0,
-    itemsPerPage: 5,
+    itemsPerPage: 3,
+  };
+  const { filters, handlePageChange, pagination, setFilters, setPagination } =
+    usePaginationAndFilters(initialPagination, initialFilters);
+  const { isLoading, error, data } = useQuery({
+    queryKey: ["orders", filters],
+    queryFn: () => getAllOrder(filters),
+    onSuccess: (data) => {
+      console.log("Orders data:", data);
+      const { page } = data;
+      setPagination({
+        current: page?.current,
+        totalPages: page?.totalPages,
+      });
+    },
+    onError: (err) => {
+      console.log("err:", err);
+    },
   });
-  React.useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getAllOrder(filters);
-        console.log(data);
-        if (data && data?.orders) {
-          setOrders(data.orders);
-          const { page } = data;
-          setPagination({
-            current: page?.current,
-            tolalPages: page?.totalPages,
-          });
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
-
   return (
     <LayoutAdmin>
-      <div className="p-3 flex flex-col gap-y-3 rounded-sm bg-white shadow-md">
+      <div className="p-3 flex order-admin flex-col gap-y-3 rounded-sm bg-white shadow-md">
         <h3 className=" font-medium text-xl"></h3>
         <div className="bg-slate-800 py-3 px-3 rounded-sm flex flex-col gap-y-3">
           <div className="flex justify-between">
@@ -85,12 +84,20 @@ export default function AllOrder(props: OrdersProps) {
               </tr>
             </thead>
             <tbody>
-              {orders?.length > 0 &&
-                orders?.map((order: IOrder) => {
+              {data?.orders?.length > 0 &&
+                data?.orders?.map((order: IOrder) => {
                   return <OrderItem key={order.id} item={order} />;
                 })}
             </tbody>
           </table>
+          {!data?.orders && (
+            <LoadingSkeleton columns={1} height={50} count={8} columnRow={4} />
+          )}
+          <PaginationComponent
+            totalPages={pagination?.totalPages}
+            pageCurrent={pagination?.current}
+            onPageChange={handlePageChange}
+          />
         </div>
       </div>
     </LayoutAdmin>

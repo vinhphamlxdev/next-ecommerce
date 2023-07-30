@@ -5,7 +5,7 @@ import create from "zustand";
 type Store = {
   cartItems: IProduct[];
   addToCart: (newProduct: IProduct) => void;
-  deleteFromCart: (id: number) => void;
+  deleteFromCart: (productNeedDelete: IProduct) => void;
   setQuantityCart: any;
   deleteAllCart: any;
 };
@@ -19,44 +19,60 @@ export const useCartStore = create<Store>((set) => {
     cartItems: initialCartItems,
     addToCart: (newProduct) => {
       set((state) => {
-        const updatedCartItems = state.cartItems.some(
-          (product: any) => product.id === newProduct.id
-        )
-          ? state.cartItems.map((product: any) =>
-              product.id === newProduct.id
-                ? {
-                    ...product,
-                    quantity: product.quantity + newProduct.quantity,
-                  }
-                : product
-            )
-          : [...state.cartItems, newProduct];
-        // localStorage.setItem("cart_items", JSON.stringify(updatedCartItems));
-        return { cartItems: updatedCartItems };
+        const existItemIndex = state.cartItems.find(
+          (item) =>
+            item.id === newProduct.id &&
+            item.sizes[0].name === newProduct.sizes[0].name &&
+            item.colors[0].colorName === newProduct.colors[0].colorName
+        );
+        if (existItemIndex) {
+          const updatedCartItems = state.cartItems.map((item) =>
+            item.id === newProduct.id &&
+            item.sizes[0].name === newProduct.sizes[0].name &&
+            item.colors[0].colorName === newProduct.colors[0].colorName
+              ? {
+                  ...item,
+                  quantity: item.quantity + 1,
+                }
+              : item
+          );
+          return { cartItems: updatedCartItems };
+        } else {
+          return {
+            cartItems: [...state.cartItems, newProduct],
+          };
+        }
       });
     },
-    setQuantityCart: (newProduct: any) => {
+    setQuantityCart: (payload: any) => {
       set((state) => {
-        let { id, type } = newProduct;
-        let index = state.cartItems.findIndex((item: any) => item.id === id);
-        if (index !== -1) {
-          if (type === "+") {
-            state.cartItems[index].quantity += 1;
-          } else if (type === "-") {
-            if (state.cartItems[index].quantity > 1) {
-              state.cartItems[index].quantity -= 1;
-            } else {
-              return state; // Trả về trạng thái hiện tại khi quantity là 1
-            }
+        const { type, product } = payload;
+        const existItemIndex = state.cartItems.findIndex(
+          (item) =>
+            item.id === product.id &&
+            item.sizes[0].name === product.sizes[0].name &&
+            item.colors[0].colorName === product.colors[0].colorName
+        );
+        if (type === "+") {
+          if (existItemIndex != -1) {
+            console.log(existItemIndex);
+
+            state.cartItems[existItemIndex].quantity += 1;
+          }
+        } else if (type === "-") {
+          if (state.cartItems[existItemIndex].quantity > 1) {
+            state.cartItems[existItemIndex].quantity -= 1;
           }
         }
         return { ...state };
       });
     },
-    deleteFromCart: (productId: number) => {
+
+    deleteFromCart: (productNeedDelete: IProduct) => {
       set((state) => {
         const updatedCartItems = state.cartItems.filter(
-          (product) => product.id !== productId
+          (product) =>
+            JSON.stringify(product) === JSON.stringify(productNeedDelete)
         );
         toast.success("Xóa sản phẩm thành công");
         // localStorage.setItem("cart_items", JSON.stringify(updatedCartItems));

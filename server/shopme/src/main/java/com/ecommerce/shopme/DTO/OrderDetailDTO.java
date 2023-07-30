@@ -12,14 +12,13 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDetailDTO {
-    private Integer id;
+    private Integer productId;
+    private Integer colorId;
+    private Integer sizeId;
+    private Integer quantity;
+    private float price;
     private Integer totalAmount;
-    private String fullName;
-    private String email;
-    private String address;
-    private Integer phoneNumber;
     private String status;
-    private List<Product> products;
      private Date createdAt;
      private float totalPrice;
 }

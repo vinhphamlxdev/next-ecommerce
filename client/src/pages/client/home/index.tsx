@@ -1,40 +1,50 @@
 import * as React from "react";
 import BestSeller from "@/components/BestSeller";
 import Slider from "@/components/Slider";
-import { getAllProducts } from "@/service/ProductApi";
 import { IProduct } from "@/types/interface";
 import dynamic from "next/dynamic";
+import { useQuery } from "@tanstack/react-query";
+import { getAllProduct } from "@/service/ProductApi";
+import usePaginationAndFilters, {
+  FiltersState,
+  PaginationState,
+} from "@/hooks/usePaginationAndFilters";
+
 const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
   ssr: false,
 });
-export interface IHomeProps {}
 
-export default function HomeClient(props: IHomeProps) {
-  const [products, setProducts] = React.useState<IProduct[] | any>();
-  const [filters, setFilters] = React.useState({
+export default function HomeClient() {
+  const initialPagination: PaginationState = {
+    current: 1,
+    totalPages: 3,
+  };
+
+  const initialFilters: FiltersState = {
     pageNum: 0,
-    itemsPerPage: 6,
+    itemsPerPage: 3,
+  };
+  const { filters, handlePageChange, pagination, setFilters, setPagination } =
+    usePaginationAndFilters(initialPagination, initialFilters);
+  const { isError, data, error, refetch, isLoading } = useQuery({
+    queryKey: ["products", filters],
+    queryFn: () => getAllProduct(filters),
+    onSuccess: (data) => {
+      const { page } = data;
+      setPagination({
+        current: page?.current,
+        totalPages: page?.totalPages,
+      });
+    },
+    onError: (err) => {
+      console.log(err);
+    },
   });
-  React.useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const data = await getAllProducts(filters);
-        console.log(data);
-        if (data && data?.products) {
-          setProducts(data.products);
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   return (
     <LayoutClient>
       <Slider />
       <div className="wrapper-layout">
-        <BestSeller data={products} />
+        <BestSeller data={data?.products} />
       </div>
     </LayoutClient>
   );

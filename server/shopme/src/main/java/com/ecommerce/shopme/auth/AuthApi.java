@@ -24,6 +24,7 @@ import com.ecommerce.shopme.entity.Role;
 import com.ecommerce.shopme.entity.User;
 import com.ecommerce.shopme.service.UserService;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 
 
@@ -77,26 +78,24 @@ public class AuthApi {
           return ResponseEntity.ok().body(response);
       
     }
+    
     @PostMapping("/auth/login")
     public ResponseEntity<?> login(@RequestBody @Valid AuthRequest request) {
         String email = request.getEmail();
         String password = request.getPassword();
         Optional<User> existUser = userService.getUserByEmail(email);
                 if (!existUser.isPresent()) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email không tồn tại!");    
+                       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email không tồn tại!");    
                 }
                 if (!userService.isPasswordCorrect(existUser, password)) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sai mật khẩu!");
+                       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sai mật khẩu!");
                 }
             Authentication authentication = authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.getEmail(), request.getPassword())
             );
         System.out.println(authentication);
-        System.out.println(
-                    new UsernamePasswordAuthenticationToken(
-                            request.getEmail(), request.getPassword())
-            );
+       
            authentication.getPrincipal(); //trả lại email user
             User user = (User) authentication.getPrincipal();
             String accessToken = jwtUtil.generateAccessToken(user);

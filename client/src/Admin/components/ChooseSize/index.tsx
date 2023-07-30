@@ -10,29 +10,29 @@ export interface IChooseSizeProps {
   sizesDelete?: number[] | any;
   setDeleteSizes?: React.Dispatch<React.SetStateAction<number[]>>;
 }
-const sizesData: ISize[] = [
+const sizesData = [
   {
-    id: 1,
+    id: "$2a$10$gZUMSLbvue8TX2Alcx",
     name: "M",
     delete: false,
   },
   {
-    id: 2,
+    id: "$2a$10$ZUMSLbvfue8TX2Alcxd",
     name: "S",
     delete: false,
   },
   {
-    id: 3,
+    id: "$2a$10$ZUMSLbvuhe8TX2Alcdsf",
     name: "L",
     delete: false,
   },
   {
-    id: 4,
+    id: "$2a$10$ZUMSLbsvue8TX2Alcxhds",
     name: "XL",
     delete: false,
   },
   {
-    id: 5,
+    id: "$2a$10$ZUMSLbvue8TX2Alcxhdae",
     name: "XXL",
     delete: false,
   },
@@ -49,32 +49,36 @@ export default function ChooseSize({
   const handleChangeSize = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const sizeObj = JSON.parse(e.target.value);
     let arrSize = [];
-
     const checkExist = sizesData.findIndex(
       (size) => size.name === sizeObj.name
     );
-    console.log(sizeObj);
     const checkDuplicate = sizes.some((size) => size.name === sizeObj.name);
     if (checkExist !== -1 && !checkDuplicate) {
       arrSize.push(sizeObj);
-      setSizes([...sizes, ...arrSize]);
+      const sizeNotDelete = sizes.map((size) => {
+        return {
+          ...size,
+          delete: false,
+        };
+      });
+      setSizes([...sizeNotDelete, ...arrSize]);
     }
   };
   const handleRemoveSize = (id: number) => {
     const newArrSizes = sizes.filter((size) => size.id !== id);
     setSizes(newArrSizes);
-
     if (typeof setDeleteSizes === "function") {
-      setDeleteSizes([...sizesDelete, id]);
-      console.log("sizesDelete", sizesDelete);
+      if (typeof id === "number") {
+        setDeleteSizes([...sizesDelete, id]);
+        console.log("sizesDelete", sizesDelete);
+      }
     }
   };
   console.log(sizes);
-
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">
-        {sizes.length > 0 &&
+        {sizes?.length > 0 &&
           sizes
             .filter((size) => !size.delete)
             .map((size: ISize) => {

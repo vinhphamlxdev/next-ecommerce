@@ -9,11 +9,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +38,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -54,15 +59,17 @@ import com.ecommerce.shopme.entity.Product;
 import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
 import com.ecommerce.shopme.service.CategoryService;
+import com.ecommerce.shopme.service.OrderDetailService;
+import com.ecommerce.shopme.service.OrderService;
 import com.ecommerce.shopme.service.ProductSevice;
 import com.ecommerce.shopme.service.SizeService;
-import com.ecommerce.shopme.utils.ProductListResponse;
+import com.ecommerce.shopme.utils.SlugUtils;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 
-@CrossOrigin(origins = "http://localhost:4000", maxAge = -1)
+@CrossOrigin(origins = "http://localhost:4000", maxAge = -1,allowedHeaders = "*")
 @RestController
 @Validated
 public class ProductController {
@@ -70,19 +77,33 @@ public class ProductController {
     ProductSevice productService;
     @Autowired
     CategoryService categoryService;
+    @Autowired 
+    OrderService orderService;
+    @Autowired 
+    OrderDetailService orderDetailService;
     //GET
     @Autowired 
     Cloudinary cloudinary;
-    //  private final Cloudinary cloudinary;
-  
-    //  @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+ 
+
+    @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products")
-    public ResponseEntity<ProductListResponse> getAll(@RequestParam(defaultValue = "0") int pageNum,
-    @RequestParam(defaultValue = "3") int itemsPerPage){
-        Pageable pageable = PageRequest.of(pageNum, itemsPerPage);
-        Page<Product> products = productService.listAll(pageable);
-        // Tạo danh sách ProductResponse từ danh sách Product
-        List<ProductDetail> productResponses = products.stream()
+    public ResponseEntity<?> getAllProduct(@RequestParam(defaultValue = "0") int pageNum,
+    @RequestParam(defaultValue = "10") int itemsPerPage, @RequestParam(name = "category",
+    required = false)  String categorySlug,@RequestParam(name = "sortfield",required = false) String sortField,
+    @RequestParam(name = "sortdir",required = false) String sortDir
+    
+    ){
+        Page<Product> page ; 
+        if (categorySlug!=null && !categorySlug.isEmpty()) {
+            page = productService.listByPageProductAndCategorySlug(pageNum, itemsPerPage,
+             categorySlug,sortField,sortDir
+          );
+        }else{
+         page =    productService.listByPageProduct(pageNum,itemsPerPage,sortField,sortDir);
+        }
+        List<Product> listProductsByPage = page.getContent();
+        List<ProductDetail> listProducts = listProductsByPage.stream()
             .map(product -> {
                 ProductDetail productDetail = new ProductDetail();
                 productDetail.setId(product.getId());
@@ -91,6 +112,7 @@ public class ProductController {
                 productDetail.setPrice(product.getPrice());
                 productDetail.setQuantity(product.getQuantity());
                 productDetail.setSlug(product.getSlug());
+                productDetail.setDelete(product.isDelete());
                 productDetail.setCategory(product.getCategory());
                 List<Size> sizes = new ArrayList<>();
                 for (Size size : product.getSizes()) {
@@ -110,18 +132,20 @@ public class ProductController {
                 return productDetail;
             })
             .collect(Collectors.toList());
-            ProductListResponse productListResponse = new ProductListResponse();
-            productListResponse.setStatus("success");
-            productListResponse.setProducts(productResponses);
-            productListResponse.setPage(new PageResponse<>(products.getNumber(),
-             products.getSize(),
-              products.getTotalElements(),
-               products.getTotalPages()
-               ));
-  
-     return ResponseEntity.ok(productListResponse);
+         Map<String,Object> response = new HashMap<>();
+            response.put("status", "success");
+            response.put("products", listProducts);
+         PageResponse paggination = new PageResponse<>();
+                paggination.setCurrent(page.getNumber());
+                paggination.setItemsPerPage(page.getSize());
+                paggination.setTotalItems(page.getTotalElements());
+                paggination.setTotalPages(page.getTotalPages());
+                response.put("page", paggination);
+                  return ResponseEntity.ok(response);
+    
     }
-//     @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+
+    @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products/{id}")
     public ResponseEntity<?> getProductById(@PathVariable("id") @Positive(message = "Id san pham toi thieu la 0") Integer id){
         Product productExist = productService.getProductById(id);
@@ -135,7 +159,8 @@ public class ProductController {
             productDetail.setShortDescription(productExist.getShortDescription());
             productDetail.setPrice(productExist.getPrice());
             productDetail.setQuantity(productExist.getQuantity());
-            productDetail.setStatus(true);
+            productDetail.setDelete(productExist.isDelete());
+            productDetail.setSlug(productExist.getSlug());
             productDetail.setCategory(productExist.getCategory());
 
               List<String> pathImgs = new ArrayList<>();
@@ -159,7 +184,8 @@ public class ProductController {
             response.put("status", "success");
                 return ResponseEntity.ok(response);
     }
-//     @RolesAllowed("ROLE_ADMIN")
+
+    @RolesAllowed("ROLE_ADMIN")
     @PostMapping("/products")
     public ResponseEntity<?> addProduct(@ModelAttribute @Valid ProductDTO productRequest,
      @RequestParam("category") Integer categoryId
@@ -169,6 +195,11 @@ public class ProductController {
             if (category==null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục voi id"+categoryId);
             }
+            String productName = productRequest.getName();
+            boolean isProductSameName = productService.checkDuplicate(productName);
+            if (isProductSameName) {
+                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tên sản phẩm đã tồn tại");
+            }
             // Lưu thông tin sản phẩm
             Product product = new Product();
             // BeanUtils.copyProperties(productRequest, product);
@@ -177,8 +208,9 @@ public class ProductController {
             product.setPrice(productRequest.getPrice());
             product.setQuantity(productRequest.getQuantity());
             product.setSlug(product.getSlug());
-            product.setStatus(true);
-            
+            product.setDelete(false);
+            product.setSlug(SlugUtils.createSlug(productRequest.getName()));
+            product.setCreatedAt(new Date());
              // Gán danh sách danh mục cho sản phẩm
               product.setCategory(category);
               Product createdProduct = productService.saveProduct(product);
@@ -203,14 +235,14 @@ public class ProductController {
   
  
 //     //PUT
-//     @RolesAllowed("ROLE_ADMIN")
+    @RolesAllowed("ROLE_ADMIN")
     @PutMapping("/products/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable Integer productId ,
     @ModelAttribute @Valid ProductDTO productRequest,
      @RequestParam("category") Integer categoryId,
       @RequestParam("imgsDelete") List<String> imgsDelete,
-      @RequestParam("sizesDelete") List<Integer> sizesDelete,
-      @RequestParam("colorsDelete") List<Integer> colorDelete
+      @RequestParam("sizesDelete") Set<Integer> sizesDelete,
+      @RequestParam("colorsDelete") Set<Integer> colorDelete
      ) throws IOException{
         System.out.println("id size can xoa: "+sizesDelete);
             // Kiểm tra sản phẩm có tồn tại hay không
@@ -229,8 +261,10 @@ public class ProductController {
             existingProduct.setPrice(productRequest.getPrice());
             existingProduct.setShortDescription(productRequest.getShortDescription());
             existingProduct.setPrice(productRequest.getPrice());
-            existingProduct.setStatus(true);
+            existingProduct.setDelete(false);
             existingProduct.setQuantity(productRequest.getQuantity());
+            existingProduct.setSlug(SlugUtils.createSlug(productRequest.getName()));
+            existingProduct.setUpdatedAt(new Date());
               // Cập nhật  danh mục cho sản phẩm
               existingProduct.setCategory(category);
       List<MultipartFile> images = productRequest.getImages();
@@ -245,13 +279,13 @@ public class ProductController {
          }
            
             //xu ly luu size
-                List<String> sizeNames = productRequest.getSizes();
+                Set<String> sizeNames = new HashSet<>(productRequest.getSizes());
                 if (!sizeNames.isEmpty()) {
                     for (String sizeName : sizeNames) {
                         productService.addSizeToProduct(existingProduct.getId(), sizeName);
                     }
                 }
-                 List<String> colorNames = productRequest.getColors();
+                 Set<String> colorNames = new HashSet<>(productRequest.getColors());
                 if (!colorNames.isEmpty()) {
                     for (String colorName : colorNames) {
                         productService.addColorToProduct(existingProduct.getId(), colorName);
@@ -259,8 +293,8 @@ public class ProductController {
                 }
                  //xử lý xóa danh sách ảnh
                 productService.deleteImage(existingProduct.getId(),imgsDelete);
-                productService.deleteSize(existingProduct.getId(), sizesDelete);
-                productService.deleteColor(existingProduct.getId(), colorDelete);
+                productService.deleteSize(existingProduct.getId(), sizesDelete,sizeNames);
+                productService.deleteColor(existingProduct.getId(), colorDelete,colorNames);
         //cập nhật sản phẩm
             Product updatedProduct = productService.saveProduct(existingProduct);
                 
@@ -269,9 +303,15 @@ public class ProductController {
 //   //DELETE
   @DeleteMapping("/products/{id}")
  public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id) throws IOException{
-        // Kiểm tra xem sản phẩm có tồn tại không
-        if (!productService.existsProductById(id)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm với id:" +id);
+    Product  existProduct = productService.getProductById(id);
+        boolean checkHasOrder = orderDetailService.checkExistProductHasOrder(id);
+        Map<String, Object> response = new HashMap<>();
+        if (checkHasOrder) {
+            if (existProduct!=null) {
+                existProduct.setDelete(true);
+                productService.saveProduct(existProduct);
+                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sản phẩm đã được đặt hàng không thể xóa!");
+            }
         }
             // Xóa sản phẩm
             productService.deleteProductById(id);
