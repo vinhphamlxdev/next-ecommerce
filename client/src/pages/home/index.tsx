@@ -4,7 +4,7 @@ import Slider from "@/components/Slider";
 import { IProduct } from "@/types/interface";
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
-import { getAllProduct } from "@/service/ProductApi";
+import { getAllProduct } from "@/pages/api/ProductApi";
 import usePaginationAndFilters, {
   FiltersState,
   PaginationState,
@@ -42,7 +42,7 @@ export default function HomeClient() {
   });
   return (
     <LayoutClient>
-      <Slider />
+      {/* <Slider /> */}
       <div className="wrapper-layout">
         <BestSeller data={data?.products} />
       </div>

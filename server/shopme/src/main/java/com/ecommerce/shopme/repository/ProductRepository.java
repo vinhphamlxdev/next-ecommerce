@@ -35,5 +35,18 @@ Set<Product> findByOrder(Order order);
 
 Page<Product> findByCategorySlug(String categorySlug, Pageable pageable);
 
+Product findBySlug(String slug);
+
+
+//Tim kiem sp chứa 1 chuỗi cụ thể
+//  List<Product> findByNameContaining(String searchString);
+//Tìm kiếm sản phẩm bắt đầu bằng một chuỗi cụ thể
+//List<Product> findByNameStartingWith(String searchString);
+//Tìm kiếm sản phẩm kết thúc bằng một chuỗi cụ thể
+//List<Product> findByNameEndingWith(String searchString);
+//Tìm kiếm sản phẩm có một ký tự bất kì ở bất kỳ vị trí nào
+//List<Product> findByNameLike(String searchString);
+@Query("SELECT p FROM Product p WHERE p.name LIKE %?1%")
+public List<Product> searchProduct(String keyword);
 }
    

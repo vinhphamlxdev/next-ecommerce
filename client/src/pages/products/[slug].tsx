@@ -1,17 +1,19 @@
+import { LoadingSpinner } from "@/Admin/components/Loading";
 import ProductDetail from "@/components/ProductDetailItem";
 import LayoutClient from "@/components/layout/LayoutMain";
-import { getProduct } from "@/service/ProductApi";
+import { getProduct, getProductBySlug } from "@/pages/api/ProductApi";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
 import * as React from "react";
 import { toast } from "react-toastify";
 export default function ProductDetailPage() {
   const router = useRouter();
-  const { id } = router.query;
-  console.log(id);
-  const { data } = useQuery({
-    queryKey: ["product", id],
-    queryFn: () => getProduct(id as string),
+  const { slug } = router.query;
+  console.log(slug);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["product", slug],
+    queryFn: () => getProductBySlug(slug as string),
     onSuccess: (data) => {
       console.log("product data:", data);
     },

@@ -10,7 +10,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { getAllCategory } from "@/service/CategoryApi";
+import { getAllCategory } from "@/pages/api/CategoryApi";
 export interface SelectProps {
   label?: string;
   select: any;

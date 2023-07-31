@@ -4,7 +4,7 @@ import { IMG_SRC } from "@/common/constanst";
 import { IFilters } from "@/types/interface";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
-import { getAllUser } from "@/service/authApi";
+import { getAllUser } from "@/pages/api/authApi";
 import UserItem from "@/Admin/components/UserItem";
 import { IUser } from "@/types/authInterface";
 import { LoadingSkeleton } from "@/Admin/components/Loading";
@@ -68,38 +68,13 @@ export default function User() {
               </tr>
             </thead>
             <tbody>
-              {/* <tr className="bg-gray-700 mt-2">
-                <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                  <Image
-                    src={IMG_SRC.avatar}
-                    className="h-12 w-12 bg-white rounded-full border"
-                    alt="..."
-                  />
-                  <span className="ml-3 font-bold text-white ">
-                    Pham Huu Vinh
-                  </span>
-                </th>
-                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                  <p aria-expanded="false">vinhpham@gmail.com</p>
-                </td>
-                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                  <button className="py-3 px-5 rounded-[5px] bg-activeBg">
-                    CUSTOMER
-                  </button>
-                </td>
-                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                  <button className="py-3 px-5 rounded-[5px] bg-activeBg">
-                    Hoạt Động
-                  </button>
-                </td>
-              </tr> */}
               {data?.users?.length > 0 &&
                 data?.users?.map((user: IUser) => {
                   return <UserItem key={user.id} item={user} />;
                 })}
             </tbody>
           </table>
-          {!data?.users && (
+          {isLoading && (
             <LoadingSkeleton columns={1} height={50} count={8} columnRow={4} />
           )}
           <PaginationComponent

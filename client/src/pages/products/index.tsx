@@ -7,8 +7,8 @@ import usePaginationAndFilters, {
   FiltersState,
   PaginationState,
 } from "@/hooks/usePaginationAndFilters";
-import { getAllCategory } from "@/service/CategoryApi";
-import { getAllProduct } from "@/service/ProductApi";
+import { getAllCategory } from "@/pages/api/CategoryApi";
+import { getAllProduct } from "@/pages/api/ProductApi";
 import { ICategory, IProduct } from "@/types/interface";
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
@@ -17,6 +17,7 @@ import { BsFilterLeft } from "react-icons/bs";
 import { GrFilter } from "react-icons/gr";
 import { styled } from "styled-components";
 import { useRouter } from "next/router";
+import Breadcrumb from "@/components/Breadcrumb";
 const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
   ssr: false,
 });
@@ -52,6 +53,8 @@ export default function ProductClient() {
     handleSortChange,
   } = usePaginationAndFilters(initialPagination, initialFilters);
   const router = useRouter();
+  const [searchResult, setSearchResult] = React.useState<IProduct[] | any>([]);
+  const [isSearching, setIsSearching] = React.useState(false);
   const { query } = router;
   const { isError, data, error, refetch, isLoading } = useQuery({
     queryKey: ["products", filters],
@@ -70,10 +73,15 @@ export default function ProductClient() {
 
   return (
     <LayoutClient>
+      <Breadcrumb titlePage="Tất cả sản phẩm"></Breadcrumb>
       <StyledProducts className="py-10">
         <div className="wrapper-layout">
           <div className="flex gap-x-10 relative">
-            <ProductFilter onChange={handleCategoryChange} filters={filters} />
+            <ProductFilter
+              setSearchResult={setSearchResult}
+              onChange={handleCategoryChange}
+              filters={filters}
+            />
             <div className="flex flex-col gap-y-3 w-full">
               <div className="sort-bar border-b border-[#e1e1e1] pb-4 mb-3 flex justify-between items-center">
                 <span className="text-textColor uppercase font-bold text-lg">
@@ -110,12 +118,20 @@ export default function ProductClient() {
                   </select>
                 </div>
               </div>
-              <div className="grid gap-y-5 grid-cols-3 gap-x-7">
-                {data?.products?.length > 0 &&
-                  data?.products?.map((product: any, index: number) => {
+              {searchResult?.length > 0 ? (
+                <div className="grid gap-y-5 grid-cols-3 gap-x-7">
+                  {searchResult.map((product: IProduct, index: number) => {
                     return <ProductItem key={product.id} item={product} />;
                   })}
-              </div>
+                </div>
+              ) : (
+                <div className="grid gap-y-5 grid-cols-3 gap-x-7">
+                  {data?.products?.length > 0 &&
+                    data?.products?.map((product: IProduct, index: number) => {
+                      return <ProductItem key={product.id} item={product} />;
+                    })}
+                </div>
+              )}
               {isLoading && (
                 <LoadingSkeleton
                   columns={4}

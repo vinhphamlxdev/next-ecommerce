@@ -15,7 +15,7 @@ import { LoadingSpinner } from "../Loading";
 import ChooseSize from "../ChooseSize";
 import ChooseColor from "../ChooseColor";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { getProduct, updateProduct } from "@/service/ProductApi";
+import { getProduct, updateProduct } from "@/pages/api/ProductApi";
 
 export interface IModalProductEditProps {
   productId: number;

@@ -9,7 +9,6 @@ import { useModalStore } from "@/store/modalStore";
 import { toast } from "react-toastify";
 import formatVnd from "@/utils/formatVnd";
 import handleAddToCart from "@/utils/handleAddToCart";
-import { useCartStore } from "@/store/cartStore";
 import Link from "next/link";
 export interface IProductItemProps {
   item: IProduct;
@@ -25,10 +24,10 @@ export default function ProductItem({ item }: IProductItemProps) {
     imageUrls,
     price,
     id,
+    slug,
   } = item;
   const { showModalQuickView, setShowModalQuickView, seletedProduct } =
     useModalStore((state) => state);
-  const { addToCart } = useCartStore((state) => state);
   const handleShowModalQuickView = (product: IProduct) => {
     console.log(seletedProduct);
     setShowModalQuickView(product);
@@ -39,7 +38,7 @@ export default function ProductItem({ item }: IProductItemProps) {
         <div className="relative flex justify-center flex-shrink-0 overflow-hidden cursor-pointer product-image">
           <div className="center-block product-action hidden  transition-all duration-500 justify-center w-full  z-50 gap-x-2">
             <Link
-              href={`/client/products/${id}`}
+              href={`/products/${slug}`}
               className="text-white flex justify-center items-center whitespace-nowrap font-normal text-sm bg-bgPrimary hover:bg-blue-600 py-2 w-32 transition-all "
             >
               Tùy chọn

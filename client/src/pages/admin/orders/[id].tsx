@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { LoadingSpinner } from "@/Admin/components/Loading";
 import dynamic from "next/dynamic";
-import { getOrder } from "@/service/OrderApi";
+import { getOrder } from "@/pages/api/OrderApi";
 
 function OrderDetail() {
   const router = useRouter();

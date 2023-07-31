@@ -9,9 +9,9 @@ export interface PaginationState {
 export interface FiltersState {
   pageNum: number;
   itemsPerPage: number;
-  category: string;
-  sortfield: string;
-  sortdir: string;
+  category?: string;
+  sortfield?: string;
+  sortdir?: string;
 }
 interface PaginationAndFiltersHook {
   pagination: PaginationState;

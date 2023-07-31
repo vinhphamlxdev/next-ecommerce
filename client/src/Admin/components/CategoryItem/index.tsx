@@ -16,7 +16,7 @@ import {
   createCategory,
   getCategory,
   updateCategory,
-} from "@/service/CategoryApi";
+} from "@/pages/api/CategoryApi";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import DeleteCategoryButton from "./DeleteCategoryButton";
 export interface ICategoryItemProps {

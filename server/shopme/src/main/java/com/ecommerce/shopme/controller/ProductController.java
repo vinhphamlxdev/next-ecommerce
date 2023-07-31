@@ -104,7 +104,7 @@ public class ProductController {
         }
         List<Product> listProductsByPage = page.getContent();
         List<ProductDetail> listProducts = listProductsByPage.stream()
-            .map(product -> {
+        .map(product -> {
                 ProductDetail productDetail = new ProductDetail();
                 productDetail.setId(product.getId());
                 productDetail.setName(product.getName());
@@ -149,6 +149,45 @@ public class ProductController {
     @GetMapping("/products/{id}")
     public ResponseEntity<?> getProductById(@PathVariable("id") @Positive(message = "Id san pham toi thieu la 0") Integer id){
         Product productExist = productService.getProductById(id);
+        if (productExist==null) {
+            return ResponseEntity.notFound().build();
+        }
+          
+            ProductDetail productDetail = new ProductDetail();
+            productDetail.setId(productExist.getId());
+            productDetail.setName(productExist.getName());
+            productDetail.setShortDescription(productExist.getShortDescription());
+            productDetail.setPrice(productExist.getPrice());
+            productDetail.setQuantity(productExist.getQuantity());
+            productDetail.setDelete(productExist.isDelete());
+            productDetail.setSlug(productExist.getSlug());
+            productDetail.setCategory(productExist.getCategory());
+
+              List<String> pathImgs = new ArrayList<>();
+                      for (Image imageUrls : productExist.getImages()) {
+                        pathImgs.add(imageUrls.getImageUrl());
+                    }
+                     productDetail.setImageUrls(pathImgs);
+               List<Size> sizes = new ArrayList<>();
+                      for (Size size : productExist.getSizes()) {
+                        sizes.add(size);
+                    }
+            productDetail.setSizes(sizes);
+                    
+             List<Color> colors = new ArrayList<>();
+                      for (Color color : productExist.getColors()) {
+                        colors.add(color);
+                    }
+            productDetail.setColors(colors);
+            Map<String,Object> response = new HashMap<>();
+            response.put("product", productDetail);
+            response.put("status", "success");
+                return ResponseEntity.ok(response);
+    }
+        @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+    @GetMapping("/products/slug/{slug}")
+    public ResponseEntity<?> getProductSlugName(@PathVariable("slug")  String slugName){
+        Product productExist = productService.getProductBySlug(slugName);
         if (productExist==null) {
             return ResponseEntity.notFound().build();
         }
@@ -299,6 +338,49 @@ public class ProductController {
             Product updatedProduct = productService.saveProduct(existingProduct);
                 
          return ResponseEntity.ok(updatedProduct);
+    }
+   @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+    @GetMapping("/products/search")
+    public ResponseEntity<?> listProductByKeyword(@RequestParam(name = "keyword") String keyword){
+        List<Product> products = productService.getByKeyword(keyword);
+        if (products.isEmpty()) {
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm với tên:"+keyword);
+
+        }
+        List<ProductDetail> listProducts = products.stream()
+        .map(product -> {
+                ProductDetail productDetail = new ProductDetail();
+                productDetail.setId(product.getId());
+                productDetail.setName(product.getName());
+                productDetail.setShortDescription(product.getShortDescription());
+                productDetail.setPrice(product.getPrice());
+                productDetail.setQuantity(product.getQuantity());
+                productDetail.setSlug(product.getSlug());
+                productDetail.setDelete(product.isDelete());
+                productDetail.setCategory(product.getCategory());
+                List<Size> sizes = new ArrayList<>();
+                for (Size size : product.getSizes()) {
+                    sizes.add(size);
+                }
+                productDetail.setSizes(sizes);
+                   List<Color> colors = new ArrayList<>();
+                for (Color color : product.getColors()) {
+                    colors.add(color);
+                }
+                productDetail.setColors(colors);
+                List<String> imageUrls = new ArrayList<>();
+                for (Image image : product.getImages()) {
+                    imageUrls.add(image.getImageUrl());
+                }
+                productDetail.setImageUrls(imageUrls);
+                return productDetail;
+            })
+            .collect(Collectors.toList());
+           Map<String,Object> response = new HashMap<>();
+            response.put("products", listProducts);
+            response.put("status", "success");
+                return ResponseEntity.ok(response);
+        
     }
 //   //DELETE
   @DeleteMapping("/products/{id}")

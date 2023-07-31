@@ -6,7 +6,6 @@ import notification from "@/utils/notification";
 import Button from "../Button";
 import formatVnd from "@/utils/formatVnd";
 import handleAddToCart from "@/utils/handleAddToCart";
-import { useCartStore } from "@/store/cartStore";
 import { usePathname } from "next/navigation";
 import { useModalStore } from "@/store/modalStore";
 import getColorClassName from "@/utils/getColorClassName";
@@ -14,6 +13,7 @@ import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { CartContextProvider, useCartContext } from "@/context/useCartContext";
 export interface IProductDetailProps {
   item: IProduct;
   className?: string;
@@ -36,7 +36,7 @@ export default function ProductDetail({
   const [imgPreview, setImgPreview] = React.useState<string>(imageUrls[0]);
   const handlePreviewProduct = (url: string) => setImgPreview(url);
   const [quantity, setQuantity] = React.useState<number>(1);
-  const { addToCart } = useCartStore();
+  const { dispatch, state } = useCartContext();
   const { setCloseModalQuickView } = useModalStore((state) => state);
   const [selectedSize, setSelectedSize] = React.useState<string>(
     sizes[0]?.name
@@ -181,27 +181,6 @@ export default function ProductDetail({
               })}
           </div>
         </div>
-        {/* {isQuickView ? (
-          <></>
-        ) : (
-          <div className="relative">
-            <Button
-              onClick={() =>
-                handleAddToCart(
-                  item,
-                  quantity,
-                  selectedSize,
-                  selectedColor,
-                  addToCart
-                )
-              }
-              className="btn-add-to-cart"
-            >
-              Mua Ngay
-            </Button>
-          </div>
-        )} */}
-
         <div className="flex flex-col gap-y-2">
           <span className="text-base text-[#707070] font-medium">
             Số lượng:
@@ -220,7 +199,7 @@ export default function ProductDetail({
                   quantity,
                   selectedSize,
                   selectedColor,
-                  addToCart
+                  dispatch
                 );
                 setCloseModalQuickView();
               }}

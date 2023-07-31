@@ -8,7 +8,6 @@ import slugify from "slugify";
 import axios from "axios";
 import { styled } from "styled-components";
 import Link from "next/link";
-import { useCartStore } from "@/store/cartStore";
 import notification from "@/utils/notification";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -18,9 +17,10 @@ import calculateTotalPrice from "@/utils/calculateTotalPrice";
 import dynamic from "next/dynamic";
 import { LoadingSpinner } from "@/Admin/components/Loading";
 import useDisabled from "@/hooks/useDisabled";
-import { createOrder } from "@/service/OrderApi";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { getAllAddress } from "@/service/AddressApi";
+import { getAllAddress } from "@/pages/api/AddressApi";
+import { createOrder } from "../api/OrderApi";
+import { useCartContext } from "@/context/useCartContext";
 
 type IDistrict = {
   code: number;
@@ -41,17 +41,18 @@ type IProvince = {
 const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
   ssr: false,
 });
-export default function Checkout() {
-  const { deleteAllCart, cartItems } = useCartStore();
+function Checkout() {
   const [districts, setDistricts] = React.useState<IDistrict[]>([]);
   const router = useRouter();
+  const { state, dispatch } = useCartContext();
+  const cartItems = state.cartItems;
   const { mutate, isLoading } = useMutation({
     mutationFn: (data: any) => createOrder(data),
     onSuccess: (data) => {
       console.log("response:", data);
       checkoutFormik.resetForm();
       toast.success("Đặt hàng thành công");
-      deleteAllCart();
+      dispatch({ type: "DELETEALL_CART", payload: [] });
     },
     onError: (err: any) => {
       toast.error(` ${err?.response?.data}`);
@@ -121,7 +122,7 @@ export default function Checkout() {
   };
   React.useEffect(() => {
     if (!cartItems.length) {
-      router.push("/client/products");
+      router.push("/products");
       toast.warning("Giỏ hàng đang trống");
     }
   }, [cartItems]);
@@ -264,7 +265,7 @@ export default function Checkout() {
                 HOÀN TẤT ĐƠN HÀNG
               </button>
               <Link
-                href="/client/cart"
+                href="/cart"
                 className="text-bgCheckout text-sm font-medium hover:opacity-80"
               >
                 <i className="bi bi-chevron-left"></i>
@@ -344,3 +345,4 @@ export default function Checkout() {
     </div>
   );
 }
+export default dynamic(() => Promise.resolve(Checkout), { ssr: false });

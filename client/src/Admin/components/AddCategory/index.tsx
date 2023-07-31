@@ -8,7 +8,7 @@ import getMessage from "@/utils/notification";
 import { toast } from "react-toastify";
 import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "../Loading/LoadingButton";
-import { createCategory } from "@/service/CategoryApi";
+import { createCategory } from "@/pages/api/CategoryApi";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 export interface AddCategoryProps {
   categorys: ICategory[];

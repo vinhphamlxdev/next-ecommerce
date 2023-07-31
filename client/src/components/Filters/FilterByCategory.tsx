@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAllCategory } from "@/service/CategoryApi";
+import { getAllCategory } from "@/pages/api/CategoryApi";
 import { ICategory, ICategoryResponse } from "@/types/interface";
 import styled from "styled-components";
 import { useRouter } from "next/router";

@@ -13,13 +13,13 @@ import { LoadingSpinner } from "@/Admin/components/Loading";
 import useDisabled from "@/hooks/useDisabled";
 import { useRouter } from "next/router";
 import { IUser } from "@/types/authInterface";
-import { useStateContext } from "@/context";
+import { useAuthContext } from "@/context/useAuthContext";
 import notification from "@/utils/notification";
 import { useGlobalStore } from "@/store/globalStore";
-import { registerUser } from "@/service/authApi";
+import { registerUser } from "@/pages/api/authApi";
 type FormStateType = Omit<IUser, "id">;
 export default function SignUp() {
-  const { dispatch, state } = useStateContext();
+  const { dispatch, state } = useAuthContext();
   const router = useRouter();
   const currentUser = state.authUser;
   const { showPassword, setShowPassword } = useGlobalStore();
@@ -83,7 +83,7 @@ export default function SignUp() {
   });
   React.useEffect(() => {
     if (currentUser) {
-      router.push("/client/home");
+      router.push("/home");
     }
   }, [currentUser]);
   const { isDisabled, disabledStyle } = useDisabled(isLoading);
@@ -182,7 +182,7 @@ export default function SignUp() {
                 </span>
                 <Link
                   className="italic text-blue-500 text-sm cursor-pointer underline font-light"
-                  href="/client/signin"
+                  href="/signin"
                 >
                   Đăng Nhập
                 </Link>

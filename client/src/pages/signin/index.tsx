@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import Link from "next/link";
 import { useFormik } from "formik";
 import { useMutation } from "@tanstack/react-query";
-import { useStateContext } from "@/context";
+import { useAuthContext } from "@/context/useAuthContext";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { useCookies } from "react-cookie";
@@ -16,10 +16,10 @@ import useDisabled from "@/hooks/useDisabled";
 import { LoadingSpinner } from "@/Admin/components/Loading";
 import { useGlobalStore } from "@/store/globalStore";
 import notification from "@/utils/notification";
-import { loginUser } from "@/service/authApi";
+import { loginUser } from "@/pages/api/authApi";
 export default function SignIn() {
   const router = useRouter();
-  const { dispatch, state } = useStateContext();
+  const { dispatch, state } = useAuthContext();
   const { showPassword, setShowPassword } = useGlobalStore();
   const currentUser = state.authUser;
   const { mutate, isLoading, data, mutateAsync } = useMutation(
@@ -30,7 +30,7 @@ export default function SignIn() {
         dispatch({ type: "LOG_IN", payload: data.user });
         signInFormik.resetForm();
         toast.success("Đăng nhập thành công");
-        router.push("/client/home");
+        router.push("/home");
       },
       onError(error: any) {
         notification(error?.response.data, "error");
@@ -64,7 +64,7 @@ export default function SignIn() {
   });
   React.useEffect(() => {
     if (currentUser) {
-      router.push("/client/home");
+      router.push("/home");
     }
   }, [currentUser]);
   const { isDisabled, disabledStyle } = useDisabled(isLoading);
@@ -130,7 +130,7 @@ export default function SignIn() {
                 </span>
                 <Link
                   className="italic text-blue-500 text-sm cursor-pointer underline font-light"
-                  href="/client/signup"
+                  href="/signup"
                 >
                   Đăng Kí
                 </Link>

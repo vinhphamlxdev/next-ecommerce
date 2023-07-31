@@ -264,4 +264,11 @@ public void deleteColor(Integer productId,Set<Integer> colorsDeleteId,Set<String
     return productRepository.findByCategoryId(id);
 }
 
+public Product getProductBySlug(String slug){
+    return productRepository.findBySlug(slug);
+}
+
+public List<Product> getByKeyword(String keyword){
+        return productRepository.searchProduct(keyword);
+}
 }

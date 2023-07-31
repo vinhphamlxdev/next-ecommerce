@@ -20,7 +20,7 @@ const initialState: State = {
       : null,
 };
 
-type StateContextProviderProps = { children: React.ReactNode };
+type AuthContextProviderProps = { children: React.ReactNode };
 
 const StateContext = React.createContext<
   { state: State; dispatch: Dispatch } | undefined
@@ -65,7 +65,7 @@ const stateReducer = (state: State, action: Action) => {
   }
 };
 
-const StateContextProvider = ({ children }: StateContextProviderProps) => {
+const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [state, dispatch] = React.useReducer(stateReducer, initialState);
 
   const value = { state, dispatch };
@@ -74,14 +74,14 @@ const StateContextProvider = ({ children }: StateContextProviderProps) => {
   );
 };
 
-const useStateContext = () => {
+const useAuthContext = () => {
   const context = React.useContext(StateContext);
 
   if (context) {
     return context;
   }
 
-  throw new Error(`useStateContext must be used within a StateContextProvider`);
+  throw new Error(`useStateContext must be used within a AuthContextProvider`);
 };
 
-export { StateContextProvider, useStateContext };
+export { AuthContextProvider, useAuthContext };

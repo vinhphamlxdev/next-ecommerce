@@ -13,7 +13,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import UseDisabled from "@/hooks/useDisabled";
 import LoadingButton from "@/Admin/components/Loading/LoadingButton";
-import { createProduct } from "@/service/ProductApi";
+import { createProduct } from "@/pages/api/ProductApi";
 import ChooseSize from "@/Admin/components/ChooseSize";
 import ChooseColor from "@/Admin/components/ChooseColor";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";

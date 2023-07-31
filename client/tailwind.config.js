@@ -18,6 +18,7 @@ module.exports = {
         bgPrimary: "#ff0000",
         bgCheckout: "rgb(0, 180, 216)",
         bgText: "#8c909",
+        bluePrimary: "#0089ff",
       },
     },
   },

@@ -6,7 +6,7 @@ import { DeleteIcon, EditIcon } from "@/components/Icons/AppIcon";
 import { BsEye } from "react-icons/bs";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useModalStore } from "@/store/modalStore";
-import { getProduct, updateProduct } from "@/service/ProductApi";
+import { getProduct, updateProduct } from "@/pages/api/ProductApi";
 import ModalProductEdit from "../Modal/ModalProductEdit";
 import ModalProductDetail from "../Modal/ModalProductDetail";
 import DeleteProductButton from "../Modal/DeleteProductButton";
@@ -64,6 +64,7 @@ export default function ProductItemAdmin({
       )}
       {isOpenDetailP && selectedProductId ? (
         <ModalProductDetail
+          setSelectedId={setSelectedProductId}
           isOpenDetailP={isOpenDetailP}
           productId={selectedProductId}
         />

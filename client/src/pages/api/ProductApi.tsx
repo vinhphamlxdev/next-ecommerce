@@ -18,6 +18,15 @@ export const getProduct = async (id: number | string) => {
   const response = await axiosConfig.get(`/products/${id}`);
   return response.data.product;
 };
+
+export const getProductBySlug = async (slug: string) => {
+  const response = await axiosConfig.get(`/products/slug/${slug}`);
+  return response.data.product;
+};
+export const getProductByKeyword = async (param: any) => {
+  const response = await axiosConfig.get(`/products/search?keyword=${param}`);
+  return response.data;
+};
 export const createProduct = async (formData: FormData) => {
   const response = await axiosConfig.post(`/products`, formData, {
     headers: {

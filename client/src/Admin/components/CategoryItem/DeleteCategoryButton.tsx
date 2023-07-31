@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCategory } from "@/service/CategoryApi";
+import { deleteCategory } from "@/pages/api/CategoryApi";
 import { toast } from "react-toastify";
 import { IFilters } from "@/types/interface";
 import Swal from "sweetalert2";

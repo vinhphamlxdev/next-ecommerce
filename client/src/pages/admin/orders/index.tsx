@@ -5,7 +5,6 @@ import Image from "next/image";
 import userImg from "../../../../public/wall.jpg";
 import { useGlobalStore } from "@/store/globalStore";
 import { IOrder } from "@/types/interface";
-import { getAllOrder } from "@/service/OrderApi";
 import OrderItem from "@/Admin/components/OrderItem";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { LoadingSkeleton } from "@/Admin/components/Loading";
@@ -14,6 +13,7 @@ import usePaginationAndFilters, {
   FiltersState,
   PaginationState,
 } from "@/hooks/usePaginationAndFilters";
+import { getAllOrder } from "@/pages/api/OrderApi";
 
 export default function AllOrder() {
   const initialPagination: PaginationState = {

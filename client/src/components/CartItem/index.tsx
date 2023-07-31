@@ -1,4 +1,4 @@
-import { useCartStore } from "@/store/cartStore";
+import { useCartContext } from "@/context/useCartContext";
 import { IProduct } from "@/types/interface";
 import formatVnd from "@/utils/formatVnd";
 import * as React from "react";
@@ -8,6 +8,7 @@ export interface ICartItemProps {
 }
 
 export default function CartItem({ item }: ICartItemProps) {
+  const { dispatch } = useCartContext();
   const {
     id,
     colors,
@@ -18,12 +19,11 @@ export default function CartItem({ item }: ICartItemProps) {
     quantity,
     sizes,
   } = item;
-  const { setQuantityCart, deleteFromCart } = useCartStore((state) => state);
   const updateQuantity = (type: string, product: IProduct) => {
-    setQuantityCart({ type, product });
+    dispatch({ type: "SET_QUANTITY", payload: { type, product } });
   };
   const handleDeleteCartItem = (newProduct: IProduct) => {
-    deleteFromCart(newProduct);
+    dispatch({ type: "DELETE_CART", payload: newProduct });
   };
   return (
     <div className=" flex py-3 border-t-0 border-b border-gray-300 cart-row">

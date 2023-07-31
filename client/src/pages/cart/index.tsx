@@ -1,24 +1,27 @@
 import * as React from "react";
 import Button from "@/components/Button";
 import CartItem from "@/components/CartItem";
-import { useCartStore } from "@/store/cartStore";
 import { IProduct } from "@/types/interface";
 import calculateTotalPrice from "@/utils/calculateTotalPrice";
 import formatVnd from "@/utils/formatVnd";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import Breadcrumb from "@/components/Breadcrumb";
+import { useCartContext } from "@/context/useCartContext";
 
 const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
   ssr: false,
 });
 
 export default function Cart() {
-  const { cartItems } = useCartStore();
+  const { dispatch, state } = useCartContext();
+  const cartItems = state.cartItems;
   console.log(cartItems);
 
   return (
     <LayoutClient>
-      <div className="cart-page">
+      <Breadcrumb titlePage="Giỏ hàng" />
+      <div className="cart-page my-10">
         <div className="wrapper-layout">
           <div className="text-xl font-medium">Giỏ hàng của bạn</div>
           <div className="flex flex-col">
@@ -61,7 +64,7 @@ export default function Cart() {
                   </span>
                 </div>
                 <Link
-                  href="/client/products"
+                  href="/products"
                   className="text-base bg-[#f2f2f2] px-4 py-3 text-gray-700 font-bold hover:text-white hover:bg-blue-500 transition-all"
                 >
                   <i className="bi bi-arrow-left"></i>
@@ -73,7 +76,7 @@ export default function Cart() {
                   Vận chuyển và thuế được tính khi thanh toán
                 </span>
                 <Link
-                  href="/client/checkout"
+                  href="/checkout"
                   className="bg-bgPrimary px-4 py-3 transition-all text-white font-bold hover:bg-blue-500 hover:text-white cursor-pointer"
                 >
                   THANH TOÁN

@@ -1,5 +1,5 @@
 import { IMG_SRC } from "@/common/constanst";
-import { useStateContext } from "@/context";
+import { useAuthContext } from "@/context/useAuthContext";
 import { useGlobalStore } from "@/store/globalStore";
 import Image from "next/image";
 import * as React from "react";
@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 export default function Header() {
   const router = useRouter();
   const { isSticky } = useGlobalStore();
-  const { state, dispatch } = useStateContext();
+  const { state, dispatch } = useAuthContext();
   const user = state.authUser;
   const onLogoutHandler = async () => {
     //delete user from local storage
@@ -70,7 +70,7 @@ export default function Header() {
               </div>
             )}
             <Link
-              href="/client/home"
+              href="/"
               className="py-2 hover:bg-gray-200 cursor-pointer flex items-center gap-x-3 px-3"
             >
               <MdOutlineAdminPanelSettings className="leading-[0px] text-xl"></MdOutlineAdminPanelSettings>

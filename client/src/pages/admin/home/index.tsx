@@ -1,6 +1,6 @@
 import LayoutAdmin from "@/Admin/components/layout";
 import BestSeller from "@/components/BestSeller";
-import { getAllProducts } from "@/service/ProductApi";
+import { getAllProducts } from "@/pages/api/ProductApi";
 import { IProduct } from "@/types/interface";
 import formatVnd from "@/utils/formatVnd";
 import * as React from "react";

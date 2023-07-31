@@ -21,7 +21,7 @@ import PaginationComponent from "@/Admin/components/Pagination";
 import ModalProductDetail from "@/Admin/components/Modal/ModalProductDetail";
 import formatVnd from "@/utils/formatVnd";
 import { useQuery } from "@tanstack/react-query";
-import { getAllProduct } from "@/service/ProductApi";
+import { getAllProduct } from "@/pages/api/ProductApi";
 import ProductItemAdmin from "@/Admin/components/ProductItem";
 import usePaginationAndFilters, {
   FiltersState,
@@ -34,7 +34,7 @@ function Products() {
     "Số lượng",
     "Chỉnh sửa",
     "Xóa",
-    "Trạng thái",
+    "Chi tiết",
   ];
   const router = useRouter();
   const initialPagination: PaginationState = {
@@ -45,8 +45,6 @@ function Products() {
   const initialFilters: FiltersState = {
     pageNum: 0,
     itemsPerPage: 6,
-    category: "",
-    sortby: "",
   };
   const { filters, handlePageChange, pagination, setFilters, setPagination } =
     usePaginationAndFilters(initialPagination, initialFilters);

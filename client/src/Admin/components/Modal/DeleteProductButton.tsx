@@ -4,7 +4,7 @@ import * as React from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { IFilters, IProductFilters } from "@/types/interface";
 import { toast } from "react-toastify";
-import { deleteProduct } from "@/service/ProductApi";
+import { deleteProduct } from "@/pages/api/ProductApi";
 
 export interface IDeleteProductButtonProps {
   productId: number;

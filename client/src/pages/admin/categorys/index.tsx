@@ -13,7 +13,7 @@ import { useGlobalStore } from "@/store/globalStore";
 import { LoadingSkeleton } from "@/Admin/components/Loading";
 import PaginationComponent from "@/Admin/components/Pagination";
 import { useQuery } from "@tanstack/react-query";
-import { getAllCategory } from "@/service/CategoryApi";
+import { getAllCategory } from "@/pages/api/CategoryApi";
 import usePaginationAndFilters, {
   FiltersState,
   PaginationState,
