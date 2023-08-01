@@ -51,7 +51,7 @@ export default function ProductItem({ item }: IProductItemProps) {
             </button>
           </div>
           {item && item.imageUrls ? (
-            <>
+            <Link href={`/products/${slug}`}>
               <img
                 className="transition-all h-[300] duration-700 first-image"
                 src={imageUrls[0]}
@@ -62,7 +62,7 @@ export default function ProductItem({ item }: IProductItemProps) {
                 src={imageUrls[1]}
                 alt=""
               />
-            </>
+            </Link>
           ) : (
             <></>
           )}
@@ -70,9 +70,12 @@ export default function ProductItem({ item }: IProductItemProps) {
       </div>
       <div className="flex flex-col items-start flex-1  h-[calc(100%-250px)] py-3  border-t-0  cursor-default product-item-content ">
         <div className="flex flex-col gap-y-2">
-          <h3 className="text-base  font-normal cursor-pointer hover:text-blue-500 text-[#323c3f]">
+          <Link
+            href={`products/${slug}`}
+            className="text-base  uppercase font-normal cursor-pointer hover:text-blue-500 text-[#323c3f]"
+          >
             {name}
-          </h3>
+          </Link>
           <div className="flex w-full product-item-price gap-x-3">
             <span className="text-lg font-semibold text-[#363636]">
               {formatVnd(price.toString())}₫

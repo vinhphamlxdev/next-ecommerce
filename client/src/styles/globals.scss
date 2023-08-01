@@ -174,3 +174,15 @@ body {
     color: #000;
   }
 }
+.slick-slider {
+  margin: 0 -8px;
+}
+.slick-list {
+  & .slick-slide {
+    padding: 0 8px;
+  }
+}
+.slick-track {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}

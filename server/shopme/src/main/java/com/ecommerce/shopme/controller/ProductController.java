@@ -54,10 +54,12 @@ import com.ecommerce.shopme.config.CloudinaryConfig;
 import com.ecommerce.shopme.dto.ProductDetail;
 import com.ecommerce.shopme.entity.Category;
 import com.ecommerce.shopme.entity.Color;
+import com.ecommerce.shopme.entity.Discount;
 import com.ecommerce.shopme.entity.Image;
 import com.ecommerce.shopme.entity.Product;
 import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
+import com.ecommerce.shopme.repository.DiscountRepository;
 import com.ecommerce.shopme.service.CategoryService;
 import com.ecommerce.shopme.service.OrderDetailService;
 import com.ecommerce.shopme.service.OrderService;
@@ -85,7 +87,8 @@ public class ProductController {
     @Autowired 
     Cloudinary cloudinary;
  
-
+    @Autowired 
+    DiscountRepository discountRepository;
     @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products")
     public ResponseEntity<?> getAllProduct(@RequestParam(defaultValue = "0") int pageNum,
@@ -114,6 +117,7 @@ public class ProductController {
                 productDetail.setSlug(product.getSlug());
                 productDetail.setDelete(product.isDelete());
                 productDetail.setCategory(product.getCategory());
+                productDetail.setDiscount(product.getDiscount());
                 List<Size> sizes = new ArrayList<>();
                 for (Size size : product.getSizes()) {
                     sizes.add(size);
@@ -162,7 +166,7 @@ public class ProductController {
             productDetail.setDelete(productExist.isDelete());
             productDetail.setSlug(productExist.getSlug());
             productDetail.setCategory(productExist.getCategory());
-
+             productDetail.setDiscount(productExist.getDiscount());
               List<String> pathImgs = new ArrayList<>();
                       for (Image imageUrls : productExist.getImages()) {
                         pathImgs.add(imageUrls.getImageUrl());
@@ -184,7 +188,7 @@ public class ProductController {
             response.put("status", "success");
                 return ResponseEntity.ok(response);
     }
-        @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+    @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products/slug/{slug}")
     public ResponseEntity<?> getProductSlugName(@PathVariable("slug")  String slugName){
         Product productExist = productService.getProductBySlug(slugName);
@@ -250,14 +254,23 @@ public class ProductController {
             product.setDelete(false);
             product.setSlug(SlugUtils.createSlug(productRequest.getName()));
             product.setCreatedAt(new Date());
-             // Gán danh sách danh mục cho sản phẩm
+
+            Discount  discount = new Discount();
+            float priceDiscount = productRequest.getPriceDiscount();
+            discount.setDiscountPrice(priceDiscount);
+            discount.setOriginalPrice(product.getPrice());
+            discount.setProductName(product.getName());
               product.setCategory(category);
+
               Product createdProduct = productService.saveProduct(product);
-                        //save img file
-                         List<String> imgUrls = productService.saveImagesToCloudinary(productRequest.getImages());
-                            for (String imgUrl : imgUrls) {
-                                productService.addImageToProduct(createdProduct.getId(), imgUrl);
-                            }
+              discount.setProduct(createdProduct);
+              discountRepository.save(discount);
+            
+            //save img file
+            List<String> imgUrls = productService.saveImagesToCloudinary(productRequest.getImages());
+             for (String imgUrl : imgUrls) {
+             productService.addImageToProduct(createdProduct.getId(), imgUrl);
+             }
   
                           //them mau cho san pham
                            List<String> colorNames = productRequest.getColors();

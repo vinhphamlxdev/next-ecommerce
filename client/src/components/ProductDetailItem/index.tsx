@@ -14,6 +14,11 @@ import "tippy.js/dist/tippy.css";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import { CartContextProvider, useCartContext } from "@/context/useCartContext";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import NextArrow from "../NextArrow";
+import PrevArrow from "../PreArrow";
 export interface IProductDetailProps {
   item: IProduct;
   className?: string;
@@ -33,8 +38,8 @@ export default function ProductDetail({
     category,
     colors,
   } = item;
+
   const [imgPreview, setImgPreview] = React.useState<string>(imageUrls[0]);
-  const handlePreviewProduct = (url: string) => setImgPreview(url);
   const [quantity, setQuantity] = React.useState<number>(1);
   const { dispatch, state } = useCartContext();
   const { setCloseModalQuickView } = useModalStore((state) => state);
@@ -44,6 +49,54 @@ export default function ProductDetail({
   const [selectedColor, setSelectedColor] = React.useState<string>(
     colors[0]?.colorName
   );
+  const [currentSlide, setCurrentSlide] = React.useState<number>(0);
+
+  let slickProperty = {
+    dots: false,
+    infinite: false,
+    speed: 500,
+    arrows: true,
+    autoplay: false,
+    autoplaySpeed: 1500,
+    slidesToShow: 4,
+    slidesToScroll: 1,
+    nextArrow: <NextArrow />,
+    prevArrow: <PrevArrow />,
+
+    responsive: [
+      {
+        breakpoint: 0,
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+        },
+      },
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 4,
+        },
+      },
+
+      {
+        breakpoint: 1200,
+        settings: {
+          slidesToShow: 4,
+        },
+      },
+      {
+        breakpoint: 2000,
+        settings: {
+          slidesToShow: 4,
+        },
+      },
+    ],
+  };
   const handleInc = () => {
     setQuantity(quantity + 1);
   };
@@ -70,47 +123,61 @@ export default function ProductDetail({
     const { value } = event.target;
     setSelectedColor(value);
   };
+  const handlePreviewProduct = (url: string) => setImgPreview(url);
+  // const imageList = document.querySelectorAll<HTMLDivElement>(".slick-slide");
+  // const handlePreviewProduct = (event: MouseEvent) => {
+  //   const parentDiv = event.currentTarget as HTMLDivElement;
+  //   const imgElm = parentDiv.querySelector(".img-elm");
+  //   if (imgElm) {
+  //     const imgUrl = imgElm.getAttribute("src") as string;
+  //     setImgPreview(imgUrl);
+  //   }
+  // };
+  // imageList.forEach((element) => {
+  //   element.addEventListener("click", handlePreviewProduct);
+  // });
+
   return (
     <StyledProductDetailItem className="flex  gap-x-5">
       <div className="flex w-[420px] p-3 flex-col gap-y-5">
         <div className="product-detail-image h-[380px] border border-[#ebebeb]">
           {imageUrls && imageUrls ? (
-            <img className="rounded-md object-cover" src={imgPreview} alt="" />
+            <img className="rounded-md  object-cover" src={imgPreview} alt="" />
           ) : (
             <></>
           )}
         </div>
-        <div className="grid grid-cols-3 gap-x-7">
-          {imageUrls &&
-            imageUrls.length > 0 &&
-            imageUrls
-              .filter((item, index) => index < 3)
-              .map((image, index) => {
+        <div className="w-full gap-x-7">
+          <Slider {...slickProperty}>
+            {imageUrls &&
+              imageUrls.length > 0 &&
+              imageUrls.map((imgUrl, index) => {
                 return (
                   <div
-                    onClick={() => handlePreviewProduct(image)}
+                    onClick={() => handlePreviewProduct(imgUrl)}
                     key={index}
-                    className={`relative image-preview border cursor-pointer border-gray-400 ${
-                      image === imgPreview ? "active" : ""
+                    className={`relative px-1 py-2 image-preview border cursor-pointer border-[#ebebeb] ${
+                      imgUrl === imgPreview ? "active" : ""
                     }`}
                   >
-                    <img src={image} alt="" />
+                    <img className="img-elm" src={imgUrl} alt="" />
                   </div>
                 );
               })}
+          </Slider>
         </div>
       </div>
       <div className="flex flex-1 flex-col gap-y-4 p-3">
-        <h3 className="text-xl product-detail__name pr-9 font-semibold">
+        <h3 className="text-3xl uppercase  product-detail__name pr-9 font-semibold">
           {item.name}
         </h3>
         <div className="flex gap-x-3">
-          <span className="text-lg product-detail__price  text-gray-600 font-semibold">
+          <span className="text-3xl product-detail__price  text-gray-600 font-semibold">
             {formatVnd(item.price.toString())}₫
           </span>
         </div>
         <div className="flex flex-col gap-y-3">
-          <span className="text-lg font-medium">Màu Sắc:</span>
+          <span className="text-base text-[#707070] font-medium">Màu Sắc:</span>
           <div className="flex items-center gap-x-2">
             {colors?.length > 0 &&
               colors.map((color) => {

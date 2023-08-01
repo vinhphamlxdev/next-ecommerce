@@ -21,8 +21,8 @@ export default function AddProduct() {
   const [select, setSelect] = useState<any>();
   const [imgs, setImgs] = useState<any>([]);
   const [files, setFile] = useState<File[]>([]);
-  const [sizes, setSizes] = useState<ISize[] | any>([]);
-  const [colors, setColors] = useState<IColor[] | any>([]);
+  const [sizes, setSizes] = useState<ISize[]>([]);
+  const [colors, setColors] = useState<IColor[]>([]);
   const router = useRouter();
   const { data, isLoading, error, isSuccess, mutate } = useMutation({
     mutationFn: (formData: FormData) => createProduct(formData),
@@ -45,6 +45,7 @@ export default function AddProduct() {
       name: "",
       description: "",
       price: "",
+      priceDiscount: "",
       quantity: "",
     },
     validationSchema: Yup.object({
@@ -58,6 +59,18 @@ export default function AddProduct() {
       price: Yup.number()
         .min(0, "Giá tối thiểu phải là 0đ")
         .required("Giá sản phẩm là bắt buộc")
+        .typeError("Giá sản phẩm phải là số"),
+      priceDiscount: Yup.number()
+        .test(
+          "is-less-than-price",
+          "Giá giảm phải thấp hơn giá gốc!",
+          function (value) {
+            const { price } = this.parent; // Lấy giá trị của trường 'price' trong đối tượng cha
+            return value === undefined || value < price; // Kiểm tra giá trị giảm có nhỏ hơn giá gốc hay không
+          }
+        )
+        .min(0, "Giá giảm tối thiểu phải là 0đ")
+        .required("Giá giảm sản phẩm là bắt buộc")
         .typeError("Giá sản phẩm phải là số"),
       quantity: Yup.number()
         .min(1, "Số lượng phải lớn hơn 0")
@@ -84,11 +97,14 @@ export default function AddProduct() {
         toast.error("Vui lòng chọn ảnh sản phẩm");
         return;
       }
-      const { name, price, description, quantity } = values;
+      const { name, price, description, quantity, priceDiscount } = values;
+
+      console.log(values);
       const newFormData = new FormData();
       newFormData.append("name", name);
       newFormData.append("shortDescription", description);
       newFormData.append("price", price);
+      newFormData.append("priceDiscount", priceDiscount);
       newFormData.append("quantity", quantity);
       newFormData.append("category", select?.id);
       const sizeNames = sizes.map((size: ISize) => size.name);
@@ -143,6 +159,14 @@ export default function AddProduct() {
             label="Giá sản phẩm"
             placeholder="Vui lòng điền giá sản phẩm"
             error={productFormik.errors.price}
+          />
+          <Input
+            id="priceDiscount"
+            data={productFormik.values.priceDiscount}
+            setData={productFormik.handleChange}
+            label="Giá giảm"
+            placeholder="Vui lòng điền giá giảm, không bắt buộc"
+            error={productFormik.errors.priceDiscount}
           />
           <Input
             id="quantity"

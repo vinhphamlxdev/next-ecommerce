@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.shopme.entity.Category;
+import com.ecommerce.shopme.entity.Discount;
 import com.ecommerce.shopme.entity.Image;
 
 import jakarta.persistence.Column;
@@ -42,7 +43,7 @@ public class ProductDTO {
 
      private List<String> colors;
      private Category category;
-
+    private float priceDiscount;
 
      
 }

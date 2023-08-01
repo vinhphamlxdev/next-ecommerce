@@ -201,6 +201,9 @@ public void addColorToProduct(Integer productId,String colorName){
          }
      }
 }
+public void addDiscountToProduct(Integer productId, float priceDiscount){
+    
+}
 // //Khi đã tìm thấy hình ảnh có URL trùng khớp với URL cần xóa,
 // // chúng ta không cần duyệt qua các hình ảnh còn lại trong danh sách images. 
 // //Việc tiếp tục duyệt qua các hình ảnh không cần thiết sẽ tăng độ phức tạp của thuật toán và làm mất thời gian thực hiện.

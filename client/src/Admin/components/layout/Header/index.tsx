@@ -70,7 +70,7 @@ export default function Header() {
               </div>
             )}
             <Link
-              href="/"
+              href="/home"
               className="py-2 hover:bg-gray-200 cursor-pointer flex items-center gap-x-3 px-3"
             >
               <MdOutlineAdminPanelSettings className="leading-[0px] text-xl"></MdOutlineAdminPanelSettings>
