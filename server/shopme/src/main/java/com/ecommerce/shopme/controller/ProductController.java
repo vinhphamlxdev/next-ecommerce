@@ -205,7 +205,7 @@ public class ProductController {
             productDetail.setDelete(productExist.isDelete());
             productDetail.setSlug(productExist.getSlug());
             productDetail.setCategory(productExist.getCategory());
-
+             productDetail.setDiscount(productExist.getDiscount());
               List<String> pathImgs = new ArrayList<>();
                       for (Image imageUrls : productExist.getImages()) {
                         pathImgs.add(imageUrls.getImageUrl());
@@ -254,12 +254,12 @@ public class ProductController {
             product.setDelete(false);
             product.setSlug(SlugUtils.createSlug(productRequest.getName()));
             product.setCreatedAt(new Date());
-
             Discount  discount = new Discount();
-            float priceDiscount = productRequest.getPriceDiscount();
+            float priceDiscount = productRequest.getDiscountPrice();
             discount.setDiscountPrice(priceDiscount);
             discount.setOriginalPrice(product.getPrice());
             discount.setProductName(product.getName());
+            discount.setDiscountPercent(product.getPrice(), priceDiscount);
               product.setCategory(category);
 
               Product createdProduct = productService.saveProduct(product);
@@ -296,7 +296,6 @@ public class ProductController {
       @RequestParam("sizesDelete") Set<Integer> sizesDelete,
       @RequestParam("colorsDelete") Set<Integer> colorDelete
      ) throws IOException{
-        System.out.println("id size can xoa: "+sizesDelete);
             // Kiểm tra sản phẩm có tồn tại hay không
         Product existingProduct = productService.getProductById(productId);
         if (existingProduct == null) {
@@ -317,6 +316,14 @@ public class ProductController {
             existingProduct.setQuantity(productRequest.getQuantity());
             existingProduct.setSlug(SlugUtils.createSlug(productRequest.getName()));
             existingProduct.setUpdatedAt(new Date());
+            Discount existdiscount = discountRepository.findByProductId(productId);
+            if (existdiscount!= null) {
+                existdiscount.setDiscountPrice(productRequest.getDiscountPrice());
+                existdiscount.setProductName(productRequest.getName());
+                existdiscount.setOriginalPrice(productRequest.getPrice());
+                existdiscount.setDiscountPercent(existingProduct.getPrice(), productRequest.getDiscountPrice());
+                discountRepository.save(existdiscount);
+            }
               // Cập nhật  danh mục cho sản phẩm
               existingProduct.setCategory(category);
       List<MultipartFile> images = productRequest.getImages();

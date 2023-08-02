@@ -43,7 +43,7 @@ public class ProductDTO {
 
      private List<String> colors;
      private Category category;
-    private float priceDiscount;
+    private float discountPrice;
 
      
 }

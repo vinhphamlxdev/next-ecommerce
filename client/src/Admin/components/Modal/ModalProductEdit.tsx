@@ -16,7 +16,7 @@ import ChooseSize from "../ChooseSize";
 import ChooseColor from "../ChooseColor";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { getProduct, updateProduct } from "@/pages/api/ProductApi";
-
+import invalidPrice from "@/utils/invalidPrice";
 export interface IModalProductEditProps {
   productId: number;
   isOpenEditP: boolean;
@@ -66,7 +66,6 @@ export default function ModalProductEdit({
       setFile([]);
       setImgsDelete([]);
       setOpenEditProduct(false);
-
       toast.success("Cập nhật sản phẩm thành công");
     },
     onError: () => {
@@ -88,6 +87,7 @@ export default function ModalProductEdit({
       shortDescription: data?.shortDescription,
       price: data?.price,
       quantity: data?.quantity,
+      discountPrice: data?.discount?.discountPrice,
     },
     onSubmit: async (values: any) => {
       // Handle form submission
@@ -96,18 +96,27 @@ export default function ModalProductEdit({
   });
 
   const handleSubmitEditProduct = async (id: number) => {
-    const { name, price, shortDescription, quantity } =
+    const { name, price, shortDescription, quantity, discountPrice } =
       productEditFormik.values;
 
     if (!selectCategory || selectCategory.length === 0) {
       toast.error("Vui lòng chọn danh mục sản phẩm");
       return;
     }
-    if (price < 0) {
+    if (!invalidPrice(price)) {
       toast.error("Giá không hợp lệ");
       return;
     }
-    if (quantity < 0) {
+    if (!invalidPrice(discountPrice)) {
+      toast.error("Giá giảm không hợp lệ");
+      return;
+    }
+    if (discountPrice > price) {
+      toast.error("Giá giảm phải nhỏ  hơn giá gốc");
+      return;
+    }
+
+    if (!invalidPrice(quantity)) {
       toast.error("Số lượng không hợp lệ");
       return;
     }
@@ -138,6 +147,7 @@ export default function ModalProductEdit({
     newFormData.append("name", name);
     newFormData.append("shortDescription", shortDescription);
     newFormData.append("price", price);
+    newFormData.append("discountPrice", discountPrice);
     newFormData.append("quantity", quantity);
     newFormData.append("category", selectCategory?.id);
     for (let index = 0; index < files.length; index++) {
@@ -205,7 +215,7 @@ export default function ModalProductEdit({
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-x-3">
+          <div className="grid grid-cols-2 gap-y-3 gap-x-3">
             <InputModal
               disabled={false}
               change={true}
@@ -219,8 +229,16 @@ export default function ModalProductEdit({
               change={true}
               id="price"
               setData={productEditFormik.handleChange}
-              title="Giá"
+              title="Giá gốc"
               value={productEditFormik.values.price ?? ""}
+            />
+            <InputModal
+              disabled={false}
+              change={true}
+              id="discountPrice"
+              setData={productEditFormik.handleChange}
+              title="Giá giảm"
+              value={productEditFormik.values.discountPrice ?? ""}
             />
             <InputModal
               disabled={false}
@@ -236,8 +254,8 @@ export default function ModalProductEdit({
             <textarea
               defaultValue={productEditFormik.values.shortDescription ?? ""}
               className="bg-[#edede9] capitalize font-normal outline-none py-4 px-3 text-base text-gray-600 w-full resize-y"
-              name="description"
-              id="description"
+              name="shortDescription"
+              id="shortDescription"
               onChange={productEditFormik.handleChange}
             ></textarea>
           </div>

@@ -102,7 +102,7 @@ export default function ModalProductDetail({
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-x-3">
+          <div className="grid grid-cols-2 gap-y-3 gap-x-3">
             <InputModal
               disabled={true}
               title="Tên sản phẩm"
@@ -112,8 +112,14 @@ export default function ModalProductDetail({
             <InputModal
               disabled={true}
               id="price"
-              title="Giá"
+              title="Giá gốc"
               value={data?.price.toString()}
+            />
+            <InputModal
+              disabled={true}
+              id="price"
+              title="Giá giảm"
+              value={data?.discount?.discountPrice?.toString()}
             />
             <InputModal
               disabled={true}

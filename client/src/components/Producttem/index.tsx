@@ -25,6 +25,7 @@ export default function ProductItem({ item }: IProductItemProps) {
     price,
     id,
     slug,
+    discount,
   } = item;
   const { showModalQuickView, setShowModalQuickView, seletedProduct } =
     useModalStore((state) => state);
@@ -36,6 +37,11 @@ export default function ProductItem({ item }: IProductItemProps) {
     <StyledProductItem className={`product-item fex flex-col relative`}>
       <div className="relative product-thumbnail">
         <div className="relative flex justify-center flex-shrink-0 overflow-hidden cursor-pointer product-image">
+          {discount?.discountPercent !== "0%" && (
+            <div className="absolute top-0 right-0 bg-bgPrimary px-3 py-1 z-50 text-white text-base font-normal">
+              {discount?.discountPercent}
+            </div>
+          )}
           <div className="center-block product-action hidden  transition-all duration-500 justify-center w-full  z-50 gap-x-2">
             <Link
               href={`/products/${slug}`}
@@ -76,10 +82,21 @@ export default function ProductItem({ item }: IProductItemProps) {
           >
             {name}
           </Link>
-          <div className="flex w-full product-item-price gap-x-3">
-            <span className="text-lg font-semibold text-[#363636]">
-              {formatVnd(price.toString())}₫
-            </span>
+          <div className="flex w-full items-center product-item-price gap-x-3">
+            {discount?.discountPercent !== "0%" ? (
+              <div className="flex items-center gap-x-3">
+                <span className="text-lg font-semibold text-[#363636]">
+                  {formatVnd(discount?.discountPrice.toString())}₫
+                </span>
+                <span className="line-through text-[#acacac] text-sm font-normal">
+                  {formatVnd(discount.originalPrice.toString())}₫
+                </span>
+              </div>
+            ) : (
+              <span className="text-lg font-semibold text-[#363636]">
+                {formatVnd(price.toString())}₫
+              </span>
+            )}
           </div>
         </div>
       </div>

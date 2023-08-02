@@ -80,6 +80,7 @@ public void placeOrder(OrderDTO orderRequest){
       product.get().setQuantity(updateQuantity);
       orderDetail.setAmount(itemRequest.getQuantity());
      orderDetail.setPrice(product.get().getPrice());
+     
       orderDetail.setTotalPrice(itemRequest.getQuantity()*product.get().getPrice());
       orderDetail.setOrder(newOrder);
       orderDetailRepository.save(orderDetail);

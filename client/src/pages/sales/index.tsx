@@ -21,7 +21,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
   ssr: false,
 });
-export default function ProductClient() {
+export default function ProductSale() {
   const initialPagination: PaginationState = {
     current: 1,
     totalPages: 3,
@@ -73,7 +73,7 @@ export default function ProductClient() {
 
   return (
     <LayoutClient>
-      <Breadcrumb titlePage="Tất cả sản phẩm"></Breadcrumb>
+      <Breadcrumb titlePage="CLEARANCE SALE"></Breadcrumb>
       <StyledProducts className="py-10">
         <div className="wrapper-layout">
           <div className="flex gap-x-10 relative">
@@ -127,9 +127,14 @@ export default function ProductClient() {
               ) : (
                 <div className="grid gap-y-5 grid-cols-3 gap-x-7">
                   {data?.products?.length > 0 &&
-                    data?.products?.map((product: IProduct, index: number) => {
-                      return <ProductItem key={product.id} item={product} />;
-                    })}
+                    data?.products
+                      ?.filter(
+                        (product: IProduct) =>
+                          product.discount?.discountPrice > 0
+                      )
+                      .map((product: IProduct, index: number) => {
+                        return <ProductItem key={product.id} item={product} />;
+                      })}
                 </div>
               )}
               {isLoading && (
@@ -155,8 +160,8 @@ export default function ProductClient() {
 const StyledProducts = styled.div`
   .search-section {
     padding: 20px;
-    /* -webkit-box-shadow: 0 2px 22px rgb(0 0 0 / 10%);
-    box-shadow: 0 2px 22px rgb(0 0 0 / 10%); */
+    -webkit-box-shadow: 0 2px 22px rgb(0 0 0 / 10%);
+    box-shadow: 0 2px 22px rgb(0 0 0 / 10%);
   }
   .css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
     color: #fff;

@@ -31,6 +31,11 @@ const navLinks = [
   },
   {
     id: 3,
+    href: "/sales",
+    name: "CLEARANCE SALE",
+  },
+  {
+    id: 4,
     href: "/contact",
     name: "Contact",
   },

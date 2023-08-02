@@ -27,6 +27,7 @@ export interface IProduct {
   colors: IColor[];
   sizes: ISize[];
   imageUrls: string[];
+  discount: IDicount;
 }
 export interface ISize {
   id: number;
@@ -72,4 +73,11 @@ export interface IFilters {
 export interface IProductFilters {
   pageNum: number;
   itemsPerPage: number;
+}
+export interface IDicount {
+  id: number;
+  productName: string;
+  originalPrice: number;
+  discountPrice: number;
+  discountPercent: string;
 }

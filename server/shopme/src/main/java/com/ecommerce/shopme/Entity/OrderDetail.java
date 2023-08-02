@@ -10,7 +10,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "order_details")
@@ -39,5 +38,69 @@ public class OrderDetail {
   @ManyToOne
   @JoinColumn(name = "size_id")
   private Size size;
+
+public Integer getId() {
+    return id;
+}
+
+public void setId(Integer id) {
+    this.id = id;
+}
+
+public Integer getAmount() {
+    return amount;
+}
+
+public void setAmount(Integer amount) {
+    this.amount = amount;
+}
+
+public float getPrice() {
+    return price;
+}
+
+public void setPrice(float price) {
+    this.price = price;
+}
+
+public float getTotalPrice() {
+    return totalPrice;
+}
+
+public void setTotalPrice(float totalPrice) {
+    this.totalPrice = totalPrice;
+}
+
+public Product getProduct() {
+    return product;
+}
+
+public void setProduct(Product product) {
+    this.product = product;
+}
+
+public Order getOrder() {
+    return order;
+}
+
+public void setOrder(Order order) {
+    this.order = order;
+}
+
+public Color getColor() {
+    return color;
+}
+
+public void setColor(Color color) {
+    this.color = color;
+}
+
+public Size getSize() {
+    return size;
+}
+
+public void setSize(Size size) {
+    this.size = size;
+}
 
 }

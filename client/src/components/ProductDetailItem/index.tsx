@@ -37,6 +37,7 @@ export default function ProductDetail({
     price,
     category,
     colors,
+    discount,
   } = item;
 
   const [imgPreview, setImgPreview] = React.useState<string>(imageUrls[0]);
@@ -172,9 +173,20 @@ export default function ProductDetail({
           {item.name}
         </h3>
         <div className="flex gap-x-3">
-          <span className="text-3xl product-detail__price  text-gray-600 font-semibold">
-            {formatVnd(item.price.toString())}₫
-          </span>
+          {discount?.discountPrice > 0 ? (
+            <div className="flex gap-x-3 items-center">
+              <span className="text-3xl product-detail__price  text-gray-600 font-semibold">
+                {formatVnd(discount?.discountPrice.toString())}₫
+              </span>
+              <span className="line-through text-xl  font-normal text-[#acacac]">
+                {formatVnd(discount?.originalPrice.toString())}₫
+              </span>
+            </div>
+          ) : (
+            <span className="text-3xl product-detail__price  text-gray-600 font-semibold">
+              {formatVnd(item.price.toString())}₫
+            </span>
+          )}
         </div>
         <div className="flex flex-col gap-y-3">
           <span className="text-base text-[#707070] font-medium">Màu Sắc:</span>
