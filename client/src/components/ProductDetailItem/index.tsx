@@ -120,24 +120,11 @@ export default function ProductDetail({
     const { value } = event.target;
     setSelectedSize(value);
   };
-  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChooseColor = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setSelectedColor(value);
   };
   const handlePreviewProduct = (url: string) => setImgPreview(url);
-  // const imageList = document.querySelectorAll<HTMLDivElement>(".slick-slide");
-  // const handlePreviewProduct = (event: MouseEvent) => {
-  //   const parentDiv = event.currentTarget as HTMLDivElement;
-  //   const imgElm = parentDiv.querySelector(".img-elm");
-  //   if (imgElm) {
-  //     const imgUrl = imgElm.getAttribute("src") as string;
-  //     setImgPreview(imgUrl);
-  //   }
-  // };
-  // imageList.forEach((element) => {
-  //   element.addEventListener("click", handlePreviewProduct);
-  // });
-
   return (
     <StyledProductDetailItem className="flex  gap-x-5">
       <div className="flex w-[420px] p-3 flex-col gap-y-5">
@@ -203,11 +190,11 @@ export default function ProductDetail({
                   >
                     <input
                       className="hidden"
-                      id={`swatch-${color.colorName}`}
+                      id={`swatch-detail-${color.colorName}`}
                       type="radio"
-                      name="color-option"
+                      name="color-option-detail"
                       value={color.colorName}
-                      onChange={handleColorChange}
+                      onChange={handleChooseColor}
                       checked={selectedColor === color.colorName}
                     />
                     <Tippy content={`${color.colorName}`}>
@@ -215,7 +202,7 @@ export default function ProductDetail({
                         className={`color-label cursor-pointer flex justify-center items-center w-7 h-7 rounded-full  select-none  border 
                         ${getColorClassName(color.colorName)}
                         `}
-                        htmlFor={`swatch-${color.colorName}`}
+                        htmlFor={`swatch-detail-${color.colorName}`}
                       ></label>
                     </Tippy>
                   </div>

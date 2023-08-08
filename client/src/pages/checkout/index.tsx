@@ -49,7 +49,7 @@ function Checkout() {
   const { mutate, isLoading } = useMutation({
     mutationFn: (data: any) => createOrder(data),
     onSuccess: (data) => {
-      console.log("response:", data);
+      // console.log("response:", data);
       checkoutFormik.resetForm();
       toast.success("Đặt hàng thành công");
       dispatch({ type: "DELETEALL_CART", payload: [] });
@@ -276,7 +276,7 @@ function Checkout() {
             <div className="order-information flex flex-col gap-y-4 border border-b-0 border-gray-300 p-3 bg-[#fafafa]">
               <div className="order-list py-3 pr-3  flex flex-col gap-y-4 h-[250px] has-scrollbar">
                 {cartItems.length > 0 &&
-                  cartItems.map((product, index) => {
+                  cartItems.map((product: IProduct, index) => {
                     const {
                       colors,
                       id,
@@ -285,6 +285,7 @@ function Checkout() {
                       price,
                       quantity,
                       sizes,
+                      discount,
                     } = product;
                     return (
                       <div
@@ -314,9 +315,21 @@ function Checkout() {
                             </div>
                             <p className="text-xs font-light text-textColor"></p>
                           </div>
-                          <span className="text-sm font-light text-textPrimary">
-                            {formatVnd((price * quantity).toString())}₫
-                          </span>
+                          {discount?.discountPrice > 0 ? (
+                            <span className="text-sm font-light text-textPrimary">
+                              {formatVnd(
+                                (discount?.discountPrice * quantity).toString()
+                              )}
+                              ₫
+                            </span>
+                          ) : (
+                            <span className="text-sm font-light text-textPrimary">
+                              {formatVnd(
+                                (discount?.originalPrice * quantity).toString()
+                              )}
+                              ₫
+                            </span>
+                          )}
                         </div>
                       </div>
                     );
@@ -330,11 +343,7 @@ function Checkout() {
                 <div className="flex items-center gap-x-3">
                   <span className="text-sm font-light text-gray-400">VND</span>
                   <span className="text-xl font-medium text-secondary">
-                    {formatVnd(
-                      (
-                        calculateTotalPrice(cartItems) + priceShipping
-                      ).toString()
-                    )}
+                    {formatVnd(calculateTotalPrice(cartItems).toString())}
                   </span>
                 </div>
               </div>

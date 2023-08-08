@@ -22,20 +22,14 @@ export default function HomeClient() {
 
   const initialFilters: FiltersState = {
     pageNum: 0,
-    itemsPerPage: 3,
+    itemsPerPage: 8,
   };
   const { filters, handlePageChange, pagination, setFilters, setPagination } =
     usePaginationAndFilters(initialPagination, initialFilters);
   const { isError, data, error, refetch, isLoading } = useQuery({
     queryKey: ["products", filters],
     queryFn: () => getAllProduct(filters),
-    onSuccess: (data) => {
-      const { page } = data;
-      setPagination({
-        current: page?.current,
-        totalPages: page?.totalPages,
-      });
-    },
+    onSuccess: (data) => {},
     onError: (err) => {
       console.log(err);
     },
@@ -44,7 +38,7 @@ export default function HomeClient() {
     <LayoutClient>
       {/* <Slider /> */}
       <div className="wrapper-layout">
-        <BestSeller data={data?.products} />
+        <BestSeller isLoading={isLoading} data={data?.products} />
       </div>
     </LayoutClient>
   );

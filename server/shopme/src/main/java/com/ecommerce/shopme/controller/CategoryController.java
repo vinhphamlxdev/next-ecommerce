@@ -37,10 +37,11 @@ public class CategoryController {
     @Autowired 
     ProductSevice productSevice;
 
-               @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+        // @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
         @GetMapping("/categorys")
         public ResponseEntity<?> getAllCategory( @RequestParam(defaultValue = "0") int pageNum,
-        @RequestParam(defaultValue = "3") int itemsPerPage){
+        @RequestParam(defaultValue = "3") int itemsPerPage
+       ){
             Page<Category> page = categoryService.listByPageCategory(pageNum,itemsPerPage);
             List<Category> listCategorys = page.getContent();
              Map<String,Object> response = new HashMap<>();
@@ -55,7 +56,7 @@ public class CategoryController {
                       return ResponseEntity.ok(response);
         
         }
-        @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+        // @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
         @GetMapping("/categorys/{id}")
         public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id) {
             Category categoryExist = categoryService.getCategoryById(id);
@@ -109,16 +110,8 @@ public class CategoryController {
         if (existingCategory==null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy danh mục");
         }
-        //lấy danh sách sản phẩm liên quan đến danh mục
-        List<Product> products = productSevice.getProductByCategoryId(id);
-        for (Product product : products) {
-            productSevice.deleteProductById(product.getId());
-            
-        }
-            // Xóa danh muc
             categoryService.deleteCategory(id);
             return ResponseEntity.ok("Đã xóa danh mục thành công");
-
  }
 
 }

@@ -18,5 +18,6 @@ public class CategoryDTO {
     private String name;
     @NotBlank(message = "Mô tả danh mục không được để trống")
     private String description;
+    private boolean isDelete;
 
 }

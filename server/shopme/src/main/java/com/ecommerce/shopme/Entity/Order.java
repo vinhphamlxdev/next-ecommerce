@@ -26,6 +26,8 @@ public class Order {
     private String email;
     @Column(name = "phone_number", length = 11, nullable = false)
     private String phoneNumber;
+
+
     private String status;
     
     @Temporal(TemporalType.TIMESTAMP)

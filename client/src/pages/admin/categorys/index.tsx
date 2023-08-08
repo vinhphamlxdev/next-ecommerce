@@ -34,7 +34,7 @@ export default function Category() {
     queryKey: ["categorys", filters],
     queryFn: () => getAllCategory(filters),
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
       const { page } = data;
       setPagination({
         current: page?.current,

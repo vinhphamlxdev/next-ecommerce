@@ -30,7 +30,6 @@ export default function ProductItem({ item }: IProductItemProps) {
   const { showModalQuickView, setShowModalQuickView, seletedProduct } =
     useModalStore((state) => state);
   const handleShowModalQuickView = (product: IProduct) => {
-    console.log(seletedProduct);
     setShowModalQuickView(product);
   };
   return (

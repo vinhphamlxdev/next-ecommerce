@@ -50,4 +50,9 @@ public class UserService   {
 public boolean isPasswordCorrect(Optional<User> existUser,String rawPassword){
   return passwordEncoder.matches(rawPassword, existUser.get().getPassword());
 }
+
+public long getTotalUser(){
+    return userRepository.countTotalUser();
+}
+
 }

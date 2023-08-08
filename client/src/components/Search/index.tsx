@@ -17,7 +17,7 @@ export default function Search({ setSearchResult }: ISearchProps) {
   const { data, isLoading, mutate } = useMutation({
     mutationFn: (keyword: string) => getProductByKeyword(keyword),
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
       queryClient.setQueryData(["search", search], data.products);
       setSearchResult(data?.products);
     },
@@ -39,7 +39,6 @@ export default function Search({ setSearchResult }: ISearchProps) {
     const cachedSearchResults = queryClient.getQueryData<IProduct[]>([
       "search",
     ]);
-    console.log(cachedSearchResults);
     setSearchResult(cachedSearchResults || []);
   }, [queryClient]);
 

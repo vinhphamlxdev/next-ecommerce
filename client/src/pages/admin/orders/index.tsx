@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import LayoutAdmin from "@/Admin/components/layout";
 import { IMG_SRC } from "@/common/constanst";
@@ -13,9 +14,14 @@ import usePaginationAndFilters, {
   FiltersState,
   PaginationState,
 } from "@/hooks/usePaginationAndFilters";
+import { useSearchParams } from "next/navigation";
 import { getAllOrder } from "@/pages/api/OrderApi";
+import { useRouter } from "next/router";
+import { stringify } from "querystring";
 
 export default function AllOrder() {
+  const router = useRouter();
+  const { query } = router;
   const initialPagination: PaginationState = {
     current: 1,
     totalPages: 3,
@@ -23,14 +29,21 @@ export default function AllOrder() {
   const initialFilters: FiltersState = {
     pageNum: 0,
     itemsPerPage: 3,
+    status: "",
   };
-  const { filters, handlePageChange, pagination, setFilters, setPagination } =
-    usePaginationAndFilters(initialPagination, initialFilters);
+  const {
+    filters,
+    handlePageChange,
+    pagination,
+    setFilters,
+    setPagination,
+    handleChangeStatusOrder,
+  } = usePaginationAndFilters(initialPagination, initialFilters);
   const { isLoading, error, data } = useQuery({
     queryKey: ["orders", filters],
     queryFn: () => getAllOrder(filters),
     onSuccess: (data) => {
-      console.log("Orders data:", data);
+      // console.log("Orders data:", data);
       const { page } = data;
       setPagination({
         current: page?.current,
@@ -51,13 +64,16 @@ export default function AllOrder() {
               Danh Sách Đơn Hàng
             </span>
             <select
-              className="p-1 bg-white w-28 outline-none rounded-sm"
+              onChange={handleChangeStatusOrder}
+              className="p-1 bg-white w-40 outline-none rounded-sm"
               name=""
               id=""
             >
-              <option value="1">All</option>
-              <option value="2">Đã Giao</option>
-              <option value="3">Đang xử lý</option>
+              <option value="">Tất cả</option>
+              <option value="PENDING">Đang xử lý</option>
+              <option value="DELIVERING">Đang vận chuyển</option>
+              <option value="CANCELED">Đã hủy</option>
+              <option value="COMPLETED">Đã giao thành công</option>
             </select>
           </div>
           <table className="items-center border-spacing-y-2 text-white w-full bg-transparent border-separate ">

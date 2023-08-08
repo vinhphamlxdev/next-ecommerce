@@ -14,8 +14,16 @@ export interface IRole {
 export interface ILoginResponse {
   status: string;
   access_token: string;
+  user: IUser;
 }
 export interface IFormLogin {
   email: string;
   password: string;
+}
+export interface IDecodeToken {
+  exp: number;
+  iat: number;
+  iss: string;
+  roles: string;
+  sub: string;
 }

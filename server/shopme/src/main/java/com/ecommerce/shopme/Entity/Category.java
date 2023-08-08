@@ -42,6 +42,9 @@ public class Category {
     private String slug;
     @NotBlank(message = "Mô tả danh mục không được để trống")
     private String description;
+
+     @Column(name = "is_delete")
+    private boolean isDelete;
     //cascade = CascadeType.ALL: để đảm bảo rằng khi một bản ghi category bị xóa, tất cả các sản phẩm liên quan sẽ được xóa theo
     //orphanRemoval = true: để đảm bảo rằng khi một sản phẩm không còn được liên kết với bất kỳ danh mục nào, nó sẽ được xóa khỏi cơ sở dữ liệu
     //mappedBy trường được chỉ định là trọng tâm của quan hệ

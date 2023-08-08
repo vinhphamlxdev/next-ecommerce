@@ -81,3 +81,14 @@ export interface IDicount {
   discountPrice: number;
   discountPercent: string;
 }
+export interface IResponseDashboard {
+  dashboard: IDashboard;
+  status: string;
+}
+
+export interface IDashboard {
+  orderPending: number;
+  orderDelivery: number;
+  totalRenenue: number;
+  totalUser: number;
+}

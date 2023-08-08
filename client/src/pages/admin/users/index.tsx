@@ -31,7 +31,7 @@ export default function User() {
     queryKey: ["users", filters],
     queryFn: () => getAllUser(filters),
     onSuccess: (data) => {
-      console.log("User data:", data);
+      // console.log("User data:", data);
       const { page } = data;
       setPagination({
         current: page?.current,

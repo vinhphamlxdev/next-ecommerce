@@ -45,7 +45,7 @@ export default function AddProduct() {
       name: "",
       description: "",
       price: "",
-      priceDiscount: "",
+      discountPrice: "",
       quantity: "",
     },
     validationSchema: Yup.object({
@@ -60,7 +60,7 @@ export default function AddProduct() {
         .min(0, "Giá tối thiểu phải là 0đ")
         .required("Giá sản phẩm là bắt buộc")
         .typeError("Giá sản phẩm phải là số"),
-      priceDiscount: Yup.number()
+      discountPrice: Yup.number()
         .test(
           "is-less-than-price",
           "Giá giảm phải thấp hơn giá gốc!",
@@ -97,14 +97,12 @@ export default function AddProduct() {
         toast.error("Vui lòng chọn ảnh sản phẩm");
         return;
       }
-      const { name, price, description, quantity, priceDiscount } = values;
-
-      console.log(values);
+      const { name, price, description, quantity, discountPrice } = values;
       const newFormData = new FormData();
       newFormData.append("name", name);
       newFormData.append("shortDescription", description);
       newFormData.append("price", price);
-      newFormData.append("priceDiscount", priceDiscount);
+      newFormData.append("discountPrice", discountPrice);
       newFormData.append("quantity", quantity);
       newFormData.append("category", select?.id);
       const sizeNames = sizes.map((size: ISize) => size.name);
@@ -156,17 +154,17 @@ export default function AddProduct() {
             id="price"
             data={productFormik.values.price}
             setData={productFormik.handleChange}
-            label="Giá sản phẩm"
+            label="Giá gốc sản phẩm"
             placeholder="Vui lòng điền giá sản phẩm"
             error={productFormik.errors.price}
           />
           <Input
-            id="priceDiscount"
-            data={productFormik.values.priceDiscount}
+            id="discountPrice"
+            data={productFormik.values.discountPrice}
             setData={productFormik.handleChange}
-            label="Giá giảm"
-            placeholder="Vui lòng điền giá giảm, không bắt buộc"
-            error={productFormik.errors.priceDiscount}
+            label="Giá khuyến mãi"
+            placeholder="Vui lòng điền giá khuyến mãi, không bắt buộc"
+            error={productFormik.errors.discountPrice}
           />
           <Input
             id="quantity"

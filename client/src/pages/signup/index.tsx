@@ -17,7 +17,16 @@ import { useAuthContext } from "@/context/useAuthContext";
 import notification from "@/utils/notification";
 import { useGlobalStore } from "@/store/globalStore";
 import { registerUser } from "@/pages/api/authApi";
+import bgSignup from "../../../public/images/bgsignup.webp";
+import bgfashion from "@/assets/fashion.webp";
 type FormStateType = Omit<IUser, "id">;
+export const backgroundImageStyle = {
+  backgroundImage: "url('/images/slider3.jpg')",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+  backgroundSize: "cover",
+  width: "100vw",
+};
 export default function SignUp() {
   const { dispatch, state } = useAuthContext();
   const router = useRouter();
@@ -30,6 +39,7 @@ export default function SignUp() {
     {
       onSuccess(data: any) {
         dispatch({ type: "SIGN_UP", payload: data?.user });
+        toast.success("Đăng kí tài khoản thành công");
         signupFormik.resetForm();
       },
       onError(error: any) {
@@ -71,12 +81,7 @@ export default function SignUp() {
         email,
         password,
       };
-      console.log(data);
-      const result = await mutateAsync(data);
-      console.log(result);
-      if (result) {
-        toast.success("Đăng kí tài khoản thành công");
-      }
+      mutate(data);
     },
     validateOnBlur: false,
     validateOnChange: false,
@@ -89,11 +94,19 @@ export default function SignUp() {
   const { isDisabled, disabledStyle } = useDisabled(isLoading);
 
   return (
-    <div className="inset-0 bg-[#ffcad4] bg-signup gap-x-5">
+    <div
+      style={backgroundImageStyle}
+      className="inset-0 bg-white relative  bg-signup gap-x-5"
+    >
       {isLoading && <LoadingSpinner />}
+      <div className="absolute px-10 left-10 top-5  py-10">
+        <div>
+          {/* <Image width={300} height={550} src={bgfashion} alt="" /> */}
+        </div>
+      </div>
       <div className="wrapper-layout section">
         <div className="flex h-screen justify-center items-center">
-          <div className="px-4 shadow-md py-6 flex flex-col w-[450px] sign-up-form  rounded-md bg-[#fff]">
+          <div className="px-4 shadow-md py-6 flex flex-col w-[450px] sign-up-form  rounded-md bg-white">
             <button className="text-secondary text-4xl font-semibold text-center">
               Đăng Kí
             </button>

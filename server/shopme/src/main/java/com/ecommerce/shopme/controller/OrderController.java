@@ -19,12 +19,16 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.ecommerce.shopme.dto.CategoryDTO;
 import com.ecommerce.shopme.dto.OrderDTO;
 import com.ecommerce.shopme.dto.OrderDetailDTO;
 import com.ecommerce.shopme.enums.OrderStatus;
 import com.ecommerce.shopme.dto.OrderDTO;
 import com.ecommerce.shopme.dto.PageResponse;
+import com.ecommerce.shopme.entity.Category;
 import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.entity.OrderDetail;
@@ -36,6 +40,10 @@ import com.ecommerce.shopme.response.OrderResponse;
 import com.ecommerce.shopme.service.OrderDetailService;
 import com.ecommerce.shopme.service.OrderService;
 import com.ecommerce.shopme.service.ProductSevice;
+import com.ecommerce.shopme.utils.SlugUtils;
+
+import jakarta.annotation.security.RolesAllowed;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 @CrossOrigin(origins = "http://localhost:4000", maxAge = -1,allowedHeaders = "*")
@@ -47,31 +55,38 @@ public class OrderController {
     @Autowired OrderDetailService orderDetailService;
 @GetMapping("/orders")
 public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "0") int pageNum,
-@RequestParam(defaultValue = "5") int itemPerPage){
-        Pageable pageable = PageRequest.of(pageNum, itemPerPage);
-        Page<Order> orders = orderService.listAllOrder(pageable);
-          // Tạo danh sách OrderResponse từ danh sách order
-        List<OrderResponse> orderResponses = orders.stream().map(order->{
-            OrderResponse orderResponse = new OrderResponse();
-            orderResponse.setId(order.getId());
-            orderResponse.setFullName(order.getFullName());
-            orderResponse.setEmail(order.getEmail());
-            orderResponse.setAddress(order.getAddress());
-            orderResponse.setCreatedAt(order.getCreatedAt());
-            orderResponse.setPhoneNumber(order.getPhoneNumber());
-             List<OrderDetail> orderDetails =   orderDetailService.getOrderDetailsByOrderId(order.getId());
-             orderResponse.setOrderDetails(orderDetails);
-            float total_Price = 0;
-             for (OrderDetail orderDetail : orderDetails) {
-                total_Price+=orderDetail.getTotalPrice();
-             }
-             orderResponse.setTotalPrice(total_Price);
+@RequestParam(defaultValue = "5") int itemPerPage, @RequestParam(name  =  "status",required = false) String status){
+  Pageable pageable = PageRequest.of(pageNum, itemPerPage);
+   Page<Order> orders;
+    Map<String, Object> response = new HashMap<>();
 
-            return orderResponse;
-        }).collect(Collectors.toList());
- Map<String, Object> response = new HashMap<>();
+  if (status!=null && !status.isEmpty()) {
+    orders = orderService.getOrdersByStatus(status, pageable);
+  }else{
+
+    orders   = orderService.listAllOrder(pageable);
+  }
+       List<OrderResponse> orderResponses = orders.stream().map(order->{
+           OrderResponse orderResponse = new OrderResponse();
+           orderResponse.setId(order.getId());
+           orderResponse.setFullName(order.getFullName());
+           orderResponse.setEmail(order.getEmail());
+           orderResponse.setAddress(order.getAddress());
+           orderResponse.setCreatedAt(order.getCreatedAt());
+           orderResponse.setPhoneNumber(order.getPhoneNumber());
+           orderResponse.setStatus(order.getStatus());
+            List<OrderDetail> orderDetails =   orderDetailService.getOrderDetailsByOrderId(order.getId());
+            orderResponse.setOrderDetails(orderDetails);
+           float total_Price = 0;
+            for (OrderDetail orderDetail : orderDetails) {
+               total_Price+=orderDetail.getTotalPrice();
+            }
+            orderResponse.setTotalPrice(total_Price);
+
+           return orderResponse;
+       }).collect(Collectors.toList());
+       response.put("orders", orderResponses);
             response.put("status", "success");
-            response.put("orders", orderResponses);
           PageResponse paggination = new PageResponse<>();
                 paggination.setCurrent(orders.getNumber());
                 paggination.setItemsPerPage(orders.getSize());
@@ -121,7 +136,7 @@ public ResponseEntity<?> getOrderDetail(@PathVariable int id) {
                 total_Price+=orderDetail.getTotalPrice();
              }
              order.setTotalPrice(total_Price);
-        order.setStatus("PENDING");
+        order.setStatus(existOrder.getStatus());
         response.put("status", "success");
         response.put("order", order);
         
@@ -129,4 +144,9 @@ public ResponseEntity<?> getOrderDetail(@PathVariable int id) {
    
      
 }
+  @RolesAllowed("ROLE_ADMIN")
+    @PutMapping("/orders/{id}")
+    public void updateCategory(@PathVariable Integer id, @RequestBody OrderStatus status){
+        orderService.updateStatusOrder(id, status);
+    }
 }

@@ -43,35 +43,32 @@ export default function FilterByCategory({
 
   return (
     <StyledFilterCategory className="flex gap-y-4 flex-col">
-      {data?.categorys?.length > 0 &&
-        data?.categorys?.map((category: ICategory) => {
-          return (
-            <div key={category.id} className="flex ">
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    checked={category.slug === selectedCategory}
-                    onChange={() => {
-                      onChangeCategory(category.slug as string);
-                      setSelectedCategory(category.slug as string);
-                      const queryParams = { ...query };
-                      if (category.slug) {
-                        queryParams.category = category.slug;
-                      } else {
-                        delete queryParams.category;
-                      }
-                      router.push({
-                        pathname: router.pathname,
-                        query: queryParams,
-                      });
-                    }}
-                  />
-                }
-                label={category.name}
-              />
-            </div>
-          );
-        })}
+      <div className="flex gap-x-3 items-center">
+        <span className=" font-semibold  top-7 left-14 text-[#333] text-lg ">
+          DANH MỤC SẢN PHẨM
+        </span>
+      </div>
+      <div className="flex flex-col gap-y-2">
+        {data?.categorys?.length > 0 &&
+          data?.categorys?.map((category: ICategory) => {
+            return (
+              <div key={category.id} className="flex ">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={category.slug === selectedCategory}
+                      onChange={() => {
+                        onChangeCategory(category.slug as string);
+                        setSelectedCategory(category.slug as string);
+                      }}
+                    />
+                  }
+                  label={category.name}
+                />
+              </div>
+            );
+          })}
+      </div>
     </StyledFilterCategory>
   );
 }

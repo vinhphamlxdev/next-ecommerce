@@ -21,7 +21,7 @@ export default function DeleteProductButton({
   const { mutate } = useMutation({
     mutationFn: (id: number) => deleteProduct(id),
     onSuccess: () => {
-      toast.success("Xóa danh mục thành công");
+      toast.success("Xóa sản phẩm thành công");
       queryClient.invalidateQueries({ queryKey: ["products", filters] });
     },
     onError: (err: any) => {

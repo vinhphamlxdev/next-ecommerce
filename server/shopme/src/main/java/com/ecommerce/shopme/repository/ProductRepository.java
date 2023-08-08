@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ecommerce.shopme.entity.Order;
+import com.ecommerce.shopme.entity.OrderDetail;
 import com.ecommerce.shopme.entity.Product;
 
 import java.util.List;
@@ -33,11 +34,11 @@ void delete(Product product);
 Product findByName(String name);
 Set<Product> findByOrder(Order order);
 
-Page<Product> findByCategorySlug(String categorySlug, Pageable pageable);
+Page<Product> findByIsDeleteAndCategorySlug(boolean isDelete,String categorySlug, Pageable pageable);
 
 Product findBySlug(String slug);
 
-
+Page<Product> findByIsDelete(boolean isDelete, Pageable pageable);
 //Tim kiem sp chứa 1 chuỗi cụ thể
 //  List<Product> findByNameContaining(String searchString);
 //Tìm kiếm sản phẩm bắt đầu bằng một chuỗi cụ thể
@@ -48,5 +49,11 @@ Product findBySlug(String slug);
 //List<Product> findByNameLike(String searchString);
 @Query("SELECT p FROM Product p WHERE p.name LIKE %?1%")
 public List<Product> searchProduct(String keyword);
+
+
+
+
+
+   
 }
    

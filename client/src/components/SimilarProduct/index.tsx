@@ -72,7 +72,7 @@ export default function SimilarProduct({ slug }: ISimilarProductProps) {
     itemsPerPage: 6,
     category: slug,
   };
-  const { filters, setFilters, handleCategoryChange } = usePaginationAndFilters(
+  const { filters } = usePaginationAndFilters(
     initialPagination,
     initialFilters
   );

@@ -1,4 +1,5 @@
 package com.ecommerce.shopme.repository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,5 +20,11 @@ public interface OrderDetailRepository  extends JpaRepository<OrderDetail,Intege
        
        @Query("SELECT od FROM OrderDetail od WHERE od.product.id = :productId")
        OrderDetail findByProductId(Integer productId);
+
+        //tinh tong doanh thu
+        @Query("SELECT SUM(od.totalPrice) FROM OrderDetail od WHERE od.order.status = 'COMPLETED'")
+        BigDecimal calculateTotalRevenue();
+
+        
 }
 

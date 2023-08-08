@@ -49,10 +49,6 @@ public class Discount {
    @OneToOne
     private Product product;
 
-    public String discountPercent(){
-        return ((this.discountPrice * 100) / this.originalPrice)+"%";
-    }
-
     public Integer getId() {
         return id;
     }
@@ -89,10 +85,6 @@ public class Discount {
     public String getDiscountPercent() {
         return discountPercent;
     }
-
-    // public void setDiscountPercent(String discountPercent) {
-    //     this.discountPercent = discountPercent;
-    // }
 
     public Product getProduct() {
         return product;

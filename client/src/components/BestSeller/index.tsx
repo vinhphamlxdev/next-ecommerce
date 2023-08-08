@@ -9,10 +9,10 @@ import styled from "styled-components";
 import Link from "next/link";
 export interface IBestSellerProps {
   data: IProduct[];
+  isLoading: boolean;
 }
 
-export default function BestSeller({ data }: IBestSellerProps) {
-  const { isLoading } = useGlobalStore((state) => state);
+export default function BestSeller({ data, isLoading }: IBestSellerProps) {
   return (
     <StyledBestSeller className="section-populars">
       <div className="pb-12">
@@ -21,27 +21,30 @@ export default function BestSeller({ data }: IBestSellerProps) {
             Bán Chạy Nhất
           </h4>
         </div> */}
-
-        {!data ? (
-          <LoadingProduct />
-        ) : (
-          <>
-            <div className="grid py-20 gap-y-5 grid-cols-4 gap-x-7">
-              {data?.length > 0 &&
-                data?.map((product: any, index: number) => {
-                  return <ProductItem key={product.id} item={product} />;
-                })}
-            </div>
-            <div className="flex justify-center mt-7 items-center">
-              <Link
-                href="/products"
-                className="btn-view-all hover:bg-[#0089ff] bg-textColor  transition-all  "
-              >
-                Xem Thêm
-              </Link>
-            </div>
-          </>
+        {isLoading && (
+          <div className="mt-5">
+            <LoadingSkeleton
+              columns={4}
+              height={200}
+              count={12}
+              columnRow={4}
+            />
+          </div>
         )}
+        <div className="grid py-20 gap-y-5 grid-cols-4 gap-x-7">
+          {data?.length > 0 &&
+            data?.map((product: IProduct, index: number) => {
+              return <ProductItem key={product.id} item={product} />;
+            })}
+        </div>
+        <div className="flex justify-center mt-7 items-center">
+          <Link
+            href="/products"
+            className="btn-view-all hover:bg-[#0089ff] bg-textColor  transition-all  "
+          >
+            Xem Thêm
+          </Link>
+        </div>
       </div>
     </StyledBestSeller>
   );

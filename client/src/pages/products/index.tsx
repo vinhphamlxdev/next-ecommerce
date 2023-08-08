@@ -51,6 +51,7 @@ export default function ProductClient() {
     setPagination,
     handleCategoryChange,
     handleSortChange,
+    handleColorChange,
   } = usePaginationAndFilters(initialPagination, initialFilters);
   const router = useRouter();
   const [searchResult, setSearchResult] = React.useState<IProduct[] | any>([]);
@@ -78,15 +79,13 @@ export default function ProductClient() {
         <div className="wrapper-layout">
           <div className="flex gap-x-10 relative">
             <ProductFilter
+              onColorChange={handleColorChange}
               setSearchResult={setSearchResult}
-              onChange={handleCategoryChange}
+              onCategoryChange={handleCategoryChange}
               filters={filters}
             />
             <div className="flex flex-col gap-y-3 w-full">
-              <div className="sort-bar border-b border-[#e1e1e1] pb-4 mb-3 flex justify-between items-center">
-                <span className="text-textColor uppercase font-bold text-lg">
-                  Ao Thun
-                </span>
+              <div className="sort-bar border-b border-[#e1e1e1] justify-end pb-4 mb-3 flex items-center">
                 <div className="flex gap-x-3 items-center">
                   <span className="text-sm font-normal ">Sắp xếp:</span>
                   <select

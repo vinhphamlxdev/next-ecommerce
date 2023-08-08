@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 
 export interface PaginationState {
   current: number;
@@ -12,6 +13,8 @@ export interface FiltersState {
   category?: string;
   sortfield?: string;
   sortdir?: string;
+  status?: string;
+  colorName?: string;
 }
 interface PaginationAndFiltersHook {
   pagination: PaginationState;
@@ -27,6 +30,8 @@ export default function usePaginationAndFilters(
   initialPagination: PaginationState,
   initialFilters: FiltersState
 ) {
+  const router = useRouter();
+  const { query } = router;
   const queryClient = useQueryClient();
   const [pagination, setPagination] =
     React.useState<PaginationState>(initialPagination);
@@ -41,12 +46,32 @@ export default function usePaginationAndFilters(
       ...prevFilter,
       pageNum: newPage - 1,
     }));
+    const queryParams = { ...query };
+    if (newPage) {
+      queryParams.pageNum = newPage.toString();
+    } else {
+      delete queryParams.pageNum;
+    }
+    router.push({
+      pathname: router.pathname,
+      query: queryParams,
+    });
   };
   const handleCategoryChange = (slug: string) => {
     setFilters((prevFilter) => ({
       ...prevFilter,
       category: slug,
     }));
+    const queryParams = { ...query };
+    if (slug) {
+      queryParams.category = slug;
+    } else {
+      delete queryParams.category;
+    }
+    router.push({
+      pathname: router.pathname,
+      query: queryParams,
+    });
   };
   const handleSortChange: React.ChangeEventHandler<HTMLSelectElement> = (
     event
@@ -66,6 +91,42 @@ export default function usePaginationAndFilters(
       ...newFilters,
     }));
   };
+  const handleChangeStatusOrder = async (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const { value } = event.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      status: value,
+    }));
+    const queryParams = { ...query };
+    if (value) {
+      queryParams.status = value;
+    } else {
+      delete queryParams.status;
+    }
+    router.push({
+      pathname: router.pathname,
+      query: queryParams,
+    });
+  };
+  const handleColorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      colorName: value,
+    }));
+    const queryParams = { ...query };
+    if (value) {
+      queryParams.colorName = value;
+    } else {
+      delete queryParams.colorName;
+    }
+    router.push({
+      pathname: router.pathname,
+      query: queryParams,
+    });
+  };
   return {
     pagination,
     setPagination,
@@ -74,5 +135,7 @@ export default function usePaginationAndFilters(
     handlePageChange,
     handleCategoryChange,
     handleSortChange,
+    handleChangeStatusOrder,
+    handleColorChange,
   };
 }

@@ -20,5 +20,8 @@ public interface CategoryRepository extends PagingAndSortingRepository<Category,
     //kt ton tai
     public boolean existsById(Integer id);
     List<Category> findByIdIn(List<Integer> categoryIds);
+
+    @Query("SELECT c FROM Category c WHERE c.isDelete = false")
+    Page<Category> findByIsDeleteFalse(Pageable pageable);
    
 }

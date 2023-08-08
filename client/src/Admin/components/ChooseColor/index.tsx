@@ -10,7 +10,7 @@ export interface IChooseColorProps {
   colorsDelete?: number[] | any;
   setDeleteColors?: React.Dispatch<React.SetStateAction<number[]>>;
 }
-const colorData = [
+export const colorData = [
   {
     id: "$2a$10fewlUMSLbvue8TX2Alcx",
     colorName: "Black",

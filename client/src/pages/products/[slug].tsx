@@ -24,7 +24,7 @@ export default function ProductDetailPage() {
     itemsPerPage: 6,
     category: "",
   };
-  const { filters, setFilters, handleCategoryChange } = usePaginationAndFilters(
+  const { filters, setFilters } = usePaginationAndFilters(
     initialPagination,
     initialFilters
   );
@@ -33,7 +33,7 @@ export default function ProductDetailPage() {
     queryFn: () => getProductBySlug(slug as string),
     enabled: slug !== undefined,
     onSuccess: (data) => {
-      console.log("product data:", data);
+      // console.log("product data:", data);
     },
     onError: (err: any) => {
       toast.error("co loi:", err);
@@ -45,7 +45,7 @@ export default function ProductDetailPage() {
       <Breadcrumb titlePage={`${data?.name}`} />
       <div className="wrapper-layout">
         <div className="product-detail-page mt-10">
-          {data && <ProductDetail item={data} />}
+          {data ? <ProductDetail item={data} /> : <LoadingSpinner />}
           <div className="mt-8">
             <div className="text-white px-7 py-2 inline-block font-semibold bg-bgPrimary uppercase text-base">
               MÔ TẢ

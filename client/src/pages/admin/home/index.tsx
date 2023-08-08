@@ -1,7 +1,6 @@
 import LayoutAdmin from "@/Admin/components/layout";
 import BestSeller from "@/components/BestSeller";
-import { getAllProducts } from "@/pages/api/ProductApi";
-import { IProduct } from "@/types/interface";
+import { IProduct, IResponseDashboard } from "@/types/interface";
 import formatVnd from "@/utils/formatVnd";
 import * as React from "react";
 import { AiOutlineMoneyCollect, AiOutlineUsergroupAdd } from "react-icons/ai";
@@ -13,8 +12,20 @@ import { MdShowChart } from "react-icons/md";
 import { BsPieChart } from "react-icons/bs";
 import { IoStatsChartOutline } from "react-icons/io5";
 import { BiMoneyWithdraw } from "react-icons/bi";
-
+import { useQuery } from "@tanstack/react-query";
+import { getDashboard } from "@/pages/api/DashboardApi";
+import Link from "next/link";
 export default function HomeAdmin() {
+  const { isError, data, error, refetch, isLoading } = useQuery({
+    queryKey: ["dasboard"],
+    queryFn: () => getDashboard(),
+    onSuccess: (data: IResponseDashboard) => {
+      // console.log(data);
+    },
+    onError: (err) => {
+      console.log(err);
+    },
+  });
   return (
     <LayoutAdmin>
       <div className="mt-5 dashboard-layout">
@@ -29,15 +40,21 @@ export default function HomeAdmin() {
                   <span className="text-sm  text-gray-500">
                     Tổng Số Khách Hàng
                   </span>
-                  <span className="text-2xl font-medium">1,02,890</span>
+                  {data?.dashboard?.totalUser ? (
+                    <span className="text-2xl font-medium">
+                      {formatVnd(data?.dashboard?.totalUser.toString())}
+                    </span>
+                  ) : (
+                    <span className="text-2xl font-medium">0</span>
+                  )}
                 </div>
-                <div
-                  onClick={() => toast.warning("Tính năng chưa cập nhật")}
+                <Link
+                  href="/admin/users"
                   className="flex gap-x-2 cursor-pointer items-center text-[#9b5de5]"
                 >
                   <span>Xem tất cả</span>
                   <i className="bi text-lg bi-arrow-right"></i>
-                </div>
+                </Link>
               </div>
               <div className="flex flex-col">
                 <FiBarChart className="text-[100px] text-[#9b5de5]"></FiBarChart>
@@ -56,13 +73,16 @@ export default function HomeAdmin() {
               <div className="flex gap-y-5  flex-col">
                 <div className="flex flex-col ">
                   <span className="text-sm  text-gray-500">Tổng Doanh Thu</span>
-                  <span className="text-2xl font-medium">295,535,000 VND</span>
+                  {data?.dashboard?.totalRenenue ? (
+                    <span className="text-2xl font-medium">
+                      {formatVnd(data?.dashboard?.totalRenenue.toString())} VND
+                    </span>
+                  ) : (
+                    <span className="text-2xl font-medium">0 VND</span>
+                  )}
                 </div>
-                <div
-                  onClick={() => toast.warning("Tính năng chưa cập nhật")}
-                  className="flex gap-x-2 cursor-pointer items-center text-[#00bbf9]"
-                >
-                  <span>Xem tất cả</span>
+                <div className="flex gap-x-2 cursor-pointer items-center text-[#00bbf9]">
+                  <Link href="/admin/orders">Xem tất cả</Link>
                   <i className="bi text-lg bi-arrow-right"></i>
                 </div>
               </div>
@@ -82,16 +102,19 @@ export default function HomeAdmin() {
             <div className="flex justify-between flex-1 ">
               <div className="flex gap-y-5  flex-col">
                 <div className="flex flex-col ">
-                  <span className="text-sm  text-gray-500">
+                  <span className="text-sm   text-gray-500">
                     Số Hóa Đơn Đang Chờ Xử Lý
                   </span>
-                  <span className="text-2xl font-medium">654,365</span>
+                  {data?.dashboard?.orderPending ? (
+                    <span className="text-2xl font-medium">
+                      {formatVnd(data?.dashboard?.orderPending.toString())}
+                    </span>
+                  ) : (
+                    <span className="text-2xl font-medium">0</span>
+                  )}
                 </div>
-                <div
-                  onClick={() => toast.warning("Tính năng chưa cập nhật")}
-                  className="flex gap-x-2 cursor-pointer items-center text-[#2ec4b6]"
-                >
-                  <span>Xem tất cả</span>
+                <div className="flex gap-x-2 cursor-pointer items-center text-[#2ec4b6]">
+                  <Link href="/admin/orders">Xem tất cả</Link>
                   <i className="bi text-lg bi-arrow-right"></i>
                 </div>
               </div>
@@ -112,16 +135,19 @@ export default function HomeAdmin() {
             <div className="flex justify-between flex-1 ">
               <div className="flex gap-y-5  flex-col">
                 <div className="flex flex-col ">
-                  <span className="text-sm  text-gray-500">
+                  <span className="text-sm   text-gray-500">
                     Số Hóa Đơn Đang Vận Chuyển
                   </span>
-                  <span className="text-2xl font-medium">312,965</span>
+                  {data?.dashboard?.orderDelivery ? (
+                    <span className="text-2xl font-medium">
+                      {formatVnd(data?.dashboard?.orderDelivery.toString())}
+                    </span>
+                  ) : (
+                    <span className="text-2xl font-medium">0</span>
+                  )}
                 </div>
-                <div
-                  onClick={() => toast.warning("Tính năng chưa cập nhật")}
-                  className="flex gap-x-2 cursor-pointer items-center text-[#fb6f92]"
-                >
-                  <span>Xem tất cả</span>
+                <div className="flex gap-x-2 cursor-pointer items-center text-[#fb6f92]">
+                  <Link href="/admin/orders">Xem tất cả</Link>
                   <i className="bi text-lg bi-arrow-right"></i>
                 </div>
               </div>

@@ -105,15 +105,6 @@ public class Product {
     @OneToMany(mappedBy = "product",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Size> sizes = new ArrayList<>();
 
-    // @ManyToMany(cascade = CascadeType.ALL)
-    // @JoinTable(
-    //     name = "product_discount",
-    //     joinColumns = @JoinColumn(name="product_id"),
-    //     inverseJoinColumns = @JoinColumn(name="discount_id")
-    // )
-    // private List<Discount> discounts;
 
-    // @OneToOne(mappedBy = "product")
-    // private Inventory inventory;
 }
 

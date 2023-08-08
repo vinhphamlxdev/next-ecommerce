@@ -18,6 +18,7 @@ export default function CartItem({ item }: ICartItemProps) {
     shortDescription,
     quantity,
     sizes,
+    discount,
   } = item;
   const updateQuantity = (type: string, product: IProduct) => {
     dispatch({ type: "SET_QUANTITY", payload: { type, product } });
@@ -43,9 +44,16 @@ export default function CartItem({ item }: ICartItemProps) {
         </div>
       </div>
       <div className="grid w-full  gap-x-3 grid-cols-4">
-        <div className="flex items-center justify-center text-base font-semibold flex-center text-secondary">
-          {formatVnd(price.toString())}₫
-        </div>
+        {discount?.discountPrice > 0 ? (
+          <div className="flex items-center justify-center text-base font-semibold flex-center text-secondary">
+            {formatVnd(discount?.discountPrice.toString())}₫
+          </div>
+        ) : (
+          <div className="flex items-center justify-center text-base font-semibold flex-center text-secondary">
+            {formatVnd(discount?.originalPrice.toString())}₫
+          </div>
+        )}
+
         <div className="flex items-center justify-center">
           <div
             onClick={() => updateQuantity("-", item)}
@@ -62,7 +70,15 @@ export default function CartItem({ item }: ICartItemProps) {
           </div>
         </div>
         <div className="flex items-center justify-center text-base font-semibold text-secondary">
-          <span>{formatVnd((price * quantity).toString())}₫</span>
+          {discount?.discountPrice > 0 ? (
+            <span>
+              {formatVnd((discount?.discountPrice * quantity).toString())}₫
+            </span>
+          ) : (
+            <span>
+              {formatVnd((discount?.originalPrice * quantity).toString())}₫
+            </span>
+          )}
         </div>
         <div
           onClick={() => handleDeleteCartItem(item)}

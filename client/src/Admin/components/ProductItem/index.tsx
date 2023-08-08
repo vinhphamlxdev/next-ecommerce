@@ -22,7 +22,6 @@ export default function ProductItemAdmin({
 }: IProductItemAdminProps) {
   const {
     name,
-
     colors,
     price,
     imageUrls,
@@ -30,6 +29,7 @@ export default function ProductItemAdmin({
     sizes,
     shortDescription,
     id,
+    discount,
     delete: isDelete,
   } = item;
   const {
@@ -50,7 +50,6 @@ export default function ProductItemAdmin({
     setSelectedProductId(id);
     setOpenDetailProduct(true);
   };
-  console.log(selectedProductId);
   return (
     <>
       {isOpenEditP && selectedProductId ? (
@@ -58,6 +57,7 @@ export default function ProductItemAdmin({
           setSelectedId={setSelectedProductId}
           isOpenEditP={isOpenEditP}
           productId={selectedProductId}
+          filters={filters}
         />
       ) : (
         <></>
@@ -67,6 +67,7 @@ export default function ProductItemAdmin({
           setSelectedId={setSelectedProductId}
           isOpenDetailP={isOpenDetailP}
           productId={selectedProductId}
+          filters={filters}
         />
       ) : (
         <></>
@@ -112,13 +113,6 @@ export default function ProductItemAdmin({
             >
               <BsEye className="leading-[0px]" />
             </button>
-            {/* {!isDelete ? (
-              <div className="text-pink-500 select-none font-medium">
-                Chưa đặt
-              </div>
-            ) : (
-              <div className="text-saveBg select-none font-medium">Đã đặt</div>
-            )} */}
           </div>
         </td>
       </tr>

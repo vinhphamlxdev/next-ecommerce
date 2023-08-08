@@ -16,9 +16,13 @@ export interface AddCategoryProps {
 }
 
 export default function AddCategory({ categorys, filters }: AddCategoryProps) {
+  const queryClient = useQueryClient();
   const { mutate, isLoading } = useMutation({
     mutationFn: (data: Omit<ICategory, "id" | "slug">) => createCategory(data),
     onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["categorys", filters],
+      });
       categoryFormik.resetForm();
       toast.success("Thêm danh mục thành công");
     },

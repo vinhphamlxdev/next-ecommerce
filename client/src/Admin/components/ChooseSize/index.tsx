@@ -70,11 +70,9 @@ export default function ChooseSize({
     if (typeof setDeleteSizes === "function") {
       if (typeof id === "number") {
         setDeleteSizes([...sizesDelete, id]);
-        console.log("sizesDelete", sizesDelete);
       }
     }
   };
-  console.log(sizes);
   return (
     <div className="flex flex-col gap-y-4">
       <div className="bg-[#f5f5f5] h-14 p-3 flex gap-x-3">

@@ -7,7 +7,7 @@ import {
 import axiosConfig from "./axiosConfig";
 
 export const getAllCategory = async (param: any) => {
-  const response = await axiosConfig.get(`/categorys`, {
+  const response = await axiosConfig.get(`/categorys?isDelete=false`, {
     params: {
       pageNum: param.pageNum || 0,
       itemsPerPage: param.itemsPerPage || 5,

@@ -6,6 +6,7 @@ export const getAllOrder = async (param: any) => {
     params: {
       pageNum: param.pageNum || 0,
       itemPerPage: param.itemPerPage || 5,
+      status: param.status,
     },
   });
   return response.data;
@@ -18,8 +19,11 @@ export const createOrder = async (data: ICategory) => {
   const response = await axiosConfig.post(`/orders`, data);
   return response;
 };
-export const updateOrder = async (id: number, data: ICategory) => {
-  const response = await axiosConfig.put(`/orders/${id}`, data);
+export const updateStatusOrder = async (
+  id: number | string,
+  status: string
+) => {
+  const response = await axiosConfig.put(`/orders/${id}`, status);
   return response;
 };
 export const deleteOrder = async (id: number | string) => {

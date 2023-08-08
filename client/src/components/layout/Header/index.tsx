@@ -17,7 +17,7 @@ import calculateTotalCart from "@/utils/caculateTotalCart";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { BsHandbag } from "react-icons/bs";
 import { useCartContext } from "@/context/useCartContext";
-export interface IHeaderClientProps {}
+import brand from "@/assets/logo.png";
 const navLinks = [
   {
     id: 1,
@@ -40,7 +40,7 @@ const navLinks = [
     name: "Contact",
   },
 ];
-export default function HeaderClient(props: IHeaderClientProps) {
+export default function HeaderClient() {
   const { scrollHeader, setScrollHeader } = useGlobalStore((state) => state);
   const { state: cartState } = useCartContext();
   const cartItems = cartState.cartItems;
@@ -102,8 +102,11 @@ export default function HeaderClient(props: IHeaderClientProps) {
       </div>
       <div className="px-10 h-20  flex justify-center items-center">
         <Link href="/home">
-          <img
-            src="https://bizweb.dktcdn.net/100/318/614/themes/667160/assets/logo.png?1681444077990"
+          <Image
+            className="object-cover"
+            width={75}
+            height={75}
+            src={brand}
             alt=""
           />
         </Link>

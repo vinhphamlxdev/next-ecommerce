@@ -5,7 +5,13 @@ import Select from "../Select";
 import InputModal from "../InputModal/InputModal";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { ICategory, IColor, IProduct, ISize } from "@/types/interface";
+import {
+  ICategory,
+  IColor,
+  IFilters,
+  IProduct,
+  ISize,
+} from "@/types/interface";
 import * as Yup from "yup";
 import { useFormik } from "formik";
 import UseDisabled from "@/hooks/useDisabled";
@@ -21,12 +27,14 @@ export interface IModalProductEditProps {
   productId: number;
   isOpenEditP: boolean;
   setSelectedId: React.Dispatch<React.SetStateAction<any>>;
+  filters: IFilters;
 }
 
 export default function ModalProductEdit({
   productId,
   isOpenEditP,
   setSelectedId,
+  filters,
 }: IModalProductEditProps) {
   const [selectCategory, setCategory] = React.useState<ICategory[] | any>([]);
   const [sizes, setSizes] = React.useState<ISize[]>([]);
@@ -38,7 +46,7 @@ export default function ModalProductEdit({
   const [colorsDelete, setColorsDelete] = React.useState<number[] | any>([]);
   const { setOpenEditProduct } = useModalStore();
   const queryClient = useQueryClient();
-  console.log(productId);
+
   const { data, isLoading: isLoadingGet } = useQuery({
     queryKey: ["product", productId],
     queryFn: () => getProduct(productId),
@@ -63,6 +71,9 @@ export default function ModalProductEdit({
     mutationFn: (formData: FormData) =>
       updateProduct(productId as number, formData),
     onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: ["products", filters],
+      });
       setFile([]);
       setImgsDelete([]);
       setOpenEditProduct(false);
@@ -237,7 +248,7 @@ export default function ModalProductEdit({
               change={true}
               id="discountPrice"
               setData={productEditFormik.handleChange}
-              title="Giá giảm"
+              title="Giá khuyến mãi"
               value={productEditFormik.values.discountPrice ?? ""}
             />
             <InputModal

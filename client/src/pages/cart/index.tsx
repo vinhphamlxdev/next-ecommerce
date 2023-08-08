@@ -14,10 +14,8 @@ const LayoutClient = dynamic(() => import("@/components/layout/LayoutMain"), {
 });
 
 export default function Cart() {
-  const { dispatch, state } = useCartContext();
+  const { state } = useCartContext();
   const cartItems = state.cartItems;
-  console.log(cartItems);
-
   return (
     <LayoutClient>
       <Breadcrumb titlePage="Giỏ hàng" />

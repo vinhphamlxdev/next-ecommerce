@@ -18,12 +18,6 @@ export default function Header() {
     dispatch({ type: "LOG_OUT", payload: null });
     toast.success("Đăng xuất thành công");
   };
-  // React.useEffect(() => {
-  //   if (user?.roles[0]?.name !== "ROLE_ADMIN") {
-  //     router.push("/client/home");
-  //     toast.error("Vui lòng đăng nhập với quyền ADMIN");
-  //   }
-  // }, [user]);
   return (
     <header
       className={`admin-header fixed z-[200] top-0 right-0 w-[calc(100%-288px)] px-3  h-16  justify-between flex items-center ${

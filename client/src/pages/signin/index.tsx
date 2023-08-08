@@ -10,13 +10,13 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuthContext } from "@/context/useAuthContext";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-import { useCookies } from "react-cookie";
 import { IFormLogin } from "@/types/authInterface";
 import useDisabled from "@/hooks/useDisabled";
 import { LoadingSpinner } from "@/Admin/components/Loading";
 import { useGlobalStore } from "@/store/globalStore";
 import notification from "@/utils/notification";
 import { loginUser } from "@/pages/api/authApi";
+import { backgroundImageStyle } from "../signup";
 export default function SignIn() {
   const router = useRouter();
   const { dispatch, state } = useAuthContext();
@@ -26,7 +26,7 @@ export default function SignIn() {
     (userData: IFormLogin) => loginUser(userData),
     {
       onSuccess(data: any) {
-        console.log(data);
+        // console.log(data);
         dispatch({ type: "LOG_IN", payload: data.user });
         signInFormik.resetForm();
         toast.success("Đăng nhập thành công");
@@ -69,11 +69,11 @@ export default function SignIn() {
   }, [currentUser]);
   const { isDisabled, disabledStyle } = useDisabled(isLoading);
   return (
-    <div className="inset-0 bg-[#ffcad4] bg-signup gap-x-5">
+    <div style={backgroundImageStyle} className="inset-0  bg-signup gap-x-5">
       {isLoading && <LoadingSpinner />}
       <div className="wrapper-layout section">
         <div className="flex h-screen justify-center items-center">
-          <div className="px-4 shadow-md py-6 flex flex-col w-[450px] sign-up-form  rounded-md bg-[#fff]">
+          <div className="px-4 shadow-md py-6 flex flex-col w-[450px] sign-up-form  rounded-md bg-white">
             <h3 className="text-secondary text-4xl font-semibold text-center">
               Đăng Nhập
             </h3>

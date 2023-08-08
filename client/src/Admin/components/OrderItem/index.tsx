@@ -46,11 +46,11 @@ export default function OrderItem({ item }: IOderItemProps) {
         </div>
       </td>
       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-        <button className="py-3 px-5 bg-orange-500 rounded-[5px]">
-          Đang xử lý
-        </button>
-        {/* {status === "PENDING" && (
-          <button className="py-3 px-5 bg-orange-500 rounded-[5px]">
+        {status === "PENDING" && (
+          <button
+            className="py-3 px-5 bg-[#00b894]
+           rounded-[5px]"
+          >
             Đang xử lý
           </button>
         )}
@@ -58,10 +58,15 @@ export default function OrderItem({ item }: IOderItemProps) {
           <button className="py-3 px-5 bg-red-500 rounded-[5px]">Đã hủy</button>
         )}
         {status === "DELIVERING" && (
-          <button className="py-3 px-5 bg-saveBg rounded-[5px]">
+          <button className="py-3 px-5 bg-[#ed6c02] rounded-[5px]">
             Đang vận chuyển
           </button>
-        )} */}
+        )}
+        {status === "COMPLETED" && (
+          <button className="py-3 px-5 bg-saveBg rounded-[5px]">
+            Thành công
+          </button>
+        )}
       </td>
       <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
         {formatVnd(totalPrice.toString())} VND

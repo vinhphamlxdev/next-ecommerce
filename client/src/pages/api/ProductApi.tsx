@@ -3,13 +3,14 @@ import axiosConfig from "./axiosConfig";
 import axios from "axios";
 
 export const getAllProduct = async (param: any) => {
-  const response = await axiosConfig.get(`/products`, {
+  const response = await axiosConfig.get(`/products?isDelete=false`, {
     params: {
       pageNum: param.pageNum || 0,
       itemsPerPage: param.itemsPerPage || 5,
       category: param.category || "",
       sortfield: param.sortField || "",
       sortdir: param.sortDir || "",
+      colorName: param.colorName || "",
     },
   });
   return response.data;

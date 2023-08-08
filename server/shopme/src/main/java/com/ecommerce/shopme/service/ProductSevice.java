@@ -28,6 +28,7 @@ import com.ecommerce.shopme.entity.Category;
 import com.ecommerce.shopme.entity.Color;
 import com.ecommerce.shopme.entity.Image;
 import com.ecommerce.shopme.entity.Order;
+import com.ecommerce.shopme.entity.OrderDetail;
 import com.ecommerce.shopme.entity.Product;
 import com.ecommerce.shopme.entity.Size;
 import com.ecommerce.shopme.exception.ProductNotFoundException;
@@ -54,7 +55,7 @@ public class ProductSevice {
     ColorRepository colorRepository;
   
     public Page<Product> listByPageProduct(Integer pageNumber, Integer itemsPerpage, String sortField,
-    String sortDir
+    String sortDir,boolean isDelete
     ) {
         if (sortField!=null && !sortField.isEmpty()) {
             String mappedSortField = mapSortField(sortField);
@@ -66,26 +67,67 @@ public class ProductSevice {
     }
          Pageable pageable = PageRequest.of(pageNumber, itemsPerpage
             );
-    return productRepository.findAll(pageable);
+            return productRepository.findByIsDelete(isDelete, pageable);
 }
 
 public Page<Product> listByPageProductAndCategorySlug(int pageNum, int itemsPerPage, String categorySlug,
 String sortField,
-    String sortDir
+    String sortDir,boolean isDelete
 ) {
+        Pageable pageable ;
+
     if (sortField!=null && !sortField.isEmpty()) {
                     String mappedSortField = mapSortField(sortField);
 
-             Pageable pageable = PageRequest.of(pageNum, itemsPerPage,
+           pageable = PageRequest.of(pageNum, itemsPerPage,
             sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
             : Sort.by(mappedSortField).descending()
             );
-                return productRepository.findByCategorySlug(categorySlug, pageable);
+                return productRepository.findByIsDeleteAndCategorySlug(isDelete,categorySlug, pageable);
     }
-    Pageable pageable = PageRequest.of(pageNum, itemsPerPage);
+  pageable = PageRequest.of(pageNum, itemsPerPage);
    
-    return productRepository.findByCategorySlug(categorySlug, pageable);
+    return productRepository.findByIsDeleteAndCategorySlug(isDelete,categorySlug, pageable);
 }
+public Page<Product> listByPageProductByColorName(int pageNum, int itemsPerPage, String colorName,
+String sortField,
+    String sortDir,boolean isDelete
+) {
+        Pageable pageable ;
+
+    if (sortField!=null && !sortField.isEmpty()) {
+                    String mappedSortField = mapSortField(sortField);
+
+           pageable = PageRequest.of(pageNum, itemsPerPage,
+            sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+            : Sort.by(mappedSortField).descending()
+            );
+                return colorRepository.findProductsByColorName(colorName, pageable);
+    }
+  pageable = PageRequest.of(pageNum, itemsPerPage);
+   
+    return colorRepository.findProductsByColorName(colorName, pageable);
+}
+public Page<Product> listByPageProductByCategoryAndColor(int pageNum, int itemsPerPage,
+                                                          String categorySlug, String colorName,
+                                                          String sortField, String sortDir,
+                                                          boolean isDelete) {
+    Pageable pageable;
+
+    if (sortField != null && !sortField.isEmpty()) {
+        String mappedSortField = mapSortField(sortField);
+
+        pageable = PageRequest.of(pageNum, itemsPerPage,
+                sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+                        : Sort.by(mappedSortField).descending()
+        );
+    } else {
+        pageable = PageRequest.of(pageNum, itemsPerPage);
+    }
+
+    return colorRepository.findByCategorySlugAndColorName(categorySlug, colorName, pageable);
+}
+
 private String mapSortField(String sortField) {
     switch (sortField) {
         case "createdat":
@@ -274,4 +316,8 @@ public Product getProductBySlug(String slug){
 public List<Product> getByKeyword(String keyword){
         return productRepository.searchProduct(keyword);
 }
+
+
+
+
 }

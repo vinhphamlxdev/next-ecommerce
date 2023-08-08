@@ -89,21 +89,28 @@ public class ProductController {
  
     @Autowired 
     DiscountRepository discountRepository;
-    @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+    // @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products")
     public ResponseEntity<?> getAllProduct(@RequestParam(defaultValue = "0") int pageNum,
     @RequestParam(defaultValue = "10") int itemsPerPage, @RequestParam(name = "category",
     required = false)  String categorySlug,@RequestParam(name = "sortfield",required = false) String sortField,
-    @RequestParam(name = "sortdir",required = false) String sortDir
-    
+    @RequestParam(name = "sortdir",required = false) String sortDir,
+    @RequestParam(name = "isDelete", defaultValue = "false") boolean isDelete,
+    @RequestParam(name = "colorName",required = false) String colorName
+
     ){
         Page<Product> page ; 
-        if (categorySlug!=null && !categorySlug.isEmpty()) {
+        if (categorySlug != null && !categorySlug.isEmpty() && colorName != null && !colorName.isEmpty()) {
+            page = productService.listByPageProductByCategoryAndColor(pageNum, itemsPerPage,
+                    categorySlug, colorName, sortField, sortDir, isDelete);
+        } else if (categorySlug != null && !categorySlug.isEmpty()) {
             page = productService.listByPageProductAndCategorySlug(pageNum, itemsPerPage,
-             categorySlug,sortField,sortDir
-          );
-        }else{
-         page =    productService.listByPageProduct(pageNum,itemsPerPage,sortField,sortDir);
+                    categorySlug, sortField, sortDir, isDelete);
+        } else if (colorName != null && !colorName.isEmpty()) {
+            page = productService.listByPageProductByColorName(pageNum, itemsPerPage,
+                    colorName, sortField, sortDir, isDelete);
+        } else {
+            page = productService.listByPageProduct(pageNum, itemsPerPage, sortField, sortDir, isDelete);
         }
         List<Product> listProductsByPage = page.getContent();
         List<ProductDetail> listProducts = listProductsByPage.stream()
@@ -149,14 +156,12 @@ public class ProductController {
     
     }
 
-    @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
     @GetMapping("/products/{id}")
     public ResponseEntity<?> getProductById(@PathVariable("id") @Positive(message = "Id san pham toi thieu la 0") Integer id){
         Product productExist = productService.getProductById(id);
         if (productExist==null) {
             return ResponseEntity.notFound().build();
         }
-          
             ProductDetail productDetail = new ProductDetail();
             productDetail.setId(productExist.getId());
             productDetail.setName(productExist.getName());
@@ -188,7 +193,7 @@ public class ProductController {
             response.put("status", "success");
                 return ResponseEntity.ok(response);
     }
-    @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+   
     @GetMapping("/products/slug/{slug}")
     public ResponseEntity<?> getProductSlugName(@PathVariable("slug")  String slugName){
         Product productExist = productService.getProductBySlug(slugName);
@@ -406,18 +411,14 @@ public class ProductController {
   @DeleteMapping("/products/{id}")
  public ResponseEntity<?> deleteProductById(@PathVariable @Positive Integer id) throws IOException{
     Product  existProduct = productService.getProductById(id);
-        boolean checkHasOrder = orderDetailService.checkExistProductHasOrder(id);
         Map<String, Object> response = new HashMap<>();
-        if (checkHasOrder) {
-            if (existProduct!=null) {
-                existProduct.setDelete(true);
-                productService.saveProduct(existProduct);
-                  return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Sản phẩm đã được đặt hàng không thể xóa!");
-            }
-        }
-            // Xóa sản phẩm
-            productService.deleteProductById(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Xóa sản phẩm thành công");
+            existProduct.setDelete(true);
+            productService.saveProduct(existProduct);
+            response.put("product", existProduct);
+            response.put("status", "success");
+                return ResponseEntity.ok(response);
+           
+        
  }
 
 }

@@ -20,10 +20,11 @@ public class CategoryService {
     
 @Autowired
 private CategoryRepository categoryRepository;
+@Autowired ProductSevice productSevice;
     
 public Page<Category> listByPageCategory(Integer pageNumber, Integer itemsPerpage) {
     Pageable pageable = PageRequest.of(pageNumber, itemsPerpage);
-    return categoryRepository.findAll(pageable);
+    return categoryRepository.findByIsDeleteFalse( pageable);
 }
 
 // //get Category by id
@@ -43,8 +44,18 @@ public Category updateCategory(Category updateCategory){
    return categoryRepository.save(updateCategory);
 }
 
-public void deleteCategory(Integer id){
-categoryRepository.deleteById(id);
+public void deleteCategory(Integer categoryId){
+    List<Product> products = productSevice.getProductByCategoryId(categoryId);
+    Category existCategory =categoryRepository.findById(categoryId);
+    if (existCategory!=null ) {
+        if (products.isEmpty()) {
+            categoryRepository.deleteById(categoryId);
+        }else{
+          existCategory.setDelete(true);
+        categoryRepository.save(existCategory);
+        }
+    }
+  
 }
 //kiem tra ton tai
 public boolean existsCategoryById(Integer id){

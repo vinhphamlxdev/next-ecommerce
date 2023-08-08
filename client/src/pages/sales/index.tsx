@@ -51,6 +51,7 @@ export default function ProductSale() {
     setPagination,
     handleCategoryChange,
     handleSortChange,
+    handleColorChange,
   } = usePaginationAndFilters(initialPagination, initialFilters);
   const router = useRouter();
   const [searchResult, setSearchResult] = React.useState<IProduct[] | any>([]);
@@ -59,6 +60,7 @@ export default function ProductSale() {
   const { isError, data, error, refetch, isLoading } = useQuery({
     queryKey: ["products", filters],
     onSuccess: (data) => {
+      // console.log(data);
       const { page } = data;
       setPagination({
         current: page?.current,
@@ -78,15 +80,13 @@ export default function ProductSale() {
         <div className="wrapper-layout">
           <div className="flex gap-x-10 relative">
             <ProductFilter
+              onColorChange={handleColorChange}
               setSearchResult={setSearchResult}
-              onChange={handleCategoryChange}
+              onCategoryChange={handleCategoryChange}
               filters={filters}
             />
             <div className="flex flex-col gap-y-3 w-full">
-              <div className="sort-bar border-b border-[#e1e1e1] pb-4 mb-3 flex justify-between items-center">
-                <span className="text-textColor uppercase font-bold text-lg">
-                  Ao Thun
-                </span>
+              <div className="sort-bar border-b border-[#e1e1e1] pb-4 mb-3 flex justify-end items-center">
                 <div className="flex gap-x-3 items-center">
                   <span className="text-sm font-normal ">Sắp xếp:</span>
                   <select
@@ -160,8 +160,8 @@ export default function ProductSale() {
 const StyledProducts = styled.div`
   .search-section {
     padding: 20px;
-    -webkit-box-shadow: 0 2px 22px rgb(0 0 0 / 10%);
-    box-shadow: 0 2px 22px rgb(0 0 0 / 10%);
+    /* -webkit-box-shadow: 0 2px 22px rgb(0 0 0 / 10%);
+    box-shadow: 0 2px 22px rgb(0 0 0 / 10%); */
   }
   .css-yuzg60-MuiButtonBase-root-MuiPaginationItem-root.Mui-selected {
     color: #fff;

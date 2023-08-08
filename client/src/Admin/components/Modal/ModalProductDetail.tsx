@@ -2,7 +2,7 @@ import { useModalStore } from "@/store/modalStore";
 import * as React from "react";
 import ReactDOM from "react-dom";
 import InputModal from "../InputModal/InputModal";
-import { IColor, IProduct, ISize } from "@/types/interface";
+import { IColor, IFilters, IProduct, ISize } from "@/types/interface";
 import Image from "next/image";
 import UseDisabled from "@/hooks/useDisabled";
 import { btnColorStyle } from "../ChooseColor";
@@ -16,21 +16,25 @@ export interface IModalProductDetailProps {
   productId: number | null;
   isOpenDetailP: boolean;
   setSelectedId: React.Dispatch<React.SetStateAction<any>>;
+  filters: IFilters;
 }
 
 export default function ModalProductDetail({
   productId,
   isOpenDetailP,
   setSelectedId,
+  filters,
 }: IModalProductDetailProps) {
-  console.log(isOpenDetailP);
+  const queryClient = useQueryClient();
   const { setOpenDetailProduct } = useModalStore();
   const { data, isLoading } = useQuery({
     queryKey: ["product", productId],
     enabled: productId !== undefined,
     queryFn: () => getProduct(productId as number),
     onSuccess: (data) => {
-      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["products", filters],
+      });
     },
     onError: (err) => {
       toast.error("Có lỗi");
@@ -118,7 +122,7 @@ export default function ModalProductDetail({
             <InputModal
               disabled={true}
               id="price"
-              title="Giá giảm"
+              title="Giá khuyến mãi"
               value={data?.discount?.discountPrice?.toString()}
             />
             <InputModal
