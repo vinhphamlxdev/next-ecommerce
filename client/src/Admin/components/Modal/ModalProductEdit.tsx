@@ -23,6 +23,7 @@ import ChooseColor from "../ChooseColor";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { getProduct, updateProduct } from "@/pages/api/ProductApi";
 import invalidPrice from "@/utils/invalidPrice";
+import notification from "@/utils/notification";
 export interface IModalProductEditProps {
   productId: number;
   isOpenEditP: boolean;
@@ -79,13 +80,13 @@ export default function ModalProductEdit({
       setOpenEditProduct(false);
       toast.success("Cập nhật sản phẩm thành công");
     },
-    onError: () => {
+    onError: (err: any) => {
       setOpenEditProduct(false);
       setFile([]);
       setImgsDelete([]);
       setSizesDelete([]);
       setColorsDelete([]);
-      toast.error("Cập nhật sản phẩm thất bại");
+      toast.error(`${err?.response?.data}`);
     },
     onSettled: () => {
       setSelectedId(null);

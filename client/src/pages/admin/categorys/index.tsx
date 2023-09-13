@@ -25,7 +25,7 @@ export default function Category() {
   };
   const initialFilters: FiltersState = {
     pageNum: 0,
-    itemsPerPage: 2,
+    itemsPerPage: 3,
   };
   const { filters, handlePageChange, pagination, setFilters, setPagination } =
     usePaginationAndFilters(initialPagination, initialFilters);

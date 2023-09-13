@@ -10,6 +10,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import com.ecommerce.shopme.entity.Category;
+import com.ecommerce.shopme.entity.Product;
 
 @Repository
 public interface CategoryRepository extends PagingAndSortingRepository<Category,Integer> {
@@ -23,5 +24,8 @@ public interface CategoryRepository extends PagingAndSortingRepository<Category,
 
     @Query("SELECT c FROM Category c WHERE c.isDelete = false")
     Page<Category> findByIsDeleteFalse(Pageable pageable);
+
+    @Query("SELECT c FROM Category c  WHERE c.name = :name")
+    Category findByName(String name);
    
 }

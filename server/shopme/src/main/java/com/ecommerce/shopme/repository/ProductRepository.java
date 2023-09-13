@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 import com.ecommerce.shopme.entity.Order;
 import com.ecommerce.shopme.entity.OrderDetail;
 import com.ecommerce.shopme.entity.Product;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 
 @Repository
 public interface ProductRepository extends PagingAndSortingRepository<Product,Integer> {
@@ -38,7 +38,9 @@ Page<Product> findByIsDeleteAndCategorySlug(boolean isDelete,String categorySlug
 
 Product findBySlug(String slug);
 
-Page<Product> findByIsDelete(boolean isDelete, Pageable pageable);
+
+@Query("SELECT p FROM Product p  WHERE p.isDelete = 0")
+Page<Product> findAllProducts(Pageable pageable);
 //Tim kiem sp chứa 1 chuỗi cụ thể
 //  List<Product> findByNameContaining(String searchString);
 //Tìm kiếm sản phẩm bắt đầu bằng một chuỗi cụ thể
@@ -47,13 +49,15 @@ Page<Product> findByIsDelete(boolean isDelete, Pageable pageable);
 //List<Product> findByNameEndingWith(String searchString);
 //Tìm kiếm sản phẩm có một ký tự bất kì ở bất kỳ vị trí nào
 //List<Product> findByNameLike(String searchString);
-@Query("SELECT p FROM Product p WHERE p.name LIKE %?1%")
-public List<Product> searchProduct(String keyword);
+@Query("SELECT p FROM Product p WHERE CONCAT(p.name, p.slug) LIKE %?1% AND p.isDelete = 0" )  
+            Page<Product> searchProduct(String keyword,Pageable pageable);
+
+@Query("SELECT p FROM Product p WHERE p.discount.discountPrice > 0 AND p.isDelete=0")
+public List<Product> findDiscountedProducts();
 
 
 
-
-
+ 
    
 }
    

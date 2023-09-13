@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,22 +98,54 @@ public class ProductController {
     required = false)  String categorySlug,@RequestParam(name = "sortfield",required = false) String sortField,
     @RequestParam(name = "sortdir",required = false) String sortDir,
     @RequestParam(name = "isDelete", defaultValue = "false") boolean isDelete,
-    @RequestParam(name = "colorName",required = false) String colorName
+    @RequestParam(name = "colorName",required = false) String colorName,
+    @RequestParam(name = "discount",required = false) float discount
+
 
     ){
+        boolean hasDiscount = discount>0;
         Page<Product> page ; 
-        if (categorySlug != null && !categorySlug.isEmpty() && colorName != null && !colorName.isEmpty()) {
-            page = productService.listByPageProductByCategoryAndColor(pageNum, itemsPerPage,
-                    categorySlug, colorName, sortField, sortDir, isDelete);
-        } else if (categorySlug != null && !categorySlug.isEmpty()) {
-            page = productService.listByPageProductAndCategorySlug(pageNum, itemsPerPage,
-                    categorySlug, sortField, sortDir, isDelete);
-        } else if (colorName != null && !colorName.isEmpty()) {
-            page = productService.listByPageProductByColorName(pageNum, itemsPerPage,
-                    colorName, sortField, sortDir, isDelete);
+
+        if (hasDiscount) {
+            if (StringUtils.isEmpty(categorySlug) && StringUtils.isEmpty(colorName)) {
+                // Khi có giảm giá và cả hai categorySlug và colorName đều trống
+                //  lấy tất cả sản phẩm giảm giá
+                page = productService.getAllDiscountedProducts(pageNum, itemsPerPage, sortField, sortDir, discount);
+            } else if (!StringUtils.isEmpty(categorySlug) && !StringUtils.isEmpty(colorName)) {
+                // Khi có giảm giá và cả hai categorySlug và colorName đều không trống
+                //  lấy sản phẩm theo cả hai điều kiện
+                page = productService.getDiscountedProductsByCategoryAndColor(pageNum, itemsPerPage, categorySlug, colorName, sortField, sortDir, discount);
+            } else if (!StringUtils.isEmpty(categorySlug)) {
+                // Khi có giảm giá và chỉ có categorySlug không trống
+                //  lấy sản phẩm theo categorySlug
+                page = productService.getDiscountedProductsByCategory(pageNum, itemsPerPage, categorySlug, sortField, sortDir, discount);
+            } else if (!StringUtils.isEmpty(colorName)) {
+                // Khi có giảm giá và chỉ có colorName không trống
+                //  lấy sản phẩm theo colorName
+                page = productService.getDiscountedProductsByColor(pageNum, itemsPerPage, colorName, sortField, sortDir, discount);
+            } else {
+                // Nếu giảm giá nhưng không có categorySlug và colorName
+                //  lấy tất cả sản phẩm giảm giá
+                page = productService.getAllDiscountedProducts(pageNum, itemsPerPage, sortField, sortDir, discount);
+            }
         } else {
-            page = productService.listByPageProduct(pageNum, itemsPerPage, sortField, sortDir, isDelete);
+            // Nếu discount là false, lấy tất cả sản phẩm hoặc theo categorySlug hoặc colorName 
+            if (!StringUtils.isEmpty(categorySlug) && !StringUtils.isEmpty(colorName)) {
+                // Khi không có giảm giá và cả hai categorySlug và colorName đều không trống
+                page = productService.listByPageProductByCategoryAndColor(pageNum, itemsPerPage, categorySlug, colorName, sortField, sortDir);
+            } else if (!StringUtils.isEmpty(categorySlug)) {
+                // Khi không có giảm giá và chỉ có categorySlug không trống
+                page = productService.listByPageProductAndCategorySlug(pageNum, itemsPerPage, categorySlug, sortField, sortDir, isDelete);
+            } else if (!StringUtils.isEmpty(colorName)) {
+                // Khi không có giảm giá và chỉ có colorName không trống
+                page = productService.listByPageProductByColorName(pageNum, itemsPerPage, colorName, sortField, sortDir, isDelete);
+            } else {
+                // Khi không có giảm giá và không có categorySlug và colorName
+                //  lấy tất cả sản phẩm
+                page = productService.listByPageProduct(pageNum, itemsPerPage, sortField, sortDir, isDelete);
+            }
         }
+///    
         List<Product> listProductsByPage = page.getContent();
         List<ProductDetail> listProducts = listProductsByPage.stream()
         .map(product -> {
@@ -296,16 +330,18 @@ public class ProductController {
     @PutMapping("/products/{productId}")
     public ResponseEntity<?> updateProduct(@PathVariable Integer productId ,
     @ModelAttribute @Valid ProductDTO productRequest,
-     @RequestParam("category") Integer categoryId,
-      @RequestParam("imgsDelete") List<String> imgsDelete,
-      @RequestParam("sizesDelete") Set<Integer> sizesDelete,
-      @RequestParam("colorsDelete") Set<Integer> colorDelete
+    @RequestParam("category") Integer categoryId,
+    @RequestParam("imgsDelete") List<String> imgsDelete,
+    @RequestParam("sizesDelete") Set<Integer> sizesDelete,
+    @RequestParam("colorsDelete") Set<Integer> colorDelete
      ) throws IOException{
             // Kiểm tra sản phẩm có tồn tại hay không
         Product existingProduct = productService.getProductById(productId);
-        if (existingProduct == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm voi id:"+productId);
-        }
+        if (!productService.checkDuplicateUpdate(productRequest.getName(), productId)) {
+            // return ResponseEntity.badRequest().body("Tên sản phẩm đã tồn tại cho sản phẩm khác.");
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tên sản phẩm đã tồn tại cho sản phẩm khác.");
+
+        } 
         // Lấy danh sách danh mục từ danh sách mã danh mục
            Category category = categoryService.getCategoryById(categoryId);
               if (category==null) {
@@ -364,15 +400,14 @@ public class ProductController {
                 
          return ResponseEntity.ok(updatedProduct);
     }
-   @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
-    @GetMapping("/products/search")
-    public ResponseEntity<?> listProductByKeyword(@RequestParam(name = "keyword") String keyword){
-        List<Product> products = productService.getByKeyword(keyword);
-        if (products.isEmpty()) {
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy sản phẩm với tên:"+keyword);
-
-        }
-        List<ProductDetail> listProducts = products.stream()
+//    @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+    @GetMapping("/search")
+    public ResponseEntity<?> listProductByKeyword(@RequestParam(name = "keyword") String keyword,
+    @RequestParam(defaultValue = "0") int pageNum,
+    @RequestParam(defaultValue = "10") int itemsPerPage){
+       Page<Product> page = productService.getByKeyword(keyword,pageNum,itemsPerPage);
+   List<Product> listProductsByPage = page.getContent();
+        List<ProductDetail> listProducts = listProductsByPage.stream()
         .map(product -> {
                 ProductDetail productDetail = new ProductDetail();
                 productDetail.setId(product.getId());
@@ -383,6 +418,7 @@ public class ProductController {
                 productDetail.setSlug(product.getSlug());
                 productDetail.setDelete(product.isDelete());
                 productDetail.setCategory(product.getCategory());
+                productDetail.setDiscount(product.getDiscount());
                 List<Size> sizes = new ArrayList<>();
                 for (Size size : product.getSizes()) {
                     sizes.add(size);
@@ -401,10 +437,16 @@ public class ProductController {
                 return productDetail;
             })
             .collect(Collectors.toList());
-           Map<String,Object> response = new HashMap<>();
-            response.put("products", listProducts);
+         Map<String,Object> response = new HashMap<>();
             response.put("status", "success");
-                return ResponseEntity.ok(response);
+            response.put("products", listProducts);
+         PageResponse paggination = new PageResponse<>();
+                paggination.setCurrent(page.getNumber());
+                paggination.setItemsPerPage(page.getSize());
+                paggination.setTotalItems(page.getTotalElements());
+                paggination.setTotalPages(page.getTotalPages());
+                response.put("page", paggination);
+                  return ResponseEntity.ok(response);
         
     }
 //   //DELETE

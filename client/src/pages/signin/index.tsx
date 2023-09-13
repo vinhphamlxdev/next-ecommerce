@@ -1,5 +1,6 @@
-import { IMG_SRC } from "@/common/constanst";
+"use client";
 import * as React from "react";
+import { IMG_SRC } from "@/common/constanst";
 import Image from "next/image";
 import { styled } from "styled-components";
 import Input from "@/Admin/components/Input";
@@ -10,14 +11,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useAuthContext } from "@/context/useAuthContext";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-import { IFormLogin } from "@/types/authInterface";
+import { IFormLogin, ILoginResponse } from "@/types/authInterface";
 import useDisabled from "@/hooks/useDisabled";
 import { LoadingSpinner } from "@/Admin/components/Loading";
 import { useGlobalStore } from "@/store/globalStore";
 import notification from "@/utils/notification";
 import { loginUser } from "@/pages/api/authApi";
 import { backgroundImageStyle } from "../signup";
-export default function SignIn() {
+import dynamic from "next/dynamic";
+function SignIn() {
   const router = useRouter();
   const { dispatch, state } = useAuthContext();
   const { showPassword, setShowPassword } = useGlobalStore();
@@ -25,7 +27,7 @@ export default function SignIn() {
   const { mutate, isLoading, data, mutateAsync } = useMutation(
     (userData: IFormLogin) => loginUser(userData),
     {
-      onSuccess(data: any) {
+      onSuccess(data: ILoginResponse) {
         // console.log(data);
         dispatch({ type: "LOG_IN", payload: data.user });
         signInFormik.resetForm();
@@ -33,6 +35,7 @@ export default function SignIn() {
         router.push("/home");
       },
       onError(error: any) {
+        console.log(error);
         notification(error?.response.data, "error");
       },
     }
@@ -142,3 +145,4 @@ export default function SignIn() {
     </div>
   );
 }
+export default dynamic(() => Promise.resolve(SignIn), { ssr: false });

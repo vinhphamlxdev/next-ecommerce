@@ -89,10 +89,11 @@ public class CategoryController {
     @PutMapping("/categorys/{id}")
     public ResponseEntity<?> updateCategory(@PathVariable Integer id, @RequestBody CategoryDTO updateCategory){
         Category categoryExist = categoryService.getCategoryById(id);
-        if (categoryExist == null) {
-            String message = "Danh mục có ID " + id + " không tồn tại";
-            return ResponseEntity.ok(message);
-        }
+       
+        if (!categoryService.checkDuplicateUpdate(updateCategory.getName(), id)) {
+             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tên danh mục đã tồn tại cho danh mục khác!");
+
+        } 
             categoryExist.setName(updateCategory.getName());
             categoryExist.setDescription(updateCategory.getDescription());
             categoryExist.setSlug(SlugUtils.createSlug(updateCategory.getName()));

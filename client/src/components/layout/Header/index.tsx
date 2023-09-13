@@ -11,13 +11,19 @@ import { usePathname } from "next/navigation";
 import { styled } from "styled-components";
 import { useAuthContext } from "@/context/useAuthContext";
 import { toast } from "react-toastify";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import deleteFromCookie from "@/token/deleteFromCookie";
 import calculateTotalCart from "@/utils/caculateTotalCart";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import { BsHandbag } from "react-icons/bs";
 import { useCartContext } from "@/context/useCartContext";
 import brand from "@/assets/logo.png";
+import usePaginationAndFilters, {
+  FiltersState,
+  PaginationState,
+} from "@/hooks/usePaginationAndFilters";
+import { getProductByKeyword } from "@/pages/api/ProductApi";
+import { useRouter } from "next/router";
 const navLinks = [
   {
     id: 1,
@@ -42,7 +48,9 @@ const navLinks = [
 ];
 export default function HeaderClient() {
   const { scrollHeader, setScrollHeader } = useGlobalStore((state) => state);
+  const [searchValue, setSearchValue] = React.useState<string>("");
   const { state: cartState } = useCartContext();
+  const router = useRouter();
   const cartItems = cartState.cartItems;
   const pathname = usePathname();
   const { dispatch, state } = useAuthContext();
@@ -64,6 +72,15 @@ export default function HeaderClient() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchValue.trim()) {
+      return;
+    }
+
+    router.push(`/search?keyword=${searchValue}`);
+    setSearchValue("");
+  };
 
   return (
     <StyledHeader>
@@ -132,6 +149,29 @@ export default function HeaderClient() {
             })}
           </div>
           <div className="flex items-center header-right gap-x-4">
+            <div className="relative search-control-icon">
+              <i className="bi text-lg text-gray-600 cursor-pointer hover:text-bgPrimary transition-all bi-search"></i>
+              <div className="absolute top-[42px] search-control hidden   right-0">
+                <form
+                  onSubmit={handleSearch}
+                  className="search-form flex  overflow-hidden"
+                >
+                  <input
+                    value={searchValue}
+                    onChange={(e) => setSearchValue(e.target.value)}
+                    className="text-textPrimary flex-1 border-r-0 text-sm outline-none h-10 border border-gray-400 rounded-sm px-3 focus:border-bgPrimary"
+                    type="text"
+                    placeholder="Tìm kiếm theo..."
+                  />
+                  <button
+                    type="submit"
+                    className="text-white w-14 bg-bgPrimary px-3 transition-all rounded-sm h-10 hover:bg-secondary"
+                  >
+                    <span> Tìm</span>
+                  </button>
+                </form>
+              </div>
+            </div>
             <div className="text-2xl icon-user relative text-textPrimary">
               <i className="transition-all cursor-pointer bi text-textPrimary hover:text-bgPrimary bi-person"></i>
               <div className="absolute w-44 select-none hidden shadow-lg border border-gray-200 -left-[153px] py-3 popup-user flex-col rounded-md bg-white">
@@ -195,7 +235,7 @@ export default function HeaderClient() {
             </div>
 
             <Link href="/cart" className="relative text-2xl text-textPrimary">
-              <BsHandbag className="text-textColor"></BsHandbag>
+              <BsHandbag className="text-textColor hover:text-bgPrimary"></BsHandbag>
               <span className="text-white cursor-pointer top-[-1px] right-[-8px] absolute text-xs bg-bgPrimary rounded-full w-4 h-4 flex justify-center items-center">
                 {calculateTotalCart(cartItems)}
               </span>

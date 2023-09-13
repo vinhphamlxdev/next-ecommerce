@@ -10,6 +10,7 @@ const nextConfig = {
   compiler: {
     styledComponents: true,
   },
+  reactDevOverlay: false,
 };
 
 module.exports = nextConfig;

@@ -1,4 +1,3 @@
-import deleteFromCookie from "@/token/deleteFromCookie";
 import { IUser } from "@/types/authInterface";
 import { IProduct } from "@/types/interface";
 import React from "react";

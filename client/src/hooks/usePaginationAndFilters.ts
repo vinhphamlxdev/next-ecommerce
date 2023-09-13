@@ -15,6 +15,7 @@ export interface FiltersState {
   sortdir?: string;
   status?: string;
   colorName?: string;
+  discount?: string;
 }
 interface PaginationAndFiltersHook {
   pagination: PaginationState;
@@ -35,7 +36,6 @@ export default function usePaginationAndFilters(
   const queryClient = useQueryClient();
   const [pagination, setPagination] =
     React.useState<PaginationState>(initialPagination);
-
   const [filters, setFilters] = React.useState<FiltersState>(initialFilters);
 
   const handlePageChange = (

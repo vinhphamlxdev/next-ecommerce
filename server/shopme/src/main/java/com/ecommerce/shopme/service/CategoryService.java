@@ -1,6 +1,7 @@
 package com.ecommerce.shopme.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -65,6 +66,16 @@ public boolean existsCategoryById(Integer id){
 public List<Category> getCategoriesByIds(List<Integer> categoryIds) {
     return categoryRepository.findByIdIn(categoryIds);
 }
-
+public boolean checkDuplicateUpdate(String name, Integer categoryId ){
+    Category existCategory = categoryRepository.findById(categoryId);
+    if (existCategory!=null) {
+        Category existingCategoryWithSameName = categoryRepository.findByName(name);
+        if (existingCategoryWithSameName == null ||existingCategoryWithSameName.getId().equals(categoryId)) {
+            return true;
+        }
+    }
+    return false;
+   
+}
 
 }

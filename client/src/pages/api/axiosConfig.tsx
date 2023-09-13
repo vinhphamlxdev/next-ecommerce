@@ -15,8 +15,8 @@ const axiosConfig = axios.create({
 
 axiosConfig.interceptors.request.use(
   (config) => {
-    const accessToken = getFromCookie("access_token");
-    console.log(accessToken);
+    // const accessToken = getFromCookie("access_token");
+    const accessToken = localStorage.getItem("access_token");
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
@@ -32,10 +32,11 @@ axiosConfig.interceptors.response.use((response) => {
   if (url?.includes("auth/login")) {
     token = response.data.access_token;
     if (token) {
-      setToCookie("access_token", token, {
-        secure: true,
-        "max-age": 3153600000,
-      });
+      // setToCookie("access_token", token, {
+      //   secure: true,
+      //   "max-age": 3153600000,
+      // });
+      localStorage.setItem("access_token", token);
     }
   }
   return response;

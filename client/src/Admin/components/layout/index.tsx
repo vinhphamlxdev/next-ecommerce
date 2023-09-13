@@ -15,7 +15,8 @@ export interface LayoutAdminProps {
 export default function LayoutAdmin(props: LayoutAdminProps) {
   const router = useRouter();
   React.useEffect(() => {
-    const token = getFromCookie("access_token");
+    // const token = getFromCookie("access_token");
+    const token = localStorage.getItem("access_token");
     if (!token) {
       router.push("/home");
       return;

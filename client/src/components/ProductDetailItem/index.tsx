@@ -44,11 +44,13 @@ export default function ProductDetail({
   const [quantity, setQuantity] = React.useState<number>(1);
   const { dispatch, state } = useCartContext();
   const { setCloseModalQuickView } = useModalStore((state) => state);
+  const newSizes = sizes?.filter((size: { delete: any }) => !size.delete);
+  const newColors = colors?.filter((color: { delete: any }) => !color.delete);
   const [selectedSize, setSelectedSize] = React.useState<string>(
-    sizes[0]?.name
+    newSizes[0]?.name
   );
   const [selectedColor, setSelectedColor] = React.useState<string>(
-    colors[0]?.colorName
+    newColors[0]?.colorName
   );
   const [currentSlide, setCurrentSlide] = React.useState<number>(0);
 
@@ -178,8 +180,8 @@ export default function ProductDetail({
         <div className="flex flex-col gap-y-3">
           <span className="text-base text-[#707070] font-medium">Màu Sắc:</span>
           <div className="flex items-center gap-x-2">
-            {colors?.length > 0 &&
-              colors.map((color) => {
+            {newColors?.length > 0 &&
+              newColors.map((color) => {
                 return (
                   <div
                     key={color.id}
@@ -215,8 +217,8 @@ export default function ProductDetail({
             Kích thước:
           </span>
           <div className="flex items-center gap-x-3">
-            {sizes?.length > 0 &&
-              sizes.map((size) => {
+            {newSizes?.length > 0 &&
+              newSizes.map((size) => {
                 return (
                   <div
                     key={size.id}

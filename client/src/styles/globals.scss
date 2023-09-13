@@ -193,3 +193,21 @@ body {
     color: #5f5f5f;
   }
 }
+nextjs-portal {
+  display: none;
+}
+.chat-popup {
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+}
+.search-control-icon:hover .search-control {
+  display: block;
+}
+.search-control-icon::after {
+  content: "";
+  position: absolute;
+  top: 25px;
+  width: 232px;
+  height: 18px;
+  background: transparent;
+  right: 0;
+}

@@ -52,7 +52,9 @@ const stateReducer = (state: State, action: Action) => {
     }
     case "LOG_OUT": {
       localStorage.removeItem("user");
-      deleteFromCookie("access_token");
+      // deleteFromCookie("access_token");
+
+      localStorage.removeItem("access_token");
       return {
         ...state,
         authUser: action.payload,

@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.validator.constraints.Length;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -33,7 +35,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 
 @Entity
 @AllArgsConstructor
@@ -64,6 +65,7 @@ public class Product {
 
     @Column(name = "quantity",nullable = false)
     @Min(value = 1,message = "số lượng tối thiểu phải là 1")
+    
     private Integer quantity;
 
     @Column(name = "created_at",nullable = false)

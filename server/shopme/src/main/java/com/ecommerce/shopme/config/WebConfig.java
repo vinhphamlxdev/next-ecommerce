@@ -1,3 +1,4 @@
+package com.ecommerce.shopme.config;
 // package com.ecommerce.shopme.config;
 
 // import org.springframework.context.annotation.Configuration;

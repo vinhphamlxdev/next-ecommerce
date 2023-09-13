@@ -37,12 +37,15 @@ export default function CategoryItem({
     mutationFn: (category: Omit<ICategory, "id">) =>
       updateCategory(id, category),
     onSuccess(data: any) {
-      queryClient.setQueryData(["category", id], data);
+      queryClient.invalidateQueries({ queryKey: ["categorys", filters] });
       toast.success("Cập nhật danh mục thành công");
     },
     onError(error: any) {
-      notification(error?.response.data, "error");
+      notification(error?.response?.data, "error");
       console.log("Có lỗi:", error);
+    },
+    onSettled: () => {
+      setEdit(false);
     },
   });
 
@@ -65,13 +68,20 @@ export default function CategoryItem({
         toast.error("Mô tả danh mục tối thiểu 20 kí tự");
         return;
       }
+      if (values.description.length > 200) {
+        toast.error("Mô tả danh mục tối đa 200 kí tự");
+        return;
+      }
+      if (values.name.length > 128) {
+        toast.error("Tên danh mục không được vượt quá 50 kí tự");
+        return;
+      }
       let data = {
         name: values.name,
         description: values.description,
       };
 
       mutate(data);
-      setEdit(false);
     },
   });
 

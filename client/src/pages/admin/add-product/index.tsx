@@ -74,7 +74,7 @@ export default function AddProduct() {
         .typeError("Giá sản phẩm phải là số"),
       quantity: Yup.number()
         .min(1, "Số lượng phải lớn hơn 0")
-        .max(500, "Số lượng tối đa là 500")
+        .max(5000, "Số lượng tối đa là 5000")
         .required("Số lượng là bắt buộc")
         .typeError("Số lượng sản phẩm phải là số"),
     }),

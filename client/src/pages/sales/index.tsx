@@ -33,6 +33,7 @@ export default function ProductSale() {
     category: "",
     sortfield: "",
     sortdir: "",
+    discount: "1",
   };
 
   const options = [
@@ -47,11 +48,11 @@ export default function ProductSale() {
     filters,
     handlePageChange,
     pagination,
-    setFilters,
     setPagination,
     handleCategoryChange,
     handleSortChange,
     handleColorChange,
+    setFilters,
   } = usePaginationAndFilters(initialPagination, initialFilters);
   const router = useRouter();
   const [searchResult, setSearchResult] = React.useState<IProduct[] | any>([]);
@@ -60,7 +61,7 @@ export default function ProductSale() {
   const { isError, data, error, refetch, isLoading } = useQuery({
     queryKey: ["products", filters],
     onSuccess: (data) => {
-      // console.log(data);
+      console.log("sale product:", data);
       const { page } = data;
       setPagination({
         current: page?.current,
@@ -72,6 +73,12 @@ export default function ProductSale() {
       console.log(err);
     },
   });
+  React.useEffect(() => {
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      discount: "1",
+    }));
+  }, []);
 
   return (
     <LayoutClient>
@@ -107,7 +114,6 @@ export default function ProductSale() {
                     className="px-3  border border-[#e1e1e1] w-[150px] bg-white h-9 outline-none rounded-sm"
                   >
                     <option value="">Mặc định</option>
-
                     {options.map((item, index) => {
                       return (
                         <option key={item.label} value={item.value}>
@@ -136,6 +142,9 @@ export default function ProductSale() {
                         return <ProductItem key={product.id} item={product} />;
                       })}
                 </div>
+              )}
+              {data?.products?.length === 0 && (
+                <div className="text-base text-center">không có sản phẩm</div>
               )}
               {isLoading && (
                 <LoadingSkeleton

@@ -63,13 +63,77 @@ public class ProductSevice {
             sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
             : Sort.by(mappedSortField).descending()
             );
-                return productRepository.findAll(pageable);
+                return productRepository.findAllProducts(pageable);
     }
          Pageable pageable = PageRequest.of(pageNumber, itemsPerpage
             );
-            return productRepository.findByIsDelete(isDelete, pageable);
+            return productRepository.findAllProducts(pageable);
+}
+////<===========================>>//
+
+  // Khi có giảm giá và cả hai categorySlug và colorName đều trống
+ // Xử lý truy vấn lấy tất cả sản phẩm giảm giá
+public Page<Product> getAllDiscountedProducts(Integer pageNumber, Integer itemsPerpage, String sortField,
+    String sortDir,float discount) {
+    if (sortField!=null && !sortField.isEmpty()) {
+            String mappedSortField = mapSortField(sortField);
+            Pageable pageable = PageRequest.of(pageNumber, itemsPerpage,
+            sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+            : Sort.by(mappedSortField).descending()
+            );
+                return colorRepository.findAllProductByDiscount(discount,pageable);
+    }
+         Pageable pageable = PageRequest.of(pageNumber, itemsPerpage
+            );
+            return colorRepository.findAllProductByDiscount(discount, pageable);
+}
+ // Khi có giảm giá và cả hai categorySlug và colorName đều không trống
+  // Xử lý truy vấn lấy sản phẩm theo cả hai điều kiện
+public Page<Product> getDiscountedProductsByCategoryAndColor(Integer pageNumber, Integer itemsPerPage,String categorySlug, String colorName, String sortField, String sortDir,  float discoutPrice) {
+    if (sortField != null && !sortField.isEmpty()) {
+        String mappedSortField = mapSortField(sortField);
+        Pageable pageable = PageRequest.of(pageNumber, itemsPerPage,
+                sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+                        : Sort.by(mappedSortField).descending()
+        );
+        return colorRepository.findByCategorySlugAndColorNameAndDiscount( categorySlug,colorName,discoutPrice, pageable);
+    } else {
+        Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+        return colorRepository.findByCategorySlugAndColorNameAndDiscount(categorySlug,colorName,discoutPrice, pageable);
+    }
+}
+  // Khi có giảm giá và chỉ có categorySlug không trống
+  // Xử lý truy vấn lấy sản phẩm theo categorySlug
+public Page<Product> getDiscountedProductsByCategory(Integer pageNumber, Integer itemsPerPage,String categorySlug, String sortField, String sortDir,  float discoutPrice) {
+    if (sortField != null && !sortField.isEmpty()) {
+        String mappedSortField = mapSortField(sortField);
+        Pageable pageable = PageRequest.of(pageNumber, itemsPerPage,
+                sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+                        : Sort.by(mappedSortField).descending()
+        );
+        return colorRepository.findByCategorySlugAndDiscount( categorySlug,discoutPrice, pageable);
+    } else {
+        Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+        return colorRepository.findByCategorySlugAndDiscount(categorySlug,discoutPrice, pageable);
+    }
+}
+ // Khi có giảm giá và chỉ có colorName không trống
+// Xử lý truy vấn lấy sản phẩm theo colorName
+public Page<Product> getDiscountedProductsByColor(Integer pageNumber, Integer itemsPerPage,String colorName, String sortField, String sortDir,  float discoutPrice) {
+    if (sortField != null && !sortField.isEmpty()) {
+        String mappedSortField = mapSortField(sortField);
+        Pageable pageable = PageRequest.of(pageNumber, itemsPerPage,
+                sortDir.equals("asc") ? Sort.by(mappedSortField).ascending()
+                        : Sort.by(mappedSortField).descending()
+        );
+        return colorRepository.findByColorNameAndDiscount(colorName,discoutPrice, pageable);
+    } else {
+        Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+        return colorRepository.findByColorNameAndDiscount(colorName,discoutPrice, pageable);
+    }
 }
 
+////<===========================>>
 public Page<Product> listByPageProductAndCategorySlug(int pageNum, int itemsPerPage, String categorySlug,
 String sortField,
     String sortDir,boolean isDelete
@@ -110,8 +174,8 @@ String sortField,
 }
 public Page<Product> listByPageProductByCategoryAndColor(int pageNum, int itemsPerPage,
                                                           String categorySlug, String colorName,
-                                                          String sortField, String sortDir,
-                                                          boolean isDelete) {
+                                                          String sortField, String sortDir
+                                                          ) {
     Pageable pageable;
 
     if (sortField != null && !sortField.isEmpty()) {
@@ -132,6 +196,8 @@ private String mapSortField(String sortField) {
     switch (sortField) {
         case "createdat":
             return "createdAt";
+        case "price":
+        return "price";
         default:
             return sortField; 
     }
@@ -203,6 +269,17 @@ public boolean checkDuplicate(String name){
         return true;
     }
     return false;
+}
+public boolean checkDuplicateUpdate(String name, Integer productId ){
+    Optional<Product> existProduct = productRepository.findById(productId);
+    if (existProduct.isPresent()) {
+        Product existingProductWithSameName = productRepository.findByName(name);
+        if (existingProductWithSameName == null ||existingProductWithSameName.getId().equals(productId)) {
+            return true;
+        }
+    }
+    return false;
+   
 }
 public void addSizeToProduct(Integer productId,String sizeName){
      Optional<Product> optionalProduct = productRepository.findById(productId);
@@ -286,7 +363,7 @@ public void deleteColor(Integer productId,Set<Integer> colorsDeleteId,Set<String
      
 }
 
-    //nhận vào là fie ảnh trả ra danh sách path ảnh để lưu vào db
+    //nhận vào là  danh sách fie ảnh trả ra danh sách url ảnh để lưu vào db
      public List<String> saveImagesToCloudinary(List<MultipartFile> images) throws IOException, java.io.IOException {
      
         List<String> imageUrls = new ArrayList<>();
@@ -313,8 +390,9 @@ public Product getProductBySlug(String slug){
     return productRepository.findBySlug(slug);
 }
 
-public List<Product> getByKeyword(String keyword){
-        return productRepository.searchProduct(keyword);
+public Page<Product> getByKeyword(String keyword, Integer pageNumber, Integer itemsPerPage){
+     Pageable pageable = PageRequest.of(pageNumber, itemsPerPage);
+        return  productRepository.searchProduct(keyword,pageable);
 }
 
 

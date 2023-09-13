@@ -24,6 +24,8 @@ import com.ecommerce.shopme.entity.Role;
 import com.ecommerce.shopme.entity.User;
 import com.ecommerce.shopme.service.UserService;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 
@@ -114,5 +116,16 @@ public class AuthApi {
                 response.put("access_token",accessToken);
           return ResponseEntity.ok().body(response);
       
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshAccessToken(){
+        //tao token moi
+         String newToken = Jwts.builder()
+         .setSubject("user") // Chỉ định người dùng
+            .signWith(SignatureAlgorithm.HS256, "your-secret-key") // Ký bằng mã bí mật
+            .compact();
+            return ResponseEntity.ok(newToken);
+
     }
 }

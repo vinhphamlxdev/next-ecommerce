@@ -59,8 +59,8 @@ export default function HomeAdmin() {
               <div className="flex flex-col">
                 <FiBarChart className="text-[100px] text-[#9b5de5]"></FiBarChart>
                 <div className="flex  gap-x-3">
-                  <span className="text-base text-saveBg">+40%</span>
-                  <span className="text-gray-400 text-sm">Trong tháng này</span>
+                  {/* <span className="text-base text-saveBg">+40%</span> */}
+                  {/* <span className="text-gray-400 text-sm">Trong tháng này</span> */}
                 </div>
               </div>
             </div>
@@ -89,8 +89,8 @@ export default function HomeAdmin() {
               <div className="flex flex-col">
                 <IoStatsChartOutline className="text-[100px] text-[#00bbf9]"></IoStatsChartOutline>
                 <div className="flex  gap-x-3">
-                  <span className="text-base text-saveBg">+64%</span>
-                  <span className="text-gray-400 text-sm">Trong tháng này</span>
+                  {/* <span className="text-base text-saveBg">+64%</span> */}
+                  {/* <span className="text-gray-400 text-sm">Trong tháng này</span> */}
                 </div>
               </div>
             </div>
@@ -121,8 +121,8 @@ export default function HomeAdmin() {
               <div className="flex flex-col">
                 <MdShowChart className="text-[100px] text-[#2ec4b6]"></MdShowChart>
                 <div className="flex  gap-x-3">
-                  <span className="text-base text-saveBg">+83%</span>
-                  <span className="text-gray-400 text-sm">Trong tháng này</span>
+                  {/* <span className="text-base text-saveBg">+83%</span> */}
+                  {/* <span className="text-gray-400 text-sm">Trong tháng này</span> */}
                 </div>
               </div>
             </div>
@@ -154,8 +154,8 @@ export default function HomeAdmin() {
               <div className="flex flex-col">
                 <GiChart className="text-[100px] text-[#fb6f92]"></GiChart>
                 <div className="flex  gap-x-3">
-                  <span className="text-base text-saveBg">+45%</span>
-                  <span className="text-gray-400 text-sm">Trong tháng này</span>
+                  {/* <span className="text-base text-saveBg">+45%</span> */}
+                  {/* <span className="text-gray-400 text-sm">Trong tháng này</span> */}
                 </div>
               </div>
             </div>

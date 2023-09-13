@@ -47,15 +47,13 @@ export default function ProductClient() {
     filters,
     handlePageChange,
     pagination,
-    setFilters,
     setPagination,
     handleCategoryChange,
     handleSortChange,
     handleColorChange,
+    setFilters,
   } = usePaginationAndFilters(initialPagination, initialFilters);
   const router = useRouter();
-  const [searchResult, setSearchResult] = React.useState<IProduct[] | any>([]);
-  const [isSearching, setIsSearching] = React.useState(false);
   const { query } = router;
   const { isError, data, error, refetch, isLoading } = useQuery({
     queryKey: ["products", filters],
@@ -80,7 +78,6 @@ export default function ProductClient() {
           <div className="flex gap-x-10 relative">
             <ProductFilter
               onColorChange={handleColorChange}
-              setSearchResult={setSearchResult}
               onCategoryChange={handleCategoryChange}
               filters={filters}
             />
@@ -117,19 +114,14 @@ export default function ProductClient() {
                   </select>
                 </div>
               </div>
-              {searchResult?.length > 0 ? (
-                <div className="grid gap-y-5 grid-cols-3 gap-x-7">
-                  {searchResult.map((product: IProduct, index: number) => {
+              <div className="grid gap-y-5 grid-cols-3 gap-x-7">
+                {data?.products?.length > 0 &&
+                  data?.products?.map((product: IProduct, index: number) => {
                     return <ProductItem key={product.id} item={product} />;
                   })}
-                </div>
-              ) : (
-                <div className="grid gap-y-5 grid-cols-3 gap-x-7">
-                  {data?.products?.length > 0 &&
-                    data?.products?.map((product: IProduct, index: number) => {
-                      return <ProductItem key={product.id} item={product} />;
-                    })}
-                </div>
+              </div>
+              {data?.products?.length === 0 && (
+                <div className="text-base text-center">không có sản phẩm</div>
               )}
               {isLoading && (
                 <LoadingSkeleton

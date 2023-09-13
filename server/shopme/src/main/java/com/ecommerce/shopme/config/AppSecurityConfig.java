@@ -59,7 +59,7 @@ public class AppSecurityConfig {
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
-               .requestMatchers("/auth/login","/auth/register","/products","/categorys","products/**").permitAll()
+               .requestMatchers("/auth/login","/auth/register","/products","/categorys","products/**","orders","orders/**").permitAll()
                 .anyRequest().authenticated();
             http.exceptionHandling()
                     .authenticationEntryPoint(

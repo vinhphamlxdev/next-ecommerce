@@ -35,7 +35,7 @@ public class Category {
     private Integer id;
     @Column(length = 128, nullable = false, unique = true)
     @NotBlank(message = "Tên danh mục không được để trống")
-    @Length(min = 5,max = 50, message = "Tên danh mục tối thiểu 5 kí  tự tối đa 40 kí tự")
+    @Length(min = 5,max = 50, message = "Tên danh mục tối thiểu 5 kí  tự tối đa 50 kí tự")
     private String name;
     @NotBlank(message = "slug không được để trống")
     @Column(name = "slug",length = 64, nullable = false, unique = true)

@@ -4,6 +4,7 @@ import * as React from "react";
 import QuickView from "../Modal";
 import { useModalStore } from "@/store/modalStore";
 import dynamic from "next/dynamic";
+import Chat from "./Chat";
 const HeaderClient = dynamic(() => import("./Header"), {
   ssr: false, // Vô hiệu hóa server-side rendering (SSR)
 });
@@ -30,6 +31,7 @@ export default function LayoutClient(props: LayoutClientProps) {
         <QuickView item={seletedProduct} />
       )}
       {props.children}
+      {/* <Chat /> */}
       <Footer />
     </div>
   );
