@@ -1,3 +1,6 @@
+"use client";
+
+"use client"
 import { useGlobalStore } from "@/store/globalStore";
 import * as React from "react";
 

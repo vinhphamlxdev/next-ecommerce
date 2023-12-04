@@ -1,3 +1,5 @@
+"use client";
+
 import LoadingButton from "@/Admin/components/Loading/LoadingButton";
 import useDisabled from "@/hooks/useDisabled";
 import { getProductByKeyword } from "@/pages/api/ProductApi";

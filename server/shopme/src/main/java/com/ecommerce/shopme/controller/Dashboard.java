@@ -25,7 +25,7 @@ public class Dashboard {
         OrderService orderService;
         @Autowired 
         UserService userService;
-        @RolesAllowed("ROLE_ADMIN")
+    @RolesAllowed("ROLE_ADMIN")
     @GetMapping("/dashboard")
     public ResponseEntity<?> getDashboard(){
         DashboardDTO newDashboardDTO = new DashboardDTO();

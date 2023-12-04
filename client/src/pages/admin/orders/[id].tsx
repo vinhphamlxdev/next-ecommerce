@@ -35,7 +35,13 @@ function OrderDetail() {
       // console.log("order detail:", data);
     },
     onError: (err: any) => {
-      toast.error("Có lỗi", err);
+      if (
+        err &&
+        (err?.response?.status === 401 || err?.response?.status === 403)
+      ) {
+        toast.error(`Không có quyền truy cập!`);
+        router.push(`/home`);
+      }
     },
   });
 

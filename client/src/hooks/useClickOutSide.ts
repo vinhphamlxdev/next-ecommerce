@@ -1,4 +1,5 @@
 // import { useState, useEffect, useRef } from "react";
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 

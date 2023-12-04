@@ -1,3 +1,4 @@
+"use client";
 import LayoutAdmin from "@/Admin/components/layout";
 import BestSeller from "@/components/BestSeller";
 import { IProduct, IResponseDashboard } from "@/types/interface";
@@ -15,15 +16,23 @@ import { BiMoneyWithdraw } from "react-icons/bi";
 import { useQuery } from "@tanstack/react-query";
 import { getDashboard } from "@/pages/api/DashboardApi";
 import Link from "next/link";
+import { useRouter } from "next/router";
 export default function HomeAdmin() {
+  const router = useRouter();
+
   const { isError, data, error, refetch, isLoading } = useQuery({
     queryKey: ["dasboard"],
     queryFn: () => getDashboard(),
-    onSuccess: (data: IResponseDashboard) => {
-      // console.log(data);
-    },
-    onError: (err) => {
-      console.log(err);
+    onSuccess: (data: IResponseDashboard) => {},
+    onError: (err: any) => {
+      console.log("co loi nè", err.response);
+      if (
+        err &&
+        (err?.response?.status === 401 || err?.response?.status === 403)
+      ) {
+        toast.error(`Không có quyền truy cập!`);
+        router.push(`/home`);
+      }
     },
   });
   return (

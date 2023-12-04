@@ -18,6 +18,7 @@ import { useSearchParams } from "next/navigation";
 import { getAllOrder } from "@/pages/api/OrderApi";
 import { useRouter } from "next/router";
 import { stringify } from "querystring";
+import { toast } from "react-toastify";
 
 export default function AllOrder() {
   const router = useRouter();
@@ -50,8 +51,14 @@ export default function AllOrder() {
         totalPages: page?.totalPages,
       });
     },
-    onError: (err) => {
-      console.log("err:", err);
+    onError: (err: any) => {
+      if (
+        err &&
+        (err?.response?.status === 401 || err?.response?.status === 403)
+      ) {
+        toast.error(`Không có quyền truy cập!`);
+        router.push(`/home`);
+      }
     },
   });
   return (
