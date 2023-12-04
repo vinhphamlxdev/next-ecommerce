@@ -69,6 +69,7 @@ import com.ecommerce.shopme.service.ProductSevice;
 import com.ecommerce.shopme.service.SizeService;
 import com.ecommerce.shopme.utils.SlugUtils;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -76,6 +77,7 @@ import jakarta.validation.constraints.Positive;
 @CrossOrigin(origins = "http://localhost:4000", maxAge = -1,allowedHeaders = "*")
 @RestController
 @Validated
+@SecurityRequirement(name = "bearerAuth")
 public class ProductController {
     @Autowired 
     ProductSevice productService;

@@ -76,6 +76,7 @@ export default function SignUp() {
         return;
       }
       const { fullName, email, password } = values;
+      console.log(values);
       const data = {
         fullName,
         email,

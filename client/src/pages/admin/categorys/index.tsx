@@ -18,6 +18,7 @@ import usePaginationAndFilters, {
   FiltersState,
   PaginationState,
 } from "@/hooks/usePaginationAndFilters";
+import { toast } from "react-toastify";
 export default function Category() {
   const initialPagination: PaginationState = {
     current: 1,
@@ -41,9 +42,7 @@ export default function Category() {
         totalPages: page?.totalPages,
       });
     },
-    onError: (err) => {
-      console.log(err);
-    },
+    onError: (err: any) => {},
   });
 
   return (

@@ -53,6 +53,7 @@ public class OrderController {
     private OrderService orderService;
     @Autowired ProductSevice productSevice;
     @Autowired OrderDetailService orderDetailService;
+@RolesAllowed("ROLE_ADMIN")
 @GetMapping("/orders")
 public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "0") int pageNum,
 @RequestParam(defaultValue = "5") int itemPerPage, @RequestParam(name  =  "status",required = false) String status){
@@ -96,6 +97,7 @@ public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "0") int pageN
              return ResponseEntity.ok(response);
 
 }
+@RolesAllowed("ROLE_ADMIN")
   @PostMapping("/orders")
   public ResponseEntity<?> createOrder(@RequestBody OrderDTO orderRequest){
     List<Product> insufficientProducts = new ArrayList<>();
@@ -113,6 +115,7 @@ public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "0") int pageN
         return new ResponseEntity<>("Đặt hàng thành công!", HttpStatus.OK);
     }
   }
+  @RolesAllowed("ROLE_ADMIN")
   @GetMapping("/orders/{id}")
 public ResponseEntity<?> getOrderDetail(@PathVariable int id) {
     Order existOrder = orderService.getOrderById(id);
@@ -144,6 +147,7 @@ public ResponseEntity<?> getOrderDetail(@PathVariable int id) {
    
      
 }
+
   @RolesAllowed("ROLE_ADMIN")
     @PutMapping("/orders/{id}")
     public void updateCategory(@PathVariable Integer id, @RequestBody OrderStatus status){

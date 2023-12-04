@@ -26,8 +26,13 @@ export default function AddCategory({ categorys, filters }: AddCategoryProps) {
       categoryFormik.resetForm();
       toast.success("Thêm danh mục thành công");
     },
-    onError: (err) => {
-      toast.error(`Có lỗi ${err}`);
+    onError: (err: any) => {
+      if (
+        err &&
+        (err?.response?.status === 401 || err?.response?.status === 403)
+      ) {
+        toast.error(`Không có quyền!`);
+      }
     },
   });
   const categoryFormik = useFormik({

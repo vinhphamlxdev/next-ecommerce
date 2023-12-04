@@ -28,11 +28,15 @@ import com.ecommerce.shopme.entity.Role;
 import com.ecommerce.shopme.entity.User;
 import com.ecommerce.shopme.service.UserService;
 
+import jakarta.annotation.security.RolesAllowed;
+
 @CrossOrigin(origins = "http://localhost:4000", maxAge = -1,allowedHeaders = "*")
 @RestController
 public class UserController {
     @Autowired
     UserService userService;
+
+    @RolesAllowed("ROLE_ADMIN")
     @GetMapping("/users")
 public ResponseEntity<?> getAllOrder(@RequestParam(defaultValue = "0") int pageNum,
 @RequestParam(defaultValue = "5") int itemPerPage){

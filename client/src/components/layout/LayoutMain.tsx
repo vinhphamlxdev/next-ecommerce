@@ -1,3 +1,4 @@
+"use client";
 import { Manrope } from "next/font/google";
 import * as React from "react";
 

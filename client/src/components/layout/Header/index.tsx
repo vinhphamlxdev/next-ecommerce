@@ -23,7 +23,8 @@ import usePaginationAndFilters, {
   PaginationState,
 } from "@/hooks/usePaginationAndFilters";
 import { getProductByKeyword } from "@/pages/api/ProductApi";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+
 const navLinks = [
   {
     id: 1,

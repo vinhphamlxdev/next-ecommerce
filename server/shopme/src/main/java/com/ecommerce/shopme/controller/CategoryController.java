@@ -37,7 +37,7 @@ public class CategoryController {
     @Autowired 
     ProductSevice productSevice;
 
-        // @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+        @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
         @GetMapping("/categorys")
         public ResponseEntity<?> getAllCategory( @RequestParam(defaultValue = "0") int pageNum,
         @RequestParam(defaultValue = "3") int itemsPerPage
@@ -56,7 +56,7 @@ public class CategoryController {
                       return ResponseEntity.ok(response);
         
         }
-        // @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
+        @RolesAllowed({"ROLE_ADMIN","ROLE_CUSTOMER"})
         @GetMapping("/categorys/{id}")
         public ResponseEntity<?> getCategoryById(@PathVariable("id") Integer id) {
             Category categoryExist = categoryService.getCategoryById(id);

@@ -1,0 +1,16 @@
+version: "3"
+services:
+  spring-app:
+    image: your-spring-boot-image:latest # Thay thế bằng tên image của ứng dụng Spring Boot
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: storedb
+      MYSQL_USER: root
+      MYSQL_PASSWORD: # để trống
+      MYSQL_ROOT_PASSWORD: # để trống
+    command: --skip-init

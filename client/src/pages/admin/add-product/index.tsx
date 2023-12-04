@@ -36,8 +36,13 @@ export default function AddProduct() {
       router.push("/admin/products");
     },
     onError: (err: any) => {
-      toast.error(`${err?.response?.data}`);
       console.log("Coloi:", err);
+      if (
+        err &&
+        (err?.response?.status === 401 || err?.response?.status === 403)
+      ) {
+        toast.error(`Không được cấp quyền!`);
+      }
     },
   });
   const productFormik = useFormik({

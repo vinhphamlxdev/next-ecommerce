@@ -1,3 +1,5 @@
+"use client";
+
 import Breadcrumb from "@/components/Breadcrumb";
 import LayoutClient from "@/components/layout/LayoutMain";
 import { useAuthContext } from "@/context/useAuthContext";

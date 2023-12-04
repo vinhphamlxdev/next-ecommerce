@@ -1,3 +1,4 @@
+"use client";
 import * as React from "react";
 import Input from "@/Admin/components/Input";
 import Button from "@/components/Button";

@@ -59,7 +59,24 @@ public class AppSecurityConfig {
         http.cors();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeHttpRequests()
-               .requestMatchers("/auth/login","/auth/register","/products","/categorys","products/**","orders","orders/**").permitAll()
+               .requestMatchers("/auth/login",
+               "/auth/register",
+               "/products",
+               "/categorys",
+               "products/**",
+               "orders",
+               "orders/**",
+               //
+               "/v2/api-docs",
+               "/v3/api-docs",
+               "/v3/api-docs/**",
+               "/swagger-resources",
+               "/swagger-resources/**",
+                "/configuration/ui",
+                "/configuration/security",
+                "/swagger-ui/**",
+               "/swagger-ui.html")
+               .permitAll()
                 .anyRequest().authenticated();
             http.exceptionHandling()
                     .authenticationEntryPoint(

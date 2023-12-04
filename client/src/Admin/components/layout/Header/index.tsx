@@ -73,7 +73,7 @@ export default function Header() {
                 Khách hàng
               </span>
             </Link>
-            <div
+            {/* <div
               onClick={() => onLogoutHandler()}
               className="py-2 cursor-pointer hover:bg-gray-200 z-50 flex items-center gap-x-3 px-3"
             >
@@ -81,7 +81,7 @@ export default function Header() {
               <span className="text-textPrimary font-medium text-sm">
                 Đăng xuất
               </span>
-            </div>
+            </div> */}
           </div>
         </button>
       </div>

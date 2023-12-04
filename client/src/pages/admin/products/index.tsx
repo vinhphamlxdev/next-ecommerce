@@ -27,6 +27,7 @@ import usePaginationAndFilters, {
   FiltersState,
   PaginationState,
 } from "@/hooks/usePaginationAndFilters";
+import { toast } from "react-toastify";
 function Products() {
   const thHeader: string[] = [
     "Tên sản phẩm",
@@ -59,8 +60,14 @@ function Products() {
         totalPages: page?.totalPages,
       });
     },
-    onError: (err) => {
-      console.log(err);
+    onError: (err: any) => {
+      if (
+        err &&
+        (err?.response?.status === 401 || err?.response?.status === 403)
+      ) {
+        toast.error(`Không có quyền truy cập!`);
+        router.push(`/home`);
+      }
     },
   });
   return (

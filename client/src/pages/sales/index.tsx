@@ -1,3 +1,4 @@
+import * as React from "react";
 import { LoadingSkeleton } from "@/Admin/components/Loading";
 import PaginationComponent from "@/Admin/components/Pagination";
 import FilterByCategory from "@/components/Filters/FilterByCategory";
@@ -12,7 +13,6 @@ import { getAllProduct } from "@/pages/api/ProductApi";
 import { ICategory, IProduct } from "@/types/interface";
 import { useQuery } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
-import * as React from "react";
 import { BsFilterLeft } from "react-icons/bs";
 import { GrFilter } from "react-icons/gr";
 import { styled } from "styled-components";
@@ -88,7 +88,6 @@ export default function ProductSale() {
           <div className="flex gap-x-10 relative">
             <ProductFilter
               onColorChange={handleColorChange}
-              setSearchResult={setSearchResult}
               onCategoryChange={handleCategoryChange}
               filters={filters}
             />
